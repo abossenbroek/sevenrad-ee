@@ -91,6 +91,33 @@ uv run pytest
 └── .pre-commit-config.yaml   # Pre-commit hooks
 ```
 
+### Code Organization
+
+This project follows the [Arkalos structure](https://arkalos.com/docs/structure/) for organizing code:
+
+- **`src/sevenrad_ee/`**: Reusable code (functions, classes, modules)
+  - Organized into logical, modular subfolders by functional domain
+  - Examples: `ai/`, `data/`, `workflows/`, etc.
+- **`notebooks/`**: Jupyter notebooks for exploration and analysis (code to run)
+- **`scripts/`**: Standalone scripts for specific tasks (code to run)
+- **`_private/`**: Personal or work-in-progress code (git-ignored)
+
+**Key Principles:**
+- **Separation of Concerns**: Distinguish between "code to run" (notebooks/scripts) and "code to reuse" (src/)
+- **Modularity**: Place reusable components in logical subfolders
+- **Privacy**: Use `_private/` for experimental work without accidentally committing
+
+### Documentation Approach
+
+We follow the [Diátaxis framework](https://diataxis.fr/) for documentation, which organizes content into four types based on user needs:
+
+1. **Tutorials**: Learning-oriented lessons for beginners
+2. **How-to guides**: Task-oriented directions for specific problems
+3. **Technical reference**: Information-oriented API and code documentation
+4. **Explanation**: Understanding-oriented discussions of concepts and design decisions
+
+When contributing documentation, identify which type best serves the user's goal and follow the appropriate style and structure.
+
 ## Code Style
 
 This project follows:

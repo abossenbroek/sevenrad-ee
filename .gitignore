@@ -216,6 +216,9 @@ __marimo__/
 output/
 temp/
 
+# Private/WIP code (Arkalos structure)
+_private/
+
 # GEE data and outputs
 *.tif
 *.tiff
