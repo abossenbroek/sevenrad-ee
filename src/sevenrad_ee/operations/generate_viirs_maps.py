@@ -11,12 +11,14 @@ import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
+
+from sevenrad_ee.data.js_config_parser import RegionConfig, load_viirs_config
 
 if TYPE_CHECKING:
     import ee
@@ -69,17 +71,17 @@ def validate_date_format(date_str: str) -> bool:
 def generate_viirs_composite(
     start_date: str,
     end_date: str,
-    region: ee.Geometry | None = None,  # type: ignore[name-defined]
-    output_path: Path | None = None,  # noqa: ARG001
+    region_name: str,
+    region: RegionConfig,
 ) -> ee.Image:  # type: ignore[name-defined]
     """
-    Generate VIIRS nighttime light composite for specified date range.
+    Generate VIIRS nighttime light composite for specified date range and region.
 
     Args:
         start_date: Start date in 'YYYY-MM-DD' format
         end_date: End date in 'YYYY-MM-DD' format
-        region: Geographic region of interest (defaults to global if None)
-        output_path: Path to save the output (optional)
+        region_name: Name of the region being processed
+        region: Region configuration with bounds
 
     Returns:
         Composite Earth Engine Image of VIIRS nighttime lights
@@ -93,7 +95,7 @@ def generate_viirs_composite(
         raise ValueError("Dates must be in YYYY-MM-DD format")
 
     console.print(
-        f"\n[cyan]Processing VIIRS data from {start_date} to {end_date}[/cyan]"
+        f"\n[cyan]Processing '{region_name}' from {start_date} to {end_date}[/cyan]"
     )
 
     with Progress(
@@ -101,6 +103,13 @@ def generate_viirs_composite(
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
+        # Create region geometry
+        task_region = progress.add_task(f"Creating region geometry...", total=None)
+        ee_region = ee.Geometry.Rectangle(  # type: ignore[attr-defined]
+            region.to_ee_rectangle()
+        )
+        progress.update(task_region, completed=True)
+
         # Load VIIRS DNB collection
         task1 = progress.add_task("Loading VIIRS DNB collection...", total=None)
         viirs_collection = ee.ImageCollection(  # type: ignore[attr-defined]
@@ -108,18 +117,17 @@ def generate_viirs_composite(
         ).filterDate(start_date, end_date)
         progress.update(task1, completed=True)
 
-        # Apply region filter if specified
-        if region is not None:
-            task2 = progress.add_task("Filtering by region...", total=None)
-            viirs_collection = viirs_collection.filterBounds(region)
-            progress.update(task2, completed=True)
+        # Apply region filter
+        task2 = progress.add_task("Filtering by region...", total=None)
+        viirs_collection = viirs_collection.filterBounds(ee_region)
+        progress.update(task2, completed=True)
 
         # Create composite
         task3 = progress.add_task("Creating composite image...", total=None)
         composite = viirs_collection.select("avg_rad").median()
         progress.update(task3, completed=True)
 
-        console.print("[green]✓[/green] Composite generated successfully")
+        console.print(f"[green]✓[/green] Composite for '{region_name}' generated")
 
         return composite
 
@@ -127,8 +135,9 @@ def generate_viirs_composite(
 def display_summary(
     start_date: str,
     end_date: str,
-    region: str | None,
-    output: str | None,
+    maps: list[str],
+    config_file: Path,
+    output_dir: Path | None,
 ) -> None:
     """
     Display a summary table of the processing parameters.
@@ -136,8 +145,9 @@ def display_summary(
     Args:
         start_date: Start date of processing
         end_date: End date of processing
-        region: Region specification (or None for global)
-        output: Output path (or None if not saving)
+        maps: List of map names to process
+        config_file: Path to configuration file
+        output_dir: Output directory (or None if not saving)
 
     """
     table = Table(title="VIIRS Map Generation Summary", show_header=True)
@@ -146,8 +156,9 @@ def display_summary(
 
     table.add_row("Start Date", start_date)
     table.add_row("End Date", end_date)
-    table.add_row("Region", region or "Global")
-    table.add_row("Output Path", output or "Not specified")
+    table.add_row("Maps", ", ".join(maps))
+    table.add_row("Config File", str(config_file))
+    table.add_row("Output Directory", str(output_dir) if output_dir else "Not saving")
 
     console.print("\n")
     console.print(table)
@@ -167,22 +178,30 @@ def parse_arguments() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Generate global composite for January 2024
+  # Generate all maps for 2020
   uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
-      --start-date 2024-01-01 \\
-      --end-date 2024-01-31
+      --start-date 2020-01-01 \\
+      --end-date 2020-12-31 \\
+      --maps all
 
-  # Generate composite for specific region
+  # Generate specific maps
   uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
-      --start-date 2024-01-01 \\
-      --end-date 2024-01-31 \\
-      --region "POLYGON((...))"
+      --start-date 2020-01-01 \\
+      --end-date 2020-12-31 \\
+      --maps us,europe,china
 
-  # Save output to file
+  # Generate Netherlands maps only
   uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
-      --start-date 2024-01-01 \\
-      --end-date 2024-01-31 \\
-      --output /path/to/output.tif
+      --start-date 2020-01-01 \\
+      --end-date 2020-12-31 \\
+      --maps netherlands_full,netherlands_regional
+
+  # With custom config file
+  uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
+      --start-date 2020-01-01 \\
+      --end-date 2020-12-31 \\
+      --maps all \\
+      --config /path/to/custom_config.js
         """,
     )
 
@@ -201,26 +220,33 @@ Examples:
     )
 
     parser.add_argument(
-        "--region",
+        "--maps",
         type=str,
-        default=None,
+        required=True,
         help=(
-            "Region as WKT geometry string (e.g., 'POLYGON((...))') "
-            "or None for global"
+            "Maps to generate: 'all' or comma-separated list "
+            "(e.g., 'us,europe,china')"
         ),
     )
 
     parser.add_argument(
-        "--output",
+        "--config",
         type=str,
         default=None,
-        help="Output file path (optional)",
+        help="Path to JavaScript config file (default: ./extract_geotiffs.js)",
+    )
+
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Output directory for saving results (optional)",
     )
 
     return parser.parse_args()
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901, PLR0912
     """
     Run the VIIRS map generation CLI.
 
@@ -241,45 +267,102 @@ def main() -> int:
         # Parse arguments
         args = parse_arguments()
 
+        # Determine config file path
+        if args.config:
+            config_file = Path(args.config)
+        else:
+            config_file = Path.cwd() / "extract_geotiffs.js"
+
+        if not config_file.exists():
+            console.print(
+                f"[red]✗[/red] Config file not found: {config_file}",
+                style="bold red",
+            )
+            console.print(
+                "\n[yellow]Tip:[/yellow] Specify config file with --config option"
+            )
+            return 1
+
+        # Load configuration
+        console.print(f"[yellow]Loading configuration from {config_file}...[/yellow]")
+        regions, vis_config = load_viirs_config(config_file)
+
+        if not regions:
+            console.print(
+                "[red]✗[/red] No regions found in config file", style="bold red"
+            )
+            return 1
+
+        console.print(f"[green]✓[/green] Found {len(regions)} region(s) in config")
+
+        # Determine which maps to process
+        if args.maps.lower() == "all":
+            maps_to_process = list(regions.keys())
+        else:
+            maps_to_process = [m.strip() for m in args.maps.split(",")]
+
+            # Validate map names
+            invalid_maps = [m for m in maps_to_process if m not in regions]
+            if invalid_maps:
+                console.print(
+                    f"[red]✗[/red] Invalid map name(s): {', '.join(invalid_maps)}",
+                    style="bold red",
+                )
+                console.print(
+                    f"\n[yellow]Available maps:[/yellow] {', '.join(regions.keys())}"
+                )
+                return 1
+
+        # Prepare output directory
+        output_dir = Path(args.output_dir) if args.output_dir else None
+        if output_dir:
+            output_dir.mkdir(parents=True, exist_ok=True)
+
         # Display summary
         display_summary(
             start_date=args.start_date,
             end_date=args.end_date,
-            region=args.region,
-            output=args.output,
+            maps=maps_to_process,
+            config_file=config_file,
+            output_dir=output_dir,
         )
 
         # Initialize Earth Engine
         console.print("[yellow]Initializing Earth Engine...[/yellow]")
         initialize_earth_engine()
 
-        # Parse region if provided
-        region: ee.Geometry | None = None  # type: ignore[name-defined]
-        if args.region:
-            console.print(f"[yellow]Parsing region geometry...[/yellow]")
-            region = ee.Geometry(args.region)  # type: ignore[attr-defined]
-            console.print("[green]✓[/green] Region parsed successfully")
-
-        # Generate composite
-        output_path = Path(args.output) if args.output else None
-        composite = generate_viirs_composite(
-            start_date=args.start_date,
-            end_date=args.end_date,
-            region=region,
-            output_path=output_path,
+        # Process each map
+        console.print(
+            f"\n[bold cyan]Processing {len(maps_to_process)} map(s)...[/bold cyan]\n"
         )
+
+        for map_name in maps_to_process:
+            region_config = regions[map_name]
+            composite = generate_viirs_composite(
+                start_date=args.start_date,
+                end_date=args.end_date,
+                region_name=map_name,
+                region=region_config,
+            )
+
+            # TODO: Add export functionality when output_dir is specified
+            if output_dir:
+                console.print(
+                    f"[dim]Note: Export to {output_dir} not yet implemented[/dim]"
+                )
 
         # Display success message
         console.print(
-            "\n[bold green]Success![/bold green] "
-            "VIIRS composite generated successfully.",
+            f"\n[bold green]Success![/bold green] "
+            f"Generated {len(maps_to_process)} VIIRS composite(s).",
             style="bold",
         )
 
-        if output_path:
-            console.print(f"[yellow]Note:[/yellow] Export task queued to {output_path}")
+        if vis_config:
             console.print(
-                "[dim]Check Earth Engine task manager for export status[/dim]"
+                f"\n[dim]Visualization: min={vis_config.min_value}, "
+                f"max={vis_config.max_value}, "
+                f"palette colors={len(vis_config.palette)}[/dim]"
             )
 
         return 0
@@ -289,6 +372,9 @@ def main() -> int:
         return 1
     except Exception as e:
         console.print(f"\n[bold red]Error:[/bold red] {e}", style="bold red")
+        import traceback
+
+        console.print(f"\n[dim]{traceback.format_exc()}[/dim]")
         return 1
 
 
