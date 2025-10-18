@@ -15,6 +15,7 @@ dependencies = [
     "earthengine-api~=1.1.0",
     "google-auth~=2.37.0",
     "google-cloud-storage~=2.19.0",
+    "rich~=13.9.0",
 ]
 
 [project.optional-dependencies]
@@ -71,3 +72,7 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 follow_imports = "normal"
+
+[[tool.mypy.overrides]]
+module = "ee"
+ignore_missing_imports = true
