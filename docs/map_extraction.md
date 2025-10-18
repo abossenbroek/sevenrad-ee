@@ -12,7 +12,15 @@ This guide shows you how to generate VIIRS nighttime light composite maps for sp
 
 ## Quick Start
 
-### 1. Authenticate with Google Earth Engine
+### 1. List Available Map Regions
+
+```bash
+uv run python -m sevenrad_ee.operations.generate_viirs_maps --list-maps
+```
+
+This displays all available regions with descriptions and their availability status in your config file.
+
+### 2. Authenticate with Google Earth Engine
 
 ```bash
 uv run earthengine authenticate
@@ -20,7 +28,7 @@ uv run earthengine authenticate
 
 Follow the prompts to authenticate with your Google account.
 
-### 2. Generate All Maps for a Year
+### 3. Generate All Maps for a Year
 
 ```bash
 uv run python -m sevenrad_ee.operations.generate_viirs_maps \
@@ -31,7 +39,9 @@ uv run python -m sevenrad_ee.operations.generate_viirs_maps \
 
 This will process all regions defined in your `extract_geotiffs.js` configuration file.
 
-### 3. Generate Specific Maps
+### 4. Generate Specific Maps
+
+Use the region codes from `--list-maps`:
 
 ```bash
 uv run python -m sevenrad_ee.operations.generate_viirs_maps \
@@ -122,6 +132,7 @@ The parser will automatically load this file if it exists in the same directory 
 
 ### Optional Arguments
 
+- `--list-maps` - Show available map regions with descriptions and exit
 - `--config PATH` - Path to JavaScript config file (default: `./extract_geotiffs.js`)
 - `--output-dir PATH` - Output directory for results (future use)
 
@@ -132,13 +143,23 @@ The `--maps` argument accepts:
 1. **All maps:** `--maps all`
    - Processes every region defined in the config file
 
-2. **Specific maps:** `--maps name1,name2,name3`
-   - Comma-separated list of region names
-   - Must match variable names in the JavaScript config
-   - Examples: `us,europe,china`
+2. **Specific maps:** `--maps region1,region2,region3`
+   - Comma-separated list of region codes
+   - Use `--list-maps` to see all available regions
+   - Examples: `--maps drc,us` or `--maps netherlands_moerkappele`
 
 3. **Single map:** `--maps netherlands_full`
    - Process just one region
+
+**Known Region Codes:**
+- `drc` - Democratic Republic of Congo
+- `us` - United States
+- `china` - China
+- `europe` - Europe
+- `netherlands_full` - Netherlands (Full - Ireland to Germany)
+- `netherlands_regional` - Netherlands (Regional)
+- `netherlands_westland_moerkappele` - Netherlands (Westland + Moerkappele)
+- `netherlands_moerkappele` - Netherlands (Moerkappele only)
 
 ## Common Tasks
 
@@ -171,22 +192,28 @@ uv run python -m sevenrad_ee.operations.generate_viirs_maps \
     --config /path/to/my_custom_regions.js
 ```
 
-### Verify Available Maps
+### List Available Maps
 
-Run the CLI with an invalid map name to see the list of available regions:
+View all available map regions with descriptions:
 
 ```bash
-uv run python -m sevenrad_ee.operations.generate_viirs_maps \
-    --start-date 2020-01-01 \
-    --end-date 2020-12-31 \
-    --maps invalid_name
+uv run python -m sevenrad_ee.operations.generate_viirs_maps --list-maps
 ```
 
-Output will include:
-```
-✗ Invalid map name(s): invalid_name
+This displays a formatted table showing:
+- Region codes (to use with --maps)
+- Full descriptions
+- Availability status in your config file
 
-Available maps: drc, us, china, europe, netherlands_full, netherlands_regional, ...
+Example output:
+```
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Region Code          ┃ Description                 ┃ Status      ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ drc                  │ Democratic Republic of Congo│ ✓ Available │
+│ us                   │ United States               │ ✓ Available │
+│ netherlands_moerkappele│ Netherlands (Moerkappele only)│ ✓ Available │
+└──────────────────────┴─────────────────────────────┴─────────────┘
 ```
 
 ## Understanding the Output

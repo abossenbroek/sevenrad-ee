@@ -9,9 +9,56 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 
 from sevenrad_ee.data.palettes import WAVELENGTH_PALETTE_1025
+
+
+class KnownRegion(str, Enum):
+    """Known region names that can be parsed from JavaScript config files."""
+
+    DRC = "drc"
+    US = "us"
+    CHINA = "china"
+    EUROPE = "europe"
+    NETHERLANDS_FULL = "netherlands_full"
+    NETHERLANDS_REGIONAL = "netherlands_regional"
+    NETHERLANDS_WESTLAND_MOERKAPPELE = "netherlands_westland_moerkappele"
+    NETHERLANDS_MOERKAPPELE = "netherlands_moerkappele"
+
+    @classmethod
+    def all_regions(cls) -> list[str]:
+        """
+        Get list of all known region names.
+
+        Returns:
+            List of region name strings
+
+        """
+        return [region.value for region in cls]
+
+    @classmethod
+    def display_names(cls) -> dict[str, str]:
+        """
+        Get friendly display names for regions.
+
+        Returns:
+            Dictionary mapping region codes to display names
+
+        """
+        return {
+            cls.DRC.value: "Democratic Republic of Congo",
+            cls.US.value: "United States",
+            cls.CHINA.value: "China",
+            cls.EUROPE.value: "Europe",
+            cls.NETHERLANDS_FULL.value: "Netherlands (Full - Ireland to Germany)",
+            cls.NETHERLANDS_REGIONAL.value: "Netherlands (Regional)",
+            cls.NETHERLANDS_WESTLAND_MOERKAPPELE.value: (
+                "Netherlands (Westland + Moerkappele)"
+            ),
+            cls.NETHERLANDS_MOERKAPPELE.value: "Netherlands (Moerkappele only)",
+        }
 
 
 @dataclass
@@ -87,17 +134,8 @@ def parse_all_regions(js_file: Path) -> dict[str, RegionConfig]:
     """
     content = js_file.read_text()
 
-    # Known region variable names from extract_geotiffs.js
-    region_names = [
-        "drc",
-        "us",
-        "china",
-        "europe",
-        "netherlands_full",
-        "netherlands_regional",
-        "netherlands_westland_moerkappele",
-        "netherlands_moerkappele",
-    ]
+    # Use known region names from enum
+    region_names = KnownRegion.all_regions()
 
     regions: dict[str, RegionConfig] = {}
     for name in region_names:

@@ -18,7 +18,11 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
-from sevenrad_ee.data.js_config_parser import RegionConfig, load_viirs_config
+from sevenrad_ee.data.js_config_parser import (
+    KnownRegion,
+    RegionConfig,
+    load_viirs_config,
+)
 
 if TYPE_CHECKING:
     import ee
@@ -132,6 +136,45 @@ def generate_viirs_composite(
         return composite
 
 
+def list_available_maps(config_file: Path | None = None) -> None:
+    """
+    Display available map regions with descriptions.
+
+    Args:
+        config_file: Optional path to config file to show actual availability
+
+    """
+    console.print("\n[bold cyan]Available Map Regions:[/bold cyan]\n")
+
+    # Show known regions with display names
+    display_names = KnownRegion.display_names()
+    table = Table(show_header=True, header_style="bold cyan")
+    table.add_column("Region Code", style="green", no_wrap=True)
+    table.add_column("Description", style="white")
+    table.add_column("Status", style="yellow")
+
+    # If config file provided, check which are actually available
+    available_regions = set()
+    if config_file and config_file.exists():
+        regions, _ = load_viirs_config(config_file)
+        available_regions = set(regions.keys())
+
+    for region_code in KnownRegion.all_regions():
+        description = display_names.get(region_code, region_code)
+        if config_file:
+            status = (
+                "✓ Available" if region_code in available_regions else "✗ Not in config"
+            )
+        else:
+            status = "Check config file"
+        table.add_row(region_code, description, status)
+
+    console.print(table)
+    console.print(
+        "\n[dim]Use --maps to select: e.g., --maps drc,us or --maps all[/dim]\n"
+    )
+
+
 def display_summary(
     start_date: str,
     end_date: str,
@@ -173,28 +216,40 @@ def parse_arguments() -> argparse.Namespace:
         Parsed command-line arguments
 
     """
+    # Build available regions help text
+    available_regions = ", ".join(KnownRegion.all_regions())
+
     parser = argparse.ArgumentParser(
         description="Generate VIIRS nighttime light maps using Google Earth Engine",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
+        epilog=f"""
+Available Regions:
+  {available_regions}
+
+  Use --list-maps to see full descriptions
+
 Examples:
+  # List available maps with descriptions
+  uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
+      --list-maps
+
   # Generate all maps for 2020
   uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
       --start-date 2020-01-01 \\
       --end-date 2020-12-31 \\
       --maps all
 
-  # Generate specific maps
+  # Generate specific maps (use region codes)
   uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
       --start-date 2020-01-01 \\
       --end-date 2020-12-31 \\
       --maps us,europe,china
 
-  # Generate Netherlands maps only
+  # Generate just Moerkappele
   uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
       --start-date 2020-01-01 \\
       --end-date 2020-12-31 \\
-      --maps netherlands_full,netherlands_regional
+      --maps netherlands_moerkappele
 
   # With custom config file
   uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
@@ -206,26 +261,29 @@ Examples:
     )
 
     parser.add_argument(
+        "--list-maps",
+        action="store_true",
+        help="List available map regions with descriptions and exit",
+    )
+
+    parser.add_argument(
         "--start-date",
         type=str,
-        required=True,
         help="Start date in YYYY-MM-DD format",
     )
 
     parser.add_argument(
         "--end-date",
         type=str,
-        required=True,
         help="End date in YYYY-MM-DD format",
     )
 
     parser.add_argument(
         "--maps",
         type=str,
-        required=True,
         help=(
-            "Maps to generate: 'all' or comma-separated list "
-            "(e.g., 'us,europe,china')"
+            f"Maps to generate: 'all' or comma-separated list. "
+            f"Available: {available_regions}"
         ),
     )
 
@@ -246,7 +304,7 @@ Examples:
     return parser.parse_args()
 
 
-def main() -> int:  # noqa: C901, PLR0912
+def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
     """
     Run the VIIRS map generation CLI.
 
@@ -272,6 +330,22 @@ def main() -> int:  # noqa: C901, PLR0912
             config_file = Path(args.config)
         else:
             config_file = Path.cwd() / "extract_geotiffs.js"
+
+        # Handle --list-maps option
+        if args.list_maps:
+            list_available_maps(config_file if config_file.exists() else None)
+            return 0
+
+        # Validate required arguments when not listing maps
+        if not args.start_date or not args.end_date or not args.maps:
+            console.print(
+                "[red]✗[/red] --start-date, --end-date, and --maps are required",
+                style="bold red",
+            )
+            console.print(
+                "\n[yellow]Tip:[/yellow] Use --list-maps to see available regions"
+            )
+            return 1
 
         if not config_file.exists():
             console.print(
@@ -308,8 +382,12 @@ def main() -> int:  # noqa: C901, PLR0912
                     f"[red]✗[/red] Invalid map name(s): {', '.join(invalid_maps)}",
                     style="bold red",
                 )
+                available = ", ".join(sorted(regions.keys()))
                 console.print(
-                    f"\n[yellow]Available maps:[/yellow] {', '.join(regions.keys())}"
+                    f"\n[yellow]Available in config:[/yellow] {available}"
+                )
+                console.print(
+                    "\n[dim]Run with --list-maps to see full descriptions[/dim]"
                 )
                 return 1
 
