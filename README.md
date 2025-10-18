@@ -1,0 +1,106 @@
+# sevenrad-ee
+
+A Python application for performing Google Earth Engine computations using modern Python 3.12.
+
+## Prerequisites
+
+- Python 3.12+
+- [mise](https://mise.jdx.dev/) - Tool version manager
+- [uv](https://github.com/astral-sh/uv) - Fast Python package installer (installed via mise)
+
+## Setup
+
+### 1. Install mise
+
+Follow the [mise installation guide](https://mise.jdx.dev/getting-started.html) for your platform.
+
+### 2. Configure mise and install tools
+
+```bash
+mise install
+```
+
+This will install `uv` as specified in `.mise.toml`.
+
+### 3. Create and activate virtual environment
+
+```bash
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+### 4. Install dependencies
+
+```bash
+# Install package with development dependencies
+uv pip install -e ".[dev]"
+```
+
+### 5. Install pre-commit hooks
+
+```bash
+uv run pre-commit install
+```
+
+### 6. Authenticate with Google Earth Engine
+
+Before using this package, authenticate with Google Earth Engine:
+
+```bash
+uv run earthengine authenticate
+```
+
+## Development
+
+### Code Quality Tools
+
+This project enforces high code quality standards using:
+
+- **ruff**: For code formatting and linting
+- **mypy**: For static type checking
+- **pre-commit**: For automated pre-commit checks
+
+### Running Quality Checks
+
+```bash
+# Format code
+uv run ruff format .
+
+# Lint code (with auto-fix)
+uv run ruff check . --fix
+
+# Type check
+uv run mypy src/sevenrad_ee
+```
+
+### Running Tests
+
+```bash
+uv run pytest
+```
+
+## Project Structure
+
+```
+.
+├── src/
+│   └── sevenrad_ee/          # Main package
+├── tests/                    # Test files
+├── pyproject.toml            # Project configuration
+├── .mise.toml                # Tool version management
+└── .pre-commit-config.yaml   # Pre-commit hooks
+```
+
+## Code Style
+
+This project follows:
+- PEP 8 style guide
+- PEP 484 type hints
+- Strict mypy checking
+- Comprehensive ruff linting rules
+
+All code is automatically checked by pre-commit hooks before committing.
+
+## License
+
+MIT
