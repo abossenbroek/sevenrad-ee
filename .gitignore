@@ -239,3 +239,9 @@ _private/
 .ee-credentials
 *.json.key
 service-account*.json
+
+# JavaScript configuration files (user-specific)
+# These contain region definitions and should not be versioned
+extract_geotiffs.js
+wavelength_palette_1025.js
+*_config.js

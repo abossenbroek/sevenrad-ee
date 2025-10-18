@@ -11,6 +11,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from sevenrad_ee.data.palettes import WAVELENGTH_PALETTE_1025
+
 
 @dataclass
 class RegionConfig:
@@ -139,6 +141,8 @@ def parse_visualization_params(js_file: Path) -> VisualizationConfig | None:
     """
     Parse visualization parameters from JavaScript file.
 
+    Uses built-in wavelength palette if not found in JavaScript files.
+
     Args:
         js_file: Path to JavaScript file
 
@@ -167,6 +171,10 @@ def parse_visualization_params(js_file: Path) -> VisualizationConfig | None:
         palette_file = js_file.parent / "wavelength_palette_1025.js"
         if palette_file.exists():
             palette = parse_palette(palette_file)
+
+    # Use built-in palette as fallback
+    if not palette:
+        palette = WAVELENGTH_PALETTE_1025
 
     return VisualizationConfig(
         min_value=min_value, max_value=max_value, palette=palette
