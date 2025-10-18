@@ -1,0 +1,58 @@
+name: Pre-commit
+
+on:
+  push:
+    branches: [main, develop, feature/*]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  pre-commit:
+    name: Pre-commit checks (ruff, mypy)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
+
+      - name: Cache pre-commit hooks
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-
+
+      - name: Run pre-commit
+        id: pre-commit
+        run: |
+          source .venv/bin/activate
+          pre-commit run --all-files --show-diff-on-failure 2>&1 | tee pre-commit-output.log
+        continue-on-error: true
+
+      - name: Upload pre-commit logs on failure
+        if: steps.pre-commit.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-commit-errors
+          path: pre-commit-output.log
+          retention-days: 7
+
+      - name: Fail if pre-commit failed
+        if: steps.pre-commit.outcome == 'failure'
+        run: exit 1
