@@ -245,3 +245,15 @@ service-account*.json
 extract_geotiffs.js
 wavelength_palette_1025.js
 *_config.js
+
+# Cache directory for API responses
+cache/
+
+# Test output files
+*.geojson
+*_test.yml
+*_output.yml
+test_*.yml
+demo_*.yml
+zen_generated.code
+*.log
