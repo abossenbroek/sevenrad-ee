@@ -7,7 +7,6 @@ and identify the top N brightest emitters in a geographic region.
 
 import hashlib
 import json
-import math
 from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -16,6 +15,7 @@ import ee
 
 from .cache import cache
 from .config import settings
+from .geospatial import haversine_distance
 from .models import Coordinates, TopEmitter
 
 
@@ -28,42 +28,6 @@ class NotEnoughEmittersError(ValueError):
     """
 
     pass
-
-
-def _haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """
-    Calculate great-circle distance between two points on Earth.
-
-    Uses the Haversine formula to compute the distance between two points
-    given their latitude and longitude coordinates.
-
-    Args:
-        lat1: Latitude of first point in decimal degrees
-        lon1: Longitude of first point in decimal degrees
-        lat2: Latitude of second point in decimal degrees
-        lon2: Longitude of second point in decimal degrees
-
-    Returns:
-        Distance between the two points in meters
-
-    """
-    # Earth's radius in meters
-    earth_radius_m = 6371000
-
-    # Convert to radians
-    phi1 = math.radians(lat1)
-    phi2 = math.radians(lat2)
-    delta_phi = math.radians(lat2 - lat1)
-    delta_lambda = math.radians(lon2 - lon1)
-
-    # Haversine formula
-    a = (
-        math.sin(delta_phi / 2) ** 2
-        + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
-    )
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-    return earth_radius_m * c
 
 
 def _parse_geojson(geojson_path: Path) -> Any:  # noqa: ANN401
@@ -213,10 +177,9 @@ def get_top_emitters(
 
         # Check distance to all previously selected emitters
         is_far_enough = True
+        current_coords = Coordinates(lat=lat, lon=lon)
         for existing in filtered_emitters:
-            distance = _haversine_distance(
-                lat, lon, existing.coordinates.lat, existing.coordinates.lon
-            )
+            distance = haversine_distance(current_coords, existing.coordinates)
             if distance < min_distance_m:
                 is_far_enough = False
                 break

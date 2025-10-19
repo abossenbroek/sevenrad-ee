@@ -28,6 +28,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Limits input length to 100 characters
   - Prevents malicious instructions via GeoJSON filenames
 
+### Improved
+- **Code Quality Enhancements**:
+  - Created `geospatial.py` module for shared distance calculations
+  - Eliminated code duplication (haversine function was in 2 places)
+  - Replaced magic numbers with named constants in confidence scoring
+  - Added comprehensive unit tests for attribution logic (12 tests)
+  - Clarified confidence score clamping behavior with documentation
+
 ### Fixed
 - **CRITICAL BUG**: Fixed VIIRS resolution from 500m to 750m (correct sensor specification)
   - Reference: https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VJ102DNB

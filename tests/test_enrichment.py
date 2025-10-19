@@ -17,9 +17,9 @@ from sevenrad_ee.top_polluters.enrichment import (
     find_nearby_businesses,
     geocode_coordinates,
     get_street_view_images,
-    haversine_distance,
     rate_limited,
 )
+from sevenrad_ee.top_polluters.geospatial import haversine_distance
 from sevenrad_ee.top_polluters.models import (
     Address,
     Business,

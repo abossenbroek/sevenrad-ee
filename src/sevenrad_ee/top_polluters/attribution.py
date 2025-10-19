@@ -25,14 +25,26 @@ from rich.table import Table
 
 from .cache import cache
 from .config import settings
-from .enrichment import find_nearby_businesses, haversine_distance
+from .enrichment import find_nearby_businesses
+from .geospatial import haversine_distance
 from .models import Business, Coordinates
 
 console = Console()
 logger = logging.getLogger(__name__)
 
-# Constants for confidence scoring
+# Display thresholds
 HIGH_LIKELIHOOD_THRESHOLD = 0.7  # Threshold for "high likelihood" status display
+
+# Confidence scoring weights
+MAX_DISTANCE_SCORE_WEIGHT = 0.3  # Maximum contribution from proximity
+GREENHOUSE_TYPE_SCORE = 0.20  # Bonus for greenhouse/nursery/horticulture types
+AGRICULTURE_TYPE_SCORE = 0.10  # Bonus for agricultural types
+MAX_LIKELIHOOD_SCORE_WEIGHT = 0.5  # Maximum contribution from grow light likelihood
+
+# Confidence scoring multipliers
+ENERGY_CROP_MULTIPLIER = 1.15  # Boost for energy-intensive crops
+LARGE_OPERATION_MULTIPLIER = 1.10  # Boost for large operations
+LARGE_GREENHOUSE_THRESHOLD_HA = 5.0  # Hectares threshold for "large" operation
 
 
 # Pydantic models for structured Perplexity responses
@@ -282,7 +294,7 @@ class PerplexityGreenhouseAnalyzer:
         return None
 
 
-def calculate_confidence(  # noqa: PLR0915
+def calculate_confidence(
     perplexity: Optional[PerplexityAnalysis],
     distance_m: float,
     business_types: list[str],
@@ -316,8 +328,8 @@ def calculate_confidence(  # noqa: PLR0915
         logger.info("No Perplexity analysis - confidence = 0.0")
         return 0.0, {"analysis_failed": 0.0}
 
-    # CONTINUOUS DISTANCE SCORE (Zen's recommendation: not step function)
-    distance_score = 0.3 * (1 - (distance_m / max_distance))
+    # CONTINUOUS DISTANCE SCORE (not step function)
+    distance_score = MAX_DISTANCE_SCORE_WEIGHT * (1 - (distance_m / max_distance))
     factors["distance"] = round(distance_score, 3)
 
     # BUSINESS TYPE SCORE
@@ -325,9 +337,9 @@ def calculate_confidence(  # noqa: PLR0915
     agri_types = {"agricultural", "farming", "agri"}
 
     if any(t.lower() in greenhouse_types for t in business_types):
-        type_score = 0.20
+        type_score = GREENHOUSE_TYPE_SCORE
     elif any(t.lower() in agri_types for t in business_types):
-        type_score = 0.10
+        type_score = AGRICULTURE_TYPE_SCORE
     else:
         type_score = 0.0
     factors["business_type"] = type_score
@@ -341,8 +353,12 @@ def calculate_confidence(  # noqa: PLR0915
 
     if perplexity.grow_light_likelihood is not None:
         # Direct likelihood score (0.0-1.0) weighted by distance
-        # Maximum contribution is 0.5 when at pixel center
-        likelihood_score = 0.5 * perplexity.grow_light_likelihood * distance_weight
+        # Maximum contribution when at pixel center
+        likelihood_score = (
+            MAX_LIKELIHOOD_SCORE_WEIGHT
+            * perplexity.grow_light_likelihood
+            * distance_weight
+        )
         factors["grow_light_likelihood"] = round(perplexity.grow_light_likelihood, 3)
         factors["grow_light_score"] = round(likelihood_score, 3)
         logger.debug(
@@ -357,25 +373,27 @@ def calculate_confidence(  # noqa: PLR0915
         factors["no_lighting_info"] = 0.0
         logger.debug("No lighting information available → score: 0.000")
 
-    # MULTIPLIERS (Zen's suggestion: signals amplify base score)
+    # MULTIPLIERS (signals amplify base score)
     multiplier = 1.0
 
     # Energy-intensive crops boost
     energy_crops = {"tomato", "pepper", "cucumber", "flower", "rose"}
     if any(crop.lower() in energy_crops for crop in perplexity.primary_crops):
-        multiplier *= 1.15
-        factors["energy_crops"] = 0.15
+        multiplier *= ENERGY_CROP_MULTIPLIER
+        factors["energy_crops"] = ENERGY_CROP_MULTIPLIER - 1.0
 
-    # Large operation boost (>5 hectares)
-    large_greenhouse_threshold_hectares = 5.0
+    # Large operation boost
     if (
         perplexity.size_hectares
-        and perplexity.size_hectares > large_greenhouse_threshold_hectares
+        and perplexity.size_hectares > LARGE_GREENHOUSE_THRESHOLD_HA
     ):
-        multiplier *= 1.10
-        factors["large_operation"] = 0.10
+        multiplier *= LARGE_OPERATION_MULTIPLIER
+        factors["large_operation"] = LARGE_OPERATION_MULTIPLIER - 1.0
 
     # Calculate total score
+    # The pre-clamped score can exceed 1.0 by design. Multipliers for strong
+    # signals (e.g., energy crops) are intended to boost already high-confidence
+    # candidates, and min() ensures the final score remains a valid probability.
     total_score = min((base_score + likelihood_score) * multiplier, 1.0)
     factors["total"] = round(total_score, 3)
 

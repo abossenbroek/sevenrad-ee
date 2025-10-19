@@ -21,6 +21,7 @@ from rich.console import Console
 
 from .cache import cache
 from .config import settings
+from .geospatial import haversine_distance
 from .models import Address, Business, Coordinates, StreetViewImages
 
 console = Console()
@@ -56,35 +57,6 @@ def rate_limited(delay_ms: int) -> Callable[[F], F]:
         return wrapper  # type: ignore[return-value]
 
     return decorator
-
-
-def haversine_distance(coord1: Coordinates, coord2: Coordinates) -> float:
-    """
-    Calculate the Haversine distance between two points in meters.
-
-    Args:
-        coord1: First coordinate
-        coord2: Second coordinate
-
-    Returns:
-        Distance in meters
-
-    """
-    earth_radius_m = 6371000
-    lat1_rad = math.radians(coord1.lat)
-    lon1_rad = math.radians(coord1.lon)
-    lat2_rad = math.radians(coord2.lat)
-    lon2_rad = math.radians(coord2.lon)
-
-    dlat = lat2_rad - lat1_rad
-    dlon = lon2_rad - lon1_rad
-
-    a = (
-        math.sin(dlat / 2) ** 2
-        + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
-    )
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return earth_radius_m * c
 
 
 def _calculate_address_quality(result: dict[str, Any]) -> float:
