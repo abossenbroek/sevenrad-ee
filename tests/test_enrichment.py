@@ -451,7 +451,7 @@ class TestGetStreetViewImages:
             mock_gmaps.streetview.return_value = b"fake_image_data"
             mock_client.return_value = mock_gmaps
 
-            images = get_street_view_images(sample_coordinates, rank=1)
+            images = get_street_view_images(sample_coordinates, sub_dir_name="1")
 
             assert isinstance(images, StreetViewImages)
             assert images.available is True
@@ -475,7 +475,7 @@ class TestGetStreetViewImages:
         ) as mock_check:
             mock_check.return_value = False
 
-            images = get_street_view_images(sample_coordinates, rank=1)
+            images = get_street_view_images(sample_coordinates, sub_dir_name="1")
 
             assert isinstance(images, StreetViewImages)
             assert images.available is False
@@ -496,11 +496,11 @@ class TestGetStreetViewImages:
             mock_check.return_value = False
 
             # First call
-            images1 = get_street_view_images(sample_coordinates, rank=1)
+            images1 = get_street_view_images(sample_coordinates, sub_dir_name="1")
             call_count = mock_check.call_count
 
             # Second call - should use cache
-            images2 = get_street_view_images(sample_coordinates, rank=1)
+            images2 = get_street_view_images(sample_coordinates, sub_dir_name="1")
 
             assert mock_check.call_count == call_count  # No additional calls
             assert images1.available == images2.available

@@ -9,22 +9,22 @@ import math
 
 import pytest
 from sevenrad_ee.top_polluters.attribution import (
-    TIER_1_CROPS,
-    TIER_2_CROPS,
-    TIER_3_CROPS,
-    TIER_1_SCORE,
-    TIER_2_SCORE,
-    TIER_3_SCORE,
     EVIDENCE_TEXT_SCORE,
     LIGHTING_KEYWORDS,
+    TIER_1_CROPS,
+    TIER_1_SCORE,
+    TIER_2_CROPS,
+    TIER_2_SCORE,
+    TIER_3_CROPS,
+    TIER_3_SCORE,
     PerplexityAnalysis,
-    calculate_confidence,
-    _logit,
-    _sigmoid,
     _get_distance_adjustment,
+    _get_evidence_based_likelihood,
     _get_size_adjustment,
     _get_type_adjustment,
-    _get_evidence_based_likelihood,
+    _logit,
+    _sigmoid,
+    calculate_confidence,
 )
 
 

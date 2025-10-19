@@ -245,7 +245,9 @@ class TestGetTopEmitters:
         mock_ee_image_collection: Mock,
         temp_cache_dir: Path,
     ) -> None:
-        """Get top emitters returns empty list when no features found."""
+        """Get top emitters raises NotEnoughEmittersError when no features found."""
+        from sevenrad_ee.top_polluters.earth_engine import NotEnoughEmittersError
+
         start_date, end_date = sample_dates
 
         with (
@@ -267,9 +269,11 @@ class TestGetTopEmitters:
                 mock_mean_image
             )
 
-            emitters = get_top_emitters(sample_region_geojson, start_date, end_date, 20)
-
-            assert emitters == []
+            with pytest.raises(
+                NotEnoughEmittersError,
+                match="Could not find 20 spatially distinct emitters",
+            ):
+                get_top_emitters(sample_region_geojson, start_date, end_date, 20)
 
     def test_get_top_emitters_invalid_dates_raises(
         self,
