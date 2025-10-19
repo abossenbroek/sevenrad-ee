@@ -76,7 +76,7 @@ class TestRateLimited:
         test_func()
 
         # Verify delays
-        assert len(call_times) == 3  # noqa: PLR2004
+        assert len(call_times) == 3
         delay1 = call_times[1] - call_times[0]
         delay2 = call_times[2] - call_times[1]
 
@@ -92,7 +92,7 @@ class TestRateLimited:
             return a + b
 
         result = add(2, 3)
-        assert result == 5  # noqa: PLR2004
+        assert result == 5
 
     def test_rate_limited_preserves_function_name(self) -> None:
         """Rate limited decorator preserves function metadata."""
@@ -368,7 +368,7 @@ class TestFindNearbyBusinesses:
 
             businesses = find_nearby_businesses(sample_coordinates, radius=100)
 
-            assert len(businesses) == 2  # noqa: PLR2004
+            assert len(businesses) == 2
             assert all(isinstance(b, Business) for b in businesses)
 
             # Verify sorted by relevance score descending
@@ -438,8 +438,13 @@ class TestGetStreetViewImages:
             patch(
                 "sevenrad_ee.top_polluters.enrichment._check_streetview_availability"
             ) as mock_check,
-            patch("sevenrad_ee.top_polluters.enrichment.googlemaps.Client") as mock_client,
-            patch("sevenrad_ee.top_polluters.enrichment.settings.google_maps_api_key", "fake_key"),
+            patch(
+                "sevenrad_ee.top_polluters.enrichment.googlemaps.Client"
+            ) as mock_client,
+            patch(
+                "sevenrad_ee.top_polluters.enrichment.settings.google_maps_api_key",
+                "fake_key",
+            ),
         ):
             mock_check.return_value = True
             mock_gmaps = Mock()

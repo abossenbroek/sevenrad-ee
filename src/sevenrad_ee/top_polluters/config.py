@@ -33,8 +33,10 @@ class Settings(BaseSettings):
         description="Directory for caching API responses and EE results.",
     )
     viirs_scale_m: int = Field(
-        default=500,
-        description="VIIRS sampling scale in meters (500m x 500m patches).",
+        default=750,
+        description=(
+            "VIIRS DNB sensor resolution in meters (750m x 750m pixels at nadir)."
+        ),
     )
     business_search_radius_m: int = Field(
         default=100,

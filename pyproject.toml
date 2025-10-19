@@ -16,7 +16,7 @@ dependencies = [
     "google-auth~=2.37.0",
     "google-cloud-storage~=2.19.0",
     "rich~=13.9.0",
-    "typer~=0.9.0",
+    "click~=8.1.0",
     "pydantic~=2.5.0",
     "pydantic-settings~=2.1.0",
     "python-dotenv~=1.0.0",
@@ -37,7 +37,7 @@ dev = [
 ]
 
 [project.scripts]
-viirs-top-polluters = "sevenrad_ee.top_polluters.cli:app"
+viirs = "sevenrad_ee.cli:main"
 
 [tool.ruff]
 target-version = "py312"
@@ -73,8 +73,14 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"src/sevenrad_ee/top_polluters/cli.py" = ["B008"]  # Typer CLI pattern
-"src/sevenrad_ee/operations/generate_viirs_maps.py" = ["B008"]  # Typer CLI pattern
+"tests/**/*.py" = [
+    "S101",    # assert usage (normal in pytest)
+    "S603",    # subprocess call without shell=True (safe in tests)
+    "S607",    # partial executable path (normal for test commands)
+    "PLR2004", # magic values in comparisons (acceptable in tests)
+    "PLR0913", # too many arguments (acceptable for test fixtures)
+    "ARG002",  # unused function arguments (fixtures may not be used directly)
+]
 
 [tool.mypy]
 python_version = "3.12"

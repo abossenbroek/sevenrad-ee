@@ -7,6 +7,7 @@ and identify the top N brightest emitters in a geographic region.
 
 import hashlib
 import json
+import math
 from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -16,6 +17,53 @@ import ee
 from .cache import cache
 from .config import settings
 from .models import Coordinates, TopEmitter
+
+
+class NotEnoughEmittersError(ValueError):
+    """
+    Raised when insufficient spatially distinct emitters can be found.
+
+    This exception is raised when the requested number of emitters cannot
+    be found with the required minimum separation distance (VIIRS resolution).
+    """
+
+    pass
+
+
+def _haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """
+    Calculate great-circle distance between two points on Earth.
+
+    Uses the Haversine formula to compute the distance between two points
+    given their latitude and longitude coordinates.
+
+    Args:
+        lat1: Latitude of first point in decimal degrees
+        lon1: Longitude of first point in decimal degrees
+        lat2: Latitude of second point in decimal degrees
+        lon2: Longitude of second point in decimal degrees
+
+    Returns:
+        Distance between the two points in meters
+
+    """
+    # Earth's radius in meters
+    earth_radius_m = 6371000
+
+    # Convert to radians
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+
+    # Haversine formula
+    a = (
+        math.sin(delta_phi / 2) ** 2
+        + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
+    )
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    return earth_radius_m * c
 
 
 def _parse_geojson(geojson_path: Path) -> Any:  # noqa: ANN401
@@ -83,9 +131,11 @@ def get_top_emitters(
     n: int = 20,
 ) -> list[TopEmitter]:
     """
-    Query VIIRS DNB for top N brightest emitters in a region.
+    Query VIIRS DNB for top N spatially distinct brightest emitters in a region.
 
-    Uses caching to avoid repeated expensive EE queries.
+    Uses caching to avoid repeated expensive EE queries. Applies spatial filtering
+    to ensure all returned emitters are at least VIIRS_SCALE_M (750m) apart,
+    reflecting the physical resolution of the VIIRS DNB sensor.
 
     Args:
         region_path: Path to GeoJSON file defining the region
@@ -94,10 +144,13 @@ def get_top_emitters(
         n: Number of top emitters to return (default: 20)
 
     Returns:
-        List of TopEmitter models sorted by avg_radiance (descending)
+        List of TopEmitter models sorted by avg_radiance (descending),
+        with minimum 750m separation between all emitters
 
     Raises:
         ValueError: If region GeoJSON is invalid or dates are invalid
+        NotEnoughEmittersError: If fewer than N spatially distinct emitters
+            can be found with required minimum separation
 
     """
     # Validate dates
@@ -144,22 +197,53 @@ def get_top_emitters(
         reverse=True,
     )
 
-    # Take top N and convert to TopEmitter models
-    top_features = sorted_features[:n]
-    emitters = []
+    # Spatial filtering: Ensure minimum separation of VIIRS_SCALE_M meters
+    # This reflects the physical resolution constraint of the VIIRS DNB sensor
+    min_distance_m = settings.viirs_scale_m
+    filtered_emitters: list[TopEmitter] = []
 
-    for rank, feature in enumerate(top_features, 1):
+    for feature in sorted_features:
+        # Stop if we have enough emitters
+        if len(filtered_emitters) >= n:
+            break
+
         coords_list = feature["geometry"]["coordinates"]
+        lon, lat = coords_list[0], coords_list[1]
         radiance = feature["properties"]["avg_rad"]
 
-        emitter = TopEmitter(
-            rank=rank,
-            coordinates=Coordinates(lat=coords_list[1], lon=coords_list[0]),
-            avg_radiance=radiance,
+        # Check distance to all previously selected emitters
+        is_far_enough = True
+        for existing in filtered_emitters:
+            distance = _haversine_distance(
+                lat, lon, existing.coordinates.lat, existing.coordinates.lon
+            )
+            if distance < min_distance_m:
+                is_far_enough = False
+                break
+
+        # Only add if sufficiently far from all existing emitters
+        if is_far_enough:
+            # Rank is based on position in filtered list (brightest first)
+            rank = len(filtered_emitters) + 1
+            emitter = TopEmitter(
+                rank=rank,
+                coordinates=Coordinates(lat=lat, lon=lon),
+                avg_radiance=radiance,
+            )
+            filtered_emitters.append(emitter)
+
+    # Check if we found enough spatially distinct emitters
+    if len(filtered_emitters) < n:
+        msg = (
+            f"Could not find {n} spatially distinct emitters with minimum "
+            f"separation of {min_distance_m}m (VIIRS sensor resolution). "
+            f"Found only {len(filtered_emitters)} emitter(s). "
+            f"Consider expanding the search region or reducing the number "
+            f"of requested emitters (use -n {len(filtered_emitters)} or less)."
         )
-        emitters.append(emitter)
+        raise NotEnoughEmittersError(msg)
 
     # Cache the results
-    cache.set(cache_key, emitters)
+    cache.set(cache_key, filtered_emitters)
 
-    return emitters
+    return filtered_emitters

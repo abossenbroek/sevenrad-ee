@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-import typer
+import click
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -30,13 +30,6 @@ else:
 
 # Initialize Rich console for colorful output
 console = Console()
-
-# Create Typer app for maps subcommand
-maps_app = typer.Typer(
-    help="Generate VIIRS DNB composite maps for regions",
-    no_args_is_help=True,
-    rich_markup_mode="rich",
-)
 
 
 def initialize_earth_engine() -> None:
@@ -214,42 +207,51 @@ def display_summary(
     console.print("\n")
 
 
-@maps_app.command()
-def main(  # noqa: C901, PLR0912, PLR0915, PLR0913
-    start_date: Optional[str] = typer.Option(
-        None,
-        "--start-date",
-        help="Start date in YYYY-MM-DD format",
-        metavar="DATE",
-    ),
-    end_date: Optional[str] = typer.Option(
-        None,
-        "--end-date",
-        help="End date in YYYY-MM-DD format",
-        metavar="DATE",
-    ),
-    maps: Optional[str] = typer.Option(
-        None,
-        "--maps",
-        help="Maps to generate: 'all' or comma-separated list",
-        metavar="REGION",
-    ),
-    list_maps: bool = typer.Option(
-        False,
-        "--list-maps",
-        help="List available map regions with descriptions and exit",
-        is_flag=True,
-    ),
-    config: Optional[Path] = typer.Option(
-        None,
-        "--config",
-        help="Path to JavaScript config file (default: ./extract_geotiffs.js)",
-    ),
-    output_dir: Optional[Path] = typer.Option(
-        None,
-        "--output-dir",
-        help="Output directory for saving results",
-    ),
+@click.command(name="maps")
+@click.option(
+    "--start-date",
+    type=str,
+    default=None,
+    help="Start date (YYYY-MM-DD)",
+)
+@click.option(
+    "--end-date",
+    type=str,
+    default=None,
+    help="End date (YYYY-MM-DD)",
+)
+@click.option(
+    "--regions",
+    type=str,
+    default=None,
+    help="Region codes: 'all' or comma-separated",
+)
+@click.option(
+    "--list-maps",
+    is_flag=True,
+    default=False,
+    help="List available map regions with descriptions and exit",
+)
+@click.option(
+    "--config",
+    "config_path",
+    type=click.Path(exists=False, dir_okay=False, path_type=Path),
+    default=None,
+    help="Path to JavaScript config file (default: ./extract_geotiffs.js)",
+)
+@click.option(
+    "--output-dir",
+    type=click.Path(file_okay=False, path_type=Path),
+    default=None,
+    help="Output directory for saving results",
+)
+def maps(  # noqa: C901, PLR0912, PLR0915, PLR0913
+    start_date: str | None,
+    end_date: str | None,
+    regions: str | None,
+    list_maps: bool,
+    config_path: Path | None,
+    output_dir: Path | None,
 ) -> None:
     r"""
     Generate VIIRS DNB composite maps for specified regions and time periods.
@@ -278,23 +280,23 @@ def main(  # noqa: C901, PLR0912, PLR0915, PLR0913
 
     try:
         # Determine config file path
-        config_file = config if config else Path.cwd() / "extract_geotiffs.js"
+        config_file = config_path if config_path else Path.cwd() / "extract_geotiffs.js"
 
         # Handle --list-maps option
         if list_maps:
             list_available_maps(config_file if config_file.exists() else None)
-            raise typer.Exit(0)
+            raise click.exceptions.Exit(0)
 
         # Validate required arguments when not listing maps
-        if not start_date or not end_date or not maps:
+        if not start_date or not end_date or not regions:
             console.print(
-                "[red]✗[/red] --start-date, --end-date, and --maps are required",
+                "[red]✗[/red] --start-date, --end-date, and --regions are required",
                 style="bold red",
             )
             console.print(
                 "\n[yellow]Tip:[/yellow] Use --list-maps to see available regions"
             )
-            raise typer.Exit(1)
+            raise click.exceptions.Exit(1)
 
         if not config_file.exists():
             console.print(
@@ -304,39 +306,41 @@ def main(  # noqa: C901, PLR0912, PLR0915, PLR0913
             console.print(
                 "\n[yellow]Tip:[/yellow] Specify config file with --config option"
             )
-            raise typer.Exit(1)
+            raise click.exceptions.Exit(1)
 
         # Load configuration
         console.print(f"[yellow]Loading configuration from {config_file}...[/yellow]")
-        regions, vis_config = load_viirs_config(config_file)
+        regions_config, vis_config = load_viirs_config(config_file)
 
-        if not regions:
+        if not regions_config:
             console.print(
                 "[red]✗[/red] No regions found in config file", style="bold red"
             )
-            raise typer.Exit(1)
+            raise click.exceptions.Exit(1)
 
-        console.print(f"[green]✓[/green] Found {len(regions)} region(s) in config")
+        console.print(
+            f"[green]✓[/green] Found {len(regions_config)} region(s) in config"
+        )
 
         # Determine which maps to process
-        if maps.lower() == "all":
-            maps_to_process = list(regions.keys())
+        if regions.lower() == "all":
+            maps_to_process = list(regions_config.keys())
         else:
-            maps_to_process = [m.strip() for m in maps.split(",")]
+            maps_to_process = [m.strip() for m in regions.split(",")]
 
             # Validate map names
-            invalid_maps = [m for m in maps_to_process if m not in regions]
+            invalid_maps = [m for m in maps_to_process if m not in regions_config]
             if invalid_maps:
                 console.print(
                     f"[red]✗[/red] Invalid map name(s): {', '.join(invalid_maps)}",
                     style="bold red",
                 )
-                available = ", ".join(sorted(regions.keys()))
+                available = ", ".join(sorted(regions_config.keys()))
                 console.print(f"\n[yellow]Available in config:[/yellow] {available}")
                 console.print(
                     "\n[dim]Run with --list-maps to see full descriptions[/dim]"
                 )
-                raise typer.Exit(1)
+                raise click.exceptions.Exit(1)
 
         # Prepare output directory
         if output_dir:
@@ -361,7 +365,7 @@ def main(  # noqa: C901, PLR0912, PLR0915, PLR0913
         )
 
         for map_name in maps_to_process:
-            region_config = regions[map_name]
+            region_config = regions_config[map_name]
             composite = generate_viirs_composite(
                 start_date=start_date,
                 end_date=end_date,
@@ -391,14 +395,10 @@ def main(  # noqa: C901, PLR0912, PLR0915, PLR0913
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Operation cancelled by user[/yellow]")
-        raise typer.Exit(1) from None
+        raise click.exceptions.Exit(1) from None
     except Exception as e:
         console.print(f"\n[bold red]Error:[/bold red] {e}", style="bold red")
         import traceback
 
         console.print(f"\n[dim]{traceback.format_exc()}[/dim]")
-        raise typer.Exit(1) from e
-
-
-if __name__ == "__main__":
-    maps_app()
+        raise click.exceptions.Exit(1) from e

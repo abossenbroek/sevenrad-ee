@@ -81,7 +81,11 @@ uv run pytest
 
 ## Features
 
-### VIIRS Top Polluters
+### Unified VIIRS CLI
+
+The `viirs` command provides access to all VIIRS satellite data analysis tools:
+
+#### VIIRS Top Polluters
 
 Identify and analyze top light-emitting locations using NOAA VIIRS DNB satellite data:
 
@@ -92,14 +96,35 @@ Identify and analyze top light-emitting locations using NOAA VIIRS DNB satellite
 **Quick Start:**
 
 ```bash
-uv run viirs-top-polluters \
-  --region my_region.geojson \
+# Show available subcommands
+uv run viirs --help
+
+# Identify top polluters
+uv run viirs top-polluters \
+  my_region.geojson \
   --start-date 2024-01-01 \
   --end-date 2024-12-31 \
   --businesses
 ```
 
 📖 **Full Documentation**: [VIIRS Top Polluters Guide](src/sevenrad_ee/top_polluters/README.md)
+
+#### VIIRS Maps
+
+Generate nighttime light composite maps for specified regions:
+
+```bash
+# List available map regions
+uv run viirs maps --list-maps
+
+# Generate maps for specific regions
+uv run viirs maps \
+  --start-date 2024-01-01 \
+  --end-date 2024-12-31 \
+  --regions us,europe
+```
+
+📖 **Full Documentation**: See `docs/map_extraction.md`
 
 ## Project Structure
 

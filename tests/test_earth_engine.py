@@ -314,15 +314,11 @@ class TestGetTopEmitters:
             )
 
             # First call - should hit EE
-            emitters1 = get_top_emitters(
-                sample_region_geojson, start_date, end_date, 3
-            )
+            emitters1 = get_top_emitters(sample_region_geojson, start_date, end_date, 3)
             ee_call_count = mock_ic.call_count
 
             # Second call - should use cache
-            emitters2 = get_top_emitters(
-                sample_region_geojson, start_date, end_date, 3
-            )
+            emitters2 = get_top_emitters(sample_region_geojson, start_date, end_date, 3)
 
             # Verify no additional EE calls
             assert mock_ic.call_count == ee_call_count

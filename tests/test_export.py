@@ -118,7 +118,10 @@ class TestExportYAML:
         emitter_data = data["emitters"][0]
 
         assert "address" in emitter_data
-        assert emitter_data["address"]["formatted"] == "123 Main St, San Francisco, CA 94102, USA"
+        assert (
+            emitter_data["address"]["formatted"]
+            == "123 Main St, San Francisco, CA 94102, USA"
+        )
         assert emitter_data["address"]["city"] == "San Francisco"
         assert emitter_data["address"]["quality_score"] == pytest.approx(0.95)
 
@@ -159,7 +162,7 @@ class TestExportYAML:
         emitter_data = data["emitters"][0]
 
         assert "businesses" in emitter_data
-        assert len(emitter_data["businesses"]) == 2  # noqa: PLR2004
+        assert len(emitter_data["businesses"]) == 2
 
         # Verify first business
         business = emitter_data["businesses"][0]
@@ -266,7 +269,9 @@ class TestExportYAML:
         # Verify file is UTF-8 encoded and data roundtrips correctly
         with output_path.open(encoding="utf-8") as f:
             data = yaml.safe_load(f)
-            assert data["emitters"][0]["address"]["formatted"] == "Café España, 123 Zürich"
+            assert (
+                data["emitters"][0]["address"]["formatted"] == "Café España, 123 Zürich"
+            )
 
     def test_export_yaml_preserves_order(
         self, sample_top_emitters: list[TopEmitter], tmp_path: Path
@@ -297,7 +302,9 @@ class TestExportYAML:
         timestamp_str = data["metadata"]["exported_at"]
 
         # Should be valid ISO 8601 format
-        timestamp = datetime.datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
+        timestamp = datetime.datetime.fromisoformat(
+            timestamp_str.replace("Z", "+00:00")
+        )
         assert timestamp.tzinfo is not None  # Should have timezone info
 
     def test_export_yaml_file_permissions(

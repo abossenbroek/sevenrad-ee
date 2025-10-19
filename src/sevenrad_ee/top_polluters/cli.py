@@ -8,7 +8,8 @@ with optional enrichment from Google Maps APIs.
 from datetime import date
 from pathlib import Path
 
-import typer
+import click
+import ee
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -19,70 +20,104 @@ from .cache import cache
 from .earth_engine import get_top_emitters
 from .models import TopEmitter
 
-app = typer.Typer()
 console = Console()
 
 
-@app.command()
-def main(  # noqa: PLR0913, C901
-    region: Path = typer.Option(
-        ...,
-        "--region",
-        help="Path to GeoJSON file defining the geographic region",
-        exists=True,
-        dir_okay=False,
-    ),
-    start_date: str = typer.Option(
-        ...,
-        "--start-date",
-        help="Start date in YYYY-MM-DD format",
-    ),
-    end_date: str = typer.Option(
-        ...,
-        "--end-date",
-        help="End date in YYYY-MM-DD format",
-    ),
-    n: int = typer.Option(
-        20,
-        "--n",
-        help="Number of top emitters to find (max 30)",
-        min=1,
-        max=30,
-    ),
-    geocode: bool = typer.Option(
-        True,
-        "--geocode/--skip-geocode",
-        help="Enrich with reverse geocoding",
-    ),
-    businesses: bool = typer.Option(
-        False,
-        "--businesses",
-        is_flag=True,
-        help="Find nearby businesses",
-    ),
-    streetview: bool = typer.Option(
-        False,
-        "--streetview",
-        is_flag=True,
-        help="Download Street View imagery",
-    ),
-    output: Path = typer.Option(
-        Path("results.yml"),
-        "--output",
-        help="Output YAML file path",
-    ),
-    clear_cache: bool = typer.Option(
-        False,
-        "--clear-cache",
-        is_flag=True,
-        help="Clear all caches before running",
-    ),
+def initialize_earth_engine() -> None:
+    """
+    Initialize Google Earth Engine API.
+
+    Raises:
+        Exception: If Earth Engine initialization fails
+
+    """
+    try:
+        ee.Initialize()
+    except Exception as e:
+        console.print(
+            f"[red]✗[/red] Failed to initialize Earth Engine: {e}", style="bold red"
+        )
+        console.print(
+            "\n[yellow]Run:[/yellow] uv run earthengine authenticate", style="italic"
+        )
+        raise
+
+
+@click.command(name="top-polluters")
+@click.argument(
+    "region",
+    type=click.Path(exists=True, dir_okay=False, readable=True, path_type=Path),
+)
+@click.option(
+    "--start-date",
+    required=True,
+    type=str,
+    help="Start date in YYYY-MM-DD format",
+)
+@click.option(
+    "--end-date",
+    required=True,
+    type=str,
+    help="End date in YYYY-MM-DD format",
+)
+@click.option(
+    "-n",
+    "--n",
+    "n_emitters",
+    type=click.IntRange(1, 30),
+    default=20,
+    show_default=True,
+    help="Number of top emitters to find.",
+)
+@click.option(
+    "--geocode/--no-geocode",
+    "geocode",
+    default=True,
+    show_default=True,
+    help="Enrich with reverse geocoding.",
+)
+@click.option(
+    "--businesses",
+    is_flag=True,
+    default=False,
+    help="Find nearby businesses.",
+)
+@click.option(
+    "--streetview",
+    is_flag=True,
+    default=False,
+    help="Download Street View imagery.",
+)
+@click.option(
+    "--output",
+    type=click.Path(dir_okay=False, writable=True, path_type=Path),
+    default=Path("results.yml"),
+    show_default=True,
+    help="Output YAML file path.",
+)
+@click.option(
+    "--clear-cache",
+    is_flag=True,
+    default=False,
+    help="Clear all caches before running.",
+)
+def top_polluters(  # noqa: PLR0913, C901
+    region: Path,
+    start_date: str,
+    end_date: str,
+    n_emitters: int,
+    geocode: bool,
+    businesses: bool,
+    streetview: bool,
+    output: Path,
+    clear_cache: bool,
 ) -> None:
     """
     Find top VIIRS DNB light emitters in a geographic region.
 
     Queries NOAA VIIRS DNB monthly satellite data to identify the brightest
     500m x 500m patches, with optional enrichment from Google Maps APIs.
+    REGION is the path to a GeoJSON file defining the geographic boundary.
     """
     # Display header
     console.print(
@@ -92,6 +127,12 @@ def main(  # noqa: PLR0913, C901
             border_style="cyan",
         )
     )
+
+    # Initialize Earth Engine
+    try:
+        initialize_earth_engine()
+    except Exception as e:
+        raise click.exceptions.Exit(1) from e
 
     # Clear cache if requested
     if clear_cache:
@@ -108,23 +149,14 @@ def main(  # noqa: PLR0913, C901
         console.print(
             "\n[yellow]Tip:[/yellow] Use YYYY-MM-DD format (e.g., 2024-01-01)"
         )
-        raise typer.Exit(1) from e
+        raise click.exceptions.Exit(1) from e
 
     if end < start:
         console.print(
             f"[red]✗[/red] End date {end_date} must be >= start date {start_date}",
             style="bold red",
         )
-        raise typer.Exit(1)
-
-    # Validate region file
-    if not region.exists():
-        console.print(
-            f"[red]✗[/red] Region file not found: {region}",
-            style="bold red",
-        )
-        console.print("\n[yellow]Tip:[/yellow] Provide a valid GeoJSON file path")
-        raise typer.Exit(1)
+        raise click.exceptions.Exit(1)
 
     # Step 1: Query Earth Engine
     console.print(f"\n[bold]1. Querying VIIRS DNB ({start_date} to {end_date})[/bold]")
@@ -136,18 +168,18 @@ def main(  # noqa: PLR0913, C901
     ) as progress:
         task = progress.add_task("Loading VIIRS DNB data...", total=None)
         try:
-            emitters = get_top_emitters(region, start, end, n)
+            emitters = get_top_emitters(region, start, end, n_emitters)
             progress.update(
                 task, description=f"[green]✓[/green] Found {len(emitters)} emitters"
             )
         except Exception as e:
             progress.update(task, description=f"[red]✗[/red] Query failed: {e}")
             console.print(f"\n[red]Error:[/red] {e}", style="bold red")
-            raise typer.Exit(1) from e
+            raise click.exceptions.Exit(1) from e
 
     if not emitters:
         console.print("[yellow]No emitters found in region[/yellow]")
-        raise typer.Exit(0)
+        raise click.exceptions.Exit(0)
 
     # Step 2: Geocoding (optional)
     if geocode:
@@ -171,7 +203,7 @@ def main(  # noqa: PLR0913, C901
         console.print(f"[green]✓[/green] Exported to {output}")
     except Exception as e:
         console.print(f"[red]✗[/red] Export failed: {e}", style="bold red")
-        raise typer.Exit(1) from e
+        raise click.exceptions.Exit(1) from e
 
     # Summary
     _display_summary(emitters)
@@ -301,4 +333,4 @@ def _display_summary(emitters: list[TopEmitter]) -> None:
 
 
 if __name__ == "__main__":
-    app()
+    top_polluters()

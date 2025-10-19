@@ -93,8 +93,8 @@ Example `my_region.geojson`:
 Query VIIRS DNB for top 20 emitters (default):
 
 ```bash
-uv run viirs-top-polluters \
-  --region my_region.geojson \
+uv run viirs top-polluters \
+  my_region.geojson \
   --start-date 2024-01-01 \
   --end-date 2024-12-31
 ```
@@ -106,8 +106,8 @@ Output: `results.yml` with ranked emitters by average radiance.
 Add geocoding and business lookup:
 
 ```bash
-uv run viirs-top-polluters \
-  --region my_region.geojson \
+uv run viirs top-polluters \
+  my_region.geojson \
   --start-date 2024-01-01 \
   --end-date 2024-12-31 \
   --geocode \
@@ -141,12 +141,11 @@ BUSINESS_SEARCH_RADIUS_M=100
 ### CLI Flags
 
 ```
---region PATH          Path to GeoJSON file (required)
+REGION                 Path to GeoJSON file (required, positional argument)
 --start-date TEXT      Start date in YYYY-MM-DD format (required)
 --end-date TEXT        End date in YYYY-MM-DD format (required)
---n INTEGER            Number of top emitters (1-30, default: 20)
---geocode              Enable reverse geocoding (default: enabled)
---skip-geocode         Disable reverse geocoding
+-n, --n INTEGER        Number of top emitters (1-30, default: 20)
+--geocode/--no-geocode Enable/disable reverse geocoding (default: enabled)
 --businesses           Enable business lookup
 --streetview           Enable Street View imagery download
 --output PATH          Output YAML file path (default: results.yml)
@@ -158,19 +157,19 @@ BUSINESS_SEARCH_RADIUS_M=100
 ### Query Top 10 Emitters
 
 ```bash
-uv run viirs-top-polluters \
-  --region san_francisco.geojson \
+uv run viirs top-polluters \
+  san_francisco.geojson \
   --start-date 2024-01-01 \
   --end-date 2024-12-31 \
   --n 10 \
-  --skip-geocode
+  --no-geocode
 ```
 
 ### Full Enrichment with Street View
 
 ```bash
-uv run viirs-top-polluters \
-  --region downtown.geojson \
+uv run viirs top-polluters \
+  downtown.geojson \
   --start-date 2024-01-01 \
   --end-date 2024-12-31 \
   --n 20 \
@@ -183,8 +182,8 @@ uv run viirs-top-polluters \
 ### Clear Cache and Re-Query
 
 ```bash
-uv run viirs-top-polluters \
-  --region my_region.geojson \
+uv run viirs top-polluters \
+  my_region.geojson \
   --start-date 2024-01-01 \
   --end-date 2024-12-31 \
   --clear-cache
@@ -194,8 +193,8 @@ uv run viirs-top-polluters \
 
 ```bash
 # Summer months only
-uv run viirs-top-polluters \
-  --region city.geojson \
+uv run viirs top-polluters \
+  city.geojson \
   --start-date 2024-06-01 \
   --end-date 2024-08-31
 ```
@@ -287,7 +286,7 @@ uv run earthengine authenticate
 **Solution**: The tool includes automatic rate limiting (50ms delay for geocoding/places, 100ms for Street View). For large queries:
 
 1. Use smaller regions
-2. Reduce `--n` parameter
+2. Reduce `-n` parameter
 3. Run overnight for quota reset
 4. Enable only required enrichment features
 
@@ -298,8 +297,8 @@ uv run earthengine authenticate
 **Solution**:
 ```bash
 # Clear all caches
-uv run viirs-top-polluters \
-  --region my_region.geojson \
+uv run viirs top-polluters \
+  my_region.geojson \
   --start-date 2024-01-01 \
   --end-date 2024-12-31 \
   --clear-cache
@@ -334,8 +333,8 @@ Use a shell script to process multiple regions:
 #!/bin/bash
 for region in regions/*.geojson; do
   name=$(basename "$region" .geojson)
-  uv run viirs-top-polluters \
-    --region "$region" \
+  uv run viirs top-polluters \
+    "$region" \
     --start-date 2024-01-01 \
     --end-date 2024-12-31 \
     --output "results_${name}.yml"
