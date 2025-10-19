@@ -50,6 +50,7 @@ class PerplexityAnalysis(BaseModel):
     lighting_evidence: Optional[str] = None
     primary_crops: list[str] = []
     size_hectares: Optional[float] = None
+    instagram_handle: Optional[str] = None  # Instagram account (without @)
     sources: list[str] = []
 
 
@@ -172,6 +173,9 @@ class PerplexityGreenhouseAnalyzer:
             "explicitly stated\n\n"
             "For lighting_evidence: Quote or paraphrase ONLY factual "
             "statements from sources. Do not infer practices.\n\n"
+            "For instagram_handle: Find official Instagram account if available "
+            "(return handle WITHOUT @ symbol, "
+            "e.g., 'summitgerbera' not '@summitgerbera').\n\n"
             "Respond ONLY with a JSON object using this schema. "
             "If information is not found, use null.\n"
             "Do not add commentary outside the JSON block.\n\n"
@@ -180,6 +184,7 @@ class PerplexityGreenhouseAnalyzer:
             '  "lighting_evidence": "...",  // FACTUAL quotes only, or null\n'
             '  "primary_crops": ["...", "..."],\n'
             '  "size_hectares": float,  // or null\n'
+            '  "instagram_handle": "...",  // Without @ symbol, or null\n'
             '  "sources": ["...", "..."]  // URLs only\n'
             "}"
         )
@@ -603,7 +608,7 @@ async def scan_pixel_for_attribution(  # noqa: PLR0915
     return results
 
 
-def _display_attribution_summary(results: list[AttributionResult]) -> None:
+def _display_attribution_summary(results: list[AttributionResult]) -> None:  # noqa: C901
     """Display attribution results in a formatted table."""
     if not results:
         console.print("[yellow]No attribution results to display[/yellow]")
@@ -652,6 +657,10 @@ def _display_attribution_summary(results: list[AttributionResult]) -> None:
             if top.perplexity_analysis.primary_crops:
                 console.print(
                     f"  Crops: {', '.join(top.perplexity_analysis.primary_crops)}"
+                )
+            if top.perplexity_analysis.instagram_handle:
+                console.print(
+                    f"  Instagram: @{top.perplexity_analysis.instagram_handle}"
                 )
             if top.perplexity_analysis.sources:
                 console.print("  Sources:")

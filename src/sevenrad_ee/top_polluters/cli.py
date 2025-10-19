@@ -7,6 +7,7 @@ with optional enrichment from Google Maps APIs.
 
 import asyncio
 import logging
+import re
 from datetime import date
 from pathlib import Path
 
@@ -126,6 +127,13 @@ def initialize_earth_engine() -> None:
     default=False,
     help="Enable verbose logging for debugging.",
 )
+@click.option(
+    "--images-dir",
+    type=click.Path(file_okay=False, writable=True, path_type=Path),
+    default=Path("images"),
+    show_default=True,
+    help="Directory for Street View images.",
+)
 def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
     region: Path,
     start_date: str,
@@ -139,6 +147,7 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
     output: Path,
     clear_cache: bool,
     verbose: bool,
+    images_dir: Path,
 ) -> None:
     """
     Find top VIIRS DNB light emitters in a geographic region.
@@ -251,7 +260,7 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
     # Step 4: Street View (optional)
     if streetview:
         console.print(f"\n[bold]4. Downloading Street View imagery[/bold]")
-        _enrich_streetview(emitters)
+        _enrich_streetview(emitters, images_dir)
 
     # Step 5: Greenhouse Attribution (optional, AI-powered)
     if attribute_greenhouses:
@@ -331,7 +340,7 @@ def _enrich_businesses(emitters: list[TopEmitter]) -> None:
     console.print(f"[green]✓[/green] Found {total_businesses} businesses")
 
 
-def _enrich_streetview(emitters: list[TopEmitter]) -> None:
+def _enrich_streetview(emitters: list[TopEmitter], images_dir: Path) -> None:
     """Enrich emitters with Street View imagery."""
     with Progress(
         TextColumn("[progress.description]{task.description}"),
@@ -344,7 +353,7 @@ def _enrich_streetview(emitters: list[TopEmitter]) -> None:
         for i, emitter in enumerate(emitters, 1):
             try:
                 streetview_images = enrichment.get_street_view_images(
-                    emitter.coordinates, emitter.rank
+                    emitter.coordinates, emitter.rank, images_dir
                 )
                 emitter.streetview = streetview_images
                 progress.update(
@@ -366,6 +375,28 @@ def _enrich_streetview(emitters: list[TopEmitter]) -> None:
     )
 
 
+def _sanitize_location_context(region_name: str) -> str:
+    """
+    Sanitize region name to prevent prompt injection attacks.
+
+    Allows only letters, numbers, spaces, commas, and hyphens to prevent
+    malicious instructions from being injected into Perplexity prompts.
+
+    Args:
+        region_name: Raw region name from GeoJSON filename
+
+    Returns:
+        Sanitized location context safe for use in prompts
+
+    """
+    # Convert underscores to spaces and titlecase
+    readable = region_name.replace("_", " ").title()
+    # Remove any characters that could be used for prompt injection
+    sanitized = re.sub(r"[^a-zA-Z0-9\s,\-]", "", readable)
+    # Limit length to prevent extremely long inputs
+    return sanitized[:100]
+
+
 def _run_attribution_analysis(
     emitters: list[TopEmitter], region_name: str, max_businesses: int
 ) -> None:
@@ -382,6 +413,10 @@ def _run_attribution_analysis(
     logger.info("Region context: %s", region_name)
     logger.info("Max businesses to analyze per pixel: %d", max_businesses)
     logger.debug("Will analyze top 5 emitters maximum to conserve API quota")
+
+    # Sanitize location context to prevent prompt injection
+    safe_location = _sanitize_location_context(region_name)
+    logger.debug("Sanitized location context: %s", safe_location)
 
     console.print(
         "[cyan]Running AI-powered attribution analysis using Perplexity...[/cyan]\n"
@@ -402,7 +437,7 @@ def _run_attribution_analysis(
             attribution_results = await scan_pixel_for_attribution(
                 pixel_center=emitter.coordinates,
                 pixel_radiance=emitter.avg_radiance,
-                location_context=region_name.replace("_", " ").title(),
+                location_context=safe_location,
                 confidence_threshold=0.85,
                 max_businesses_to_analyze=max_businesses,
             )

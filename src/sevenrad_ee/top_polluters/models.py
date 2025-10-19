@@ -71,6 +71,14 @@ class Business(BaseModel):
         default=None,
         description="Raw Perplexity AI analysis with crops, lighting, sources, etc.",
     )
+    streetview_link: Optional[str] = Field(
+        default=None,
+        description="Google Street View URL for this business location.",
+    )
+    coordinates: Optional[Coordinates] = Field(
+        default=None,
+        description="Geographic coordinates of the business.",
+    )
 
 
 class StreetViewImages(BaseModel):

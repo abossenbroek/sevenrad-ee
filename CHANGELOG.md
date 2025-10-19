@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Instagram Discovery**: Perplexity AI now identifies Instagram accounts for greenhouse businesses
+  - Added `instagram_handle` field to `PerplexityAnalysis` model
+  - Updated AI prompt to request Instagram account discovery
+  - Display Instagram handle in attribution summary output
+- **Street View Links**: Automatic Google Street View URL generation for all businesses
+  - Added `streetview_link` field to Business model
+  - Links use `map_action=pano` format for direct Street View access
+  - Included in YAML export for easy access
+- **Configurable Image Directory**: New `--images-dir` CLI option
+  - Customize location for Street View image downloads
+  - Default: `images/` (was hardcoded to `cache/streetview/`)
+  - Updated `get_street_view_images()` to accept custom base directory
+
+### Security
+- **Prompt Injection Protection**: Sanitized user input in Perplexity prompts
+  - Added `_sanitize_location_context()` function
+  - Removes special characters that could manipulate AI prompts
+  - Limits input length to 100 characters
+  - Prevents malicious instructions via GeoJSON filenames
+
 ### Fixed
 - **CRITICAL BUG**: Fixed VIIRS resolution from 500m to 750m (correct sensor specification)
   - Reference: https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VJ102DNB

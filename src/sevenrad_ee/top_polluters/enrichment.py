@@ -307,6 +307,19 @@ def find_nearby_businesses(
     businesses = []
     for result in results:
         relevance_score, distance_m = _calculate_business_relevance(result, coords)
+
+        # Extract business coordinates
+        business_coords = Coordinates(
+            lat=result["geometry"]["location"]["lat"],
+            lon=result["geometry"]["location"]["lng"],
+        )
+
+        # Generate Street View link
+        streetview_link = (
+            f"https://www.google.com/maps/@?api=1&map_action=pano&"
+            f"viewpoint={business_coords.lat},{business_coords.lon}"
+        )
+
         businesses.append(
             Business(
                 name=result["name"],
@@ -316,6 +329,8 @@ def find_nearby_businesses(
                 distance_m=distance_m,
                 rating=result.get("rating"),
                 relevance_score=relevance_score,
+                coordinates=business_coords,
+                streetview_link=streetview_link,
             )
         )
 
@@ -349,15 +364,18 @@ def _check_streetview_availability(coords: Coordinates) -> bool:
         return False
 
 
-def get_street_view_images(coords: Coordinates, rank: int) -> StreetViewImages:
+def get_street_view_images(
+    coords: Coordinates, rank: int, images_dir: Path | None = None
+) -> StreetViewImages:
     """
     Get Street View images from four cardinal directions.
 
-    Saves images to cache/streetview/{rank}/ directory.
+    Saves images to specified directory or default images/streetview/{rank}/.
 
     Args:
         coords: Center coordinates
         rank: Emitter rank (for organizing saved images)
+        images_dir: Base directory for images (defaults to settings.images_dir)
 
     Returns:
         StreetViewImages model with paths to saved images
@@ -375,7 +393,8 @@ def get_street_view_images(coords: Coordinates, rank: int) -> StreetViewImages:
         return result
 
     # Create directory for images
-    image_dir = settings.cache_dir / "streetview" / str(rank)
+    base_dir = images_dir if images_dir is not None else settings.images_dir
+    image_dir = base_dir / "streetview" / str(rank)
     image_dir.mkdir(parents=True, exist_ok=True)
 
     # Download images for four cardinal directions

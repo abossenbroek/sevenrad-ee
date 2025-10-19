@@ -32,6 +32,10 @@ class Settings(BaseSettings):
         default=Path("cache"),
         description="Directory for caching API responses and EE results.",
     )
+    images_dir: Path = Field(
+        default=Path("images"),
+        description="Directory for Street View images.",
+    )
     viirs_scale_m: int = Field(
         default=750,
         description=(

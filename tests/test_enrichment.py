@@ -99,10 +99,10 @@ class TestRateLimited:
 
         @rate_limited(10)
         def example_function() -> None:
-            """Example docstring."""
+            """Return nothing (test function)."""
 
         assert example_function.__name__ == "example_function"
-        assert example_function.__doc__ == "Example docstring."
+        assert example_function.__doc__ == "Return nothing (test function)."
 
 
 class TestCalculateAddressQuality:
