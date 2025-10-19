@@ -1,0 +1,131 @@
+metadata:
+  exported_at: '2025-10-19T08:16:16.109727+00:00'
+  total_emitters: 3
+  source: NOAA VIIRS DNB Monthly
+emitters:
+- rank: 1
+  coordinates:
+    lat: 52.036035726728436
+    lon: 4.598251360586801
+  avg_radiance: 9841.76953125
+  address:
+    formatted: 2HPX+C8 Waddinxveen, Netherlands
+    street: null
+    city: Waddinxveen
+    state: South Holland
+    country: Netherlands
+    postal_code: null
+    place_id: GhIJhn5c0ZwESkARFSXXA5xkEkA
+    quality_score: 0.6000000000000001
+    match_type: GEOMETRIC_CENTER
+  businesses:
+  - name: Waddinxveen
+    place_id: ChIJ_cJ2pKbaxUcRLP6R59cYtRM
+    types:
+    - locality
+    - political
+    vicinity: Waddinxveen
+    distance_m: 4197.842805175455
+    rating: null
+    relevance_score: 3.1062984912705283e-37
+    confidence_score: null
+    perplexity_analysis: null
+    streetview_link: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=52.0312972,4.6591318
+    coordinates:
+      lat: 52.0312972
+      lon: 4.6591318
+  streetview:
+    available: false
+    north: null
+    south: null
+    east: null
+    west: null
+- rank: 2
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.604988725217697
+  avg_radiance: 3873.4033203125
+  address:
+    formatted: 2JV3+4X Waddinxveen, Netherlands
+    street: null
+    city: Waddinxveen
+    state: South Holland
+    country: Netherlands
+    postal_code: null
+    place_id: GhIJA9PElnkFSkARWMxjKIJrEkA
+    quality_score: 0.6000000000000001
+    match_type: GEOMETRIC_CENTER
+  businesses:
+  - name: Moerkapelle
+    place_id: ChIJgQwsqDvOxUcRjpyv2a-53kA
+    types:
+    - locality
+    - political
+    vicinity: Moerkapelle
+    distance_m: 1960.3937787180753
+    rating: null
+    relevance_score: 8.44264445744177e-18
+    confidence_score: null
+    perplexity_analysis: null
+    streetview_link: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=52.0438616,4.5763794
+    coordinates:
+      lat: 52.0438616
+      lon: 4.5763794
+  - name: Waddinxveen
+    place_id: ChIJ_cJ2pKbaxUcRLP6R59cYtRM
+    types:
+    - locality
+    - political
+    vicinity: Waddinxveen
+    distance_m: 3917.156446363748
+    rating: null
+    relevance_score: 8.516358231606083e-35
+    confidence_score: null
+    perplexity_analysis: null
+    streetview_link: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=52.0312972,4.6591318
+    coordinates:
+      lat: 52.0312972
+      lon: 4.6591318
+  streetview:
+    available: false
+    north: null
+    south: null
+    east: null
+    west: null
+- rank: 3
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.591513995955904
+  avg_radiance: 3771.7099609375
+  address:
+    formatted: Industriestraat 20, 2751 GT Moerkapelle, Netherlands
+    street: Industriestraat
+    city: Moerkapelle
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2751 GT
+    place_id: ChIJ00lzWiPOxUcRVynehORWdGY
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses:
+  - name: Moerkapelle
+    place_id: ChIJgQwsqDvOxUcRjpyv2a-53kA
+    types:
+    - locality
+    - political
+    vicinity: Moerkapelle
+    distance_m: 1042.1404240843988
+    rating: null
+    relevance_score: 7.985935504954092e-10
+    confidence_score: null
+    perplexity_analysis: null
+    streetview_link: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=52.0438616,4.5763794
+    coordinates:
+      lat: 52.0438616
+      lon: 4.5763794
+  streetview:
+    available: false
+    north: null
+    south: null
+    east: null
+    west: null

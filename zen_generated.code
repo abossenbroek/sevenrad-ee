@@ -1,0 +1,360 @@
+<GENERATED-CODE>
+I will update `src/sevenrad_ee/top_polluters/attribution.py` to implement the robust multi-signal scoring logic.
+
+1.  **Add new constants** for keyword and crop-based heuristics.
+2.  **Update the Perplexity prompt** in `PerplexityGreenhouseAnalyzer.analyze_business` to be more explicit.
+3.  **Introduce a new helper function** `_get_evidence_based_likelihood` to derive a score from multiple signals.
+4.  **Refactor `calculate_confidence`** to use this new robust likelihood score.
+
+<UPDATED_EXISTING_FILE: src/sevenrad_ee/top_polluters/attribution.py>
+```python
+# Add these new constants after the LARGE_GREENHOUSE_THRESHOLD_HA definition around line 47
+
+# Confidence scoring multipliers
+ENERGY_CROP_MULTIPLIER = 1.15  # Boost for energy-intensive crops
+LARGE_OPERATION_MULTIPLIER = 1.10  # Boost for large operations
+LARGE_GREENHOUSE_THRESHOLD_HA = 5.0  # Hectares threshold for "large" operation
+
+# Multi-signal scoring heuristics
+LIGHTING_KEYWORDS = {
+    "led", "hps", "son-t", "assimilation", "supplemental light",
+    "supplemental lighting", "artificial light", "grow light", "photoperiod"
+}
+HIGH_LIGHT_CROPS = {"rose", "gerbera", "chrysanthemum", "tomato", "pepper", "cucumber"}
+EVIDENCE_TEXT_SCORE = 0.95  # Score if lighting keywords are found in evidence
+HIGH_LIGHT_CROP_SCORE = 0.80  # Score for energy-intensive crops
+
+
+# Pydantic models for structured Perplexity responses
+
+
+# ... (rest of the file until PerplexityGreenhouseAnalyzer.analyze_business)
+
+# Replace the entire analyze_business method (lines 131-294) with this updated version.
+# The key change is the improved prompt for Perplexity.
+
+    async def analyze_business(
+        self,
+        business: Business,
+        location_context: str,
+        max_retries: int = 3,
+    ) -> Optional[PerplexityAnalysis]:
+        """
+        Analyze greenhouse operation using Perplexity AI with structured JSON.
+
+        Uses official perplexityai SDK with sonar model (2025)
+        for real-time web search and factual data retrieval.
+
+        Args:
+            business: Business to analyze from Google Places
+            location_context: Location context (e.g., "Moerkapelle, Netherlands")
+            max_retries: Maximum retry attempts for API errors
+
+        Returns:
+            PerplexityAnalysis model or None if analysis fails
+
+        """
+        logger.info(
+            "Starting Perplexity analysis for business: %s (place_id: %s)",
+            business.name,
+            business.place_id,
+        )
+        logger.debug("Business types: %s", business.types)
+        logger.debug("Location context: %s", location_context)
+
+        # Check cache first
+        cache_key = f"perplexity_greenhouse:{business.place_id}"
+        cached = cache.get(cache_key)
+        if cached:
+            logger.info("Cache HIT for business: %s", business.name)
+            return cached  # type: ignore[no-any-return]
+
+        logger.info(
+            "Cache MISS for business: %s - querying Perplexity API", business.name
+        )
+
+        # Construct structured JSON prompt with improved clarity
+        business_info = business.name
+        location_info = location_context
+        prompt = (
+            f"Analyze greenhouse operation: {business_info} near {location_info} to determine if it uses artificial lighting that could cause nighttime light pollution.\n\n"
+            "Focus ONLY on verifiable information from official websites, industry reports, or agricultural databases.\n\n"
+            "For grow_light_likelihood: Estimate the probability (0.0-1.0) that this operation uses any form of artificial lighting for cultivation. This is for identifying potential sources of nighttime light pollution.\n"
+            "Treat the following as strong evidence of artificial grow light usage:\n"
+            "- Explicit mentions of 'LED lighting', 'HPS lamps', 'SON-T', 'assimilation lighting', 'supplemental lighting', or 'photoperiodic lighting'.\n"
+            "- Business activities like 'year-round production' or operating in a 'controlled environment'.\n"
+            "- Cultivation of crops that require high light intensity in this climate, such as roses, gerberas, tomatoes, or peppers.\n\n"
+            "For lighting_evidence: Quote or paraphrase ONLY factual statements from sources about lighting. Do not infer practices.\n\n"
+            "For instagram_handle: Find official Instagram account if available (return handle WITHOUT @ symbol, e.g., 'summitgerbera' not '@summitgerbera').\n\n"
+            "Respond ONLY with a JSON object using this schema. If information is not found, use null.\n"
+            "Do not add commentary outside the JSON block.\n\n"
+            "{\n"
+            '  "grow_light_likelihood": float,  // 0.0-1.0 probability\n'
+            '  "lighting_evidence": "...",  // FACTUAL quotes only, or null\n'
+            '  "primary_crops": ["...", "..."],\n'
+            '  "size_hectares": float,  // or null\n'
+            '  "instagram_handle": "...",  // Without @ symbol, or null\n'
+            '  "sources": ["...", "..."]  // URLs only\n'
+            "}"
+        )
+
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert agricultural operations analyst. "
+                    "Your task is to find verifiable evidence of artificial lighting use in greenhouses. "
+                    "Respond only with the requested JSON."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ]
+
+        # Retry loop with exponential backoff
+        for attempt in range(max_retries):
+            logger.debug(
+                "Perplexity API call attempt %d/%d for business: %s",
+                attempt + 1,
+                max_retries,
+                business.name,
+            )
+
+            try:
+                logger.debug("Sending request to Perplexity sonar model...")
+                response = await self.client.chat.completions.create(
+                    model="sonar",
+                    messages=messages,  # type: ignore[arg-type]
+                )
+
+                logger.debug("Received response from Perplexity API")
+                raw_content = response.choices[0].message.content
+                logger.debug(
+                    "Raw response length: %d characters", len(str(raw_content))
+                )
+                logger.debug("Raw response preview: %s...", raw_content[:200])
+
+                cleaned_json = self._clean_json_string(str(raw_content))
+
+                if not cleaned_json:
+                    logger.warning(
+                        "No JSON in Perplexity response for business: %s",
+                        business.name,
+                    )
+                    logger.debug("Full raw response: %s", raw_content)
+                    return None
+
+                logger.debug("Extracted JSON: %s", cleaned_json[:300])
+
+                # Parse with Pydantic for validation
+                logger.debug("Validating JSON with Pydantic schema...")
+                analysis = PerplexityAnalysis.model_validate_json(cleaned_json)
+
+                logger.info("✓ Successfully analyzed business: %s", business.name)
+                if analysis.grow_light_likelihood is not None:
+                    logger.info(
+                        "  - AI grow light likelihood: %.2f%%",
+                        analysis.grow_light_likelihood * 100,
+                    )
+                logger.info("  - Crops: %s", analysis.primary_crops)
+                logger.info("  - Size: %s hectares", analysis.size_hectares)
+                logger.info("  - Sources: %d found", len(analysis.sources))
+
+                # Cache successful result
+                cache.set(cache_key, analysis)
+                logger.debug("Cached analysis result for future requests")
+
+                return analysis
+
+            except ValidationError as e:
+                logger.error(
+                    "JSON validation failed for business %s: %s", business.name, e
+                )
+                logger.debug("Raw content was: %s", raw_content[:500])
+                await asyncio.sleep(1 * (attempt + 1))
+                continue  # Retry
+
+            except Exception as e:
+                # Catch all API errors (rate limits, connection errors, etc.)
+                wait_time = 2 ** (attempt + 1)  # Exponential backoff
+                logger.warning(
+                    "API error for business %s (attempt %d/%d): %s. " "Retrying in %ds",
+                    business.name,
+                    attempt + 1,
+                    max_retries,
+                    e,
+                    wait_time,
+                )
+                await asyncio.sleep(wait_time)
+
+        logger.error(
+            "Failed to analyze business %s after %d retries", business.name, max_retries
+        )
+        return None
+
+
+def _get_evidence_based_likelihood(
+    analysis: PerplexityAnalysis,
+) -> tuple[float, str]:
+    """
+    Derive a robust grow light likelihood from multiple signals.
+
+    This function combines several signals to determine the likelihood of grow
+    light usage, preventing over-reliance on the AI's direct score. It returns
+    the highest likelihood found and the name of the signal that produced it.
+
+    Signals used:
+    1.  AI Likelihood: The direct `grow_light_likelihood` from Perplexity.
+    2.  Evidence Keywords: Scans `lighting_evidence` for high-confidence keywords.
+    3.  Crop Heuristics: Checks if `primary_crops` are known to require
+        supplemental lighting in the given climate.
+
+    Args:
+        analysis: The PerplexityAnalysis object for a business.
+
+    Returns:
+        A tuple containing the highest likelihood score (float) and the name
+        of the winning signal (str).
+    """
+    signals: dict[str, float] = {}
+
+    # Signal 1: AI's direct score
+    if analysis.grow_light_likelihood is not None:
+        signals["ai_likelihood"] = analysis.grow_light_likelihood
+
+    # Signal 2: Evidence text keyword analysis
+    if analysis.lighting_evidence:
+        text = analysis.lighting_evidence.lower()
+        if any(kw in text for kw in LIGHTING_KEYWORDS):
+            signals["evidence_keyword"] = EVIDENCE_TEXT_SCORE
+
+    # Signal 3: Crop type heuristics
+    if any(crop.lower() in HIGH_LIGHT_CROPS for crop in analysis.primary_crops):
+        signals["crop_heuristic"] = HIGH_LIGHT_CROP_SCORE
+
+    if not signals:
+        return 0.0, "no_signals"
+
+    # Find the strongest signal (highest score)
+    best_signal_name = max(signals, key=lambda k: signals[k])
+    best_score = signals[best_signal_name]
+
+    return best_score, best_signal_name
+
+
+# Replace the entire calculate_confidence function (lines 297-417) with this new version.
+# This version uses the multi-signal approach.
+
+def calculate_confidence(
+    perplexity: Optional[PerplexityAnalysis],
+    distance_m: float,
+    business_types: list[str],
+    max_distance: float = 1000,
+) -> tuple[float, dict[str, float | str]]:
+    """
+    Calculate attribution confidence using improved multi-factor algorithm.
+
+    Uses a multi-signal approach for grow light likelihood, combining AI
+    analysis, evidence text parsing, and crop-based heuristics.
+
+    Args:
+        perplexity: Perplexity analysis result (None if failed)
+        distance_m: Distance from VIIRS pixel center in meters
+        business_types: List of business types from Google Places
+        max_distance: Maximum search distance (default 1000m)
+
+    Returns:
+        Tuple of (total_confidence_score, factor_breakdown_dict)
+
+    """
+    logger.debug("Calculating confidence score...")
+    logger.debug("  Distance: %.1fm", distance_m)
+    logger.debug("  Business types: %s", business_types)
+
+    factors: dict[str, float | str] = {}
+
+    if perplexity is None:
+        logger.info("No Perplexity analysis - confidence = 0.0")
+        return 0.0, {"analysis_failed": 0.0}
+
+    # CONTINUOUS DISTANCE SCORE (not step function)
+    distance_score = MAX_DISTANCE_SCORE_WEIGHT * (1 - (distance_m / max_distance))
+    factors["distance_score"] = round(distance_score, 3)
+
+    # BUSINESS TYPE SCORE
+    greenhouse_types = {"greenhouse", "nursery", "horticulture"}
+    agri_types = {"agricultural", "farming", "agri"}
+
+    if any(t.lower() in greenhouse_types for t in business_types):
+        type_score = GREENHOUSE_TYPE_SCORE
+    elif any(t.lower() in agri_types for t in business_types):
+        type_score = AGRICULTURE_TYPE_SCORE
+    else:
+        type_score = 0.0
+    factors["business_type_score"] = type_score
+
+    # BASE SCORE from distance + type
+    base_score = distance_score + type_score
+
+    # GROW LIGHT LIKELIHOOD SCORE (multi-signal, distance-weighted)
+    evidence_likelihood, reason = _get_evidence_based_likelihood(perplexity)
+    factors["evidence_likelihood"] = round(evidence_likelihood, 3)
+    factors["evidence_reason"] = reason
+    factors["ai_grow_light_likelihood"] = round(
+        perplexity.grow_light_likelihood or 0.0, 3
+    )
+
+    distance_weight = 1 - (distance_m / max_distance)
+    likelihood_score = (
+        MAX_LIKELIHOOD_SCORE_WEIGHT * evidence_likelihood * distance_weight
+    )
+    factors["grow_light_score"] = round(likelihood_score, 3)
+    logger.debug(
+        "Evidence likelihood (from %s): %.3f x distance_weight: %.3f = score: %.3f",
+        reason,
+        evidence_likelihood,
+        distance_weight,
+        likelihood_score,
+    )
+
+    # MULTIPLIERS (signals amplify base score)
+    multiplier = 1.0
+
+    # Energy-intensive crops boost
+    if any(crop.lower() in HIGH_LIGHT_CROPS for crop in perplexity.primary_crops):
+        multiplier *= ENERGY_CROP_MULTIPLIER
+        factors["energy_crop_multiplier"] = ENERGY_CROP_MULTIPLIER
+
+    # Large operation boost
+    if (
+        perplexity.size_hectares
+        and perplexity.size_hectares > LARGE_GREENHOUSE_THRESHOLD_HA
+    ):
+        multiplier *= LARGE_OPERATION_MULTIPLIER
+        factors["large_op_multiplier"] = LARGE_OPERATION_MULTIPLIER
+
+    # Calculate total score
+    # The pre-clamped score can exceed 1.0 by design. Multipliers for strong
+    # signals (e.g., energy crops) are intended to boost already high-confidence
+    # candidates, and min() ensures the final score remains a valid probability.
+    total_score = min((base_score + likelihood_score) * multiplier, 1.0)
+    factors["total"] = round(total_score, 3)
+
+    logger.info("Confidence calculation complete:")
+    logger.info("  Distance score: %.3f", factors["distance_score"])
+    logger.info("  Business type score: %.3f", factors["business_type_score"])
+    logger.info(
+        "  Evidence likelihood: %.3f (reason: %s)",
+        factors["evidence_likelihood"],
+        factors["evidence_reason"],
+    )
+    logger.info(
+        "  Grow light score (weighted): %.3f", factors.get("grow_light_score", 0.0)
+    )
+    logger.info("  Base score: %.3f", base_score)
+    logger.info("  Multiplier: %.3f", multiplier)
+    logger.info("  TOTAL CONFIDENCE: %.3f", total_score)
+
+    return total_score, factors
+```
+</UPDATED_EXISTING_FILE>
+</GENERATED-CODE>

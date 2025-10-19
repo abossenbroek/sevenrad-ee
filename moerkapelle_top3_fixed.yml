@@ -1,0 +1,29 @@
+metadata:
+  exported_at: '2025-10-19T04:33:18.924735+00:00'
+  total_emitters: 3
+  source: NOAA VIIRS DNB Monthly
+emitters:
+- rank: 1
+  coordinates:
+    lat: 52.036035726728436
+    lon: 4.598251360586801
+  avg_radiance: 9841.76953125
+  address: null
+  businesses: []
+  streetview: null
+- rank: 2
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.604988725217697
+  avg_radiance: 3873.4033203125
+  address: null
+  businesses: []
+  streetview: null
+- rank: 3
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.591513995955904
+  avg_radiance: 3771.7099609375
+  address: null
+  businesses: []
+  streetview: null

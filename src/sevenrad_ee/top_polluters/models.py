@@ -52,6 +52,16 @@ class Address(BaseModel):
     match_type: str
 
 
+class StreetViewImages(BaseModel):
+    """Represents Street View images from four cardinal directions."""
+
+    available: bool
+    north: Optional[Path] = None
+    south: Optional[Path] = None
+    east: Optional[Path] = None
+    west: Optional[Path] = None
+
+
 class Business(BaseModel):
     """Represents a business found via Google Places API."""
 
@@ -79,16 +89,10 @@ class Business(BaseModel):
         default=None,
         description="Geographic coordinates of the business.",
     )
-
-
-class StreetViewImages(BaseModel):
-    """Represents Street View images from four cardinal directions."""
-
-    available: bool
-    north: Optional[Path] = None
-    south: Optional[Path] = None
-    east: Optional[Path] = None
-    west: Optional[Path] = None
+    streetview: Optional[StreetViewImages] = Field(
+        default=None,
+        description="Street View imagery for the business location.",
+    )
 
 
 class TopEmitter(BaseModel):

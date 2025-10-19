@@ -1,0 +1,22 @@
+metadata:
+  exported_at: '2025-10-19T06:59:30.352689+00:00'
+  total_emitters: 1
+  source: NOAA VIIRS DNB Monthly
+emitters:
+- rank: 1
+  coordinates:
+    lat: 52.036035726728436
+    lon: 4.604988725217697
+  avg_radiance: 4523.16650390625
+  address:
+    formatted: Abraham Kroesweg 27, 2742 KV Waddinxveen, Netherlands
+    street: Abraham Kroesweg
+    city: Waddinxveen
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2742 KV
+    place_id: ChIJBdPfY-DRxUcRGMErjasoHpY
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses: []
+  streetview: null

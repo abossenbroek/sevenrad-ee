@@ -20,7 +20,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from . import enrichment, export
-from .attribution import scan_pixel_for_attribution
+from .attribution import HIGH_LIKELIHOOD_THRESHOLD, scan_pixel_for_attribution
 from .cache import cache
 from .earth_engine import get_top_emitters
 from .models import Business, TopEmitter
@@ -92,7 +92,7 @@ def initialize_earth_engine() -> None:
     "--streetview",
     is_flag=True,
     default=False,
-    help="Download Street View imagery.",
+    help="Download Street View imagery for attributed greenhouses.",
 )
 @click.option(
     "--attribute-greenhouses",
@@ -252,24 +252,39 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
         console.print(f"\n[bold]2. Geocoding {len(emitters)} locations[/bold]")
         _enrich_geocoding(emitters)
 
-    # Step 3: Business lookup (optional)
-    if businesses:
+    # Step 3: Business lookup (optional, but required for attribution)
+    if businesses or attribute_greenhouses:
         console.print(f"\n[bold]3. Finding nearby businesses[/bold]")
         _enrich_businesses(emitters)
 
-    # Step 4: Street View (optional)
-    if streetview:
-        console.print(f"\n[bold]4. Downloading Street View imagery[/bold]")
-        _enrich_streetview(emitters, images_dir)
-
-    # Step 5: Greenhouse Attribution (optional, AI-powered)
+    # Step 4: Greenhouse Attribution (optional, AI-powered)
     if attribute_greenhouses:
-        step_num = 5 if streetview else (4 if businesses else (3 if geocode else 2))
+        step_num = 4 if businesses or geocode else 2
         console.print(f"\n[bold]{step_num}. AI Greenhouse Attribution Analysis[/bold]")
         _run_attribution_analysis(emitters, region.stem, max_businesses)
 
+    # Step 5: Conditional Street View (optional)
+    if streetview:
+        if not attribute_greenhouses:
+            console.print(
+                "[yellow]Warning:[/yellow] --streetview requires "
+                "--attribute-greenhouses to identify targets. Skipping."
+            )
+        else:
+            step_num = 5 if businesses or geocode else 3
+            console.print(
+                f"\n[bold]{step_num}. Downloading Street View for "
+                "high-confidence greenhouses[/bold]"
+            )
+            _enrich_attributed_streetview(emitters, images_dir)
+
     # Final Step: Export to YAML
-    final_step = 6 if attribute_greenhouses else 5
+    final_step = (
+        (2 if geocode else 1)
+        + (1 if businesses or attribute_greenhouses else 0)
+        + (1 if attribute_greenhouses else 0)
+        + (1 if streetview and attribute_greenhouses else 0)
+    )
     console.print(f"\n[bold]{final_step}. Exporting to {output}[/bold]")
     try:
         export.export_yaml(emitters, output)
@@ -340,38 +355,66 @@ def _enrich_businesses(emitters: list[TopEmitter]) -> None:
     console.print(f"[green]✓[/green] Found {total_businesses} businesses")
 
 
-def _enrich_streetview(emitters: list[TopEmitter], images_dir: Path) -> None:
-    """Enrich emitters with Street View imagery."""
+def _enrich_attributed_streetview(emitters: list[TopEmitter], images_dir: Path) -> None:
+    """Download Street View for businesses with high grow light likelihood."""
+    targets: list[Business] = []
+    for emitter in emitters:
+        for business in emitter.businesses:
+            if business.perplexity_analysis:
+                likelihood = business.perplexity_analysis.get("grow_light_likelihood")
+                if likelihood and likelihood >= HIGH_LIKELIHOOD_THRESHOLD:
+                    targets.append(business)
+
+    if not targets:
+        console.print("[dim]No high-likelihood greenhouses found to capture.[/dim]")
+        return
+
     with Progress(
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
         task = progress.add_task(
-            f"Downloading imagery 0/{len(emitters)}", total=len(emitters)
+            f"Downloading imagery 0/{len(targets)}", total=len(targets)
         )
-
-        for i, emitter in enumerate(emitters, 1):
+        for i, business in enumerate(targets, 1):
+            if not business.coordinates:
+                progress.advance(task)
+                continue
             try:
-                streetview_images = enrichment.get_street_view_images(
-                    emitter.coordinates, emitter.rank, images_dir
+                # Create a unique, filesystem-safe name for the subdirectory
+                safe_name = re.sub(
+                    r"[^a-zA-Z0-9_-]", "", business.name.replace(" ", "_")
                 )
-                emitter.streetview = streetview_images
+                sub_dir_name = f"{safe_name}_{business.place_id[:8]}"
+
+                streetview_images = enrichment.get_street_view_images(
+                    business.coordinates,
+                    sub_dir_name=sub_dir_name,
+                    images_dir=images_dir,
+                )
+                business.streetview = streetview_images
                 progress.update(
                     task,
                     advance=1,
-                    description=f"Downloading imagery {i}/{len(emitters)}",
+                    description=(
+                        f"Downloading imagery {i}/{len(targets)}: {business.name}"
+                    ),
                 )
             except Exception as e:
                 console.print(
-                    f"[yellow]Warning:[/yellow] Street View failed for rank {emitter.rank}: {e}"  # noqa: E501
+                    f"[yellow]Warning:[/yellow] Street View failed for "
+                    f"{business.name}: {e}"
                 )
                 progress.advance(task)
 
     available_count = sum(
-        1 for e in emitters if e.streetview and e.streetview.available
+        1
+        for business in targets
+        if business.streetview and business.streetview.available
     )
     console.print(
-        f"[green]✓[/green] Downloaded imagery for {available_count}/{len(emitters)} locations"  # noqa: E501
+        f"[green]✓[/green] Downloaded imagery for {available_count}/"
+        f"{len(targets)} businesses"
     )
 
 

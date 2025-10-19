@@ -1,0 +1,139 @@
+metadata:
+  exported_at: '2025-10-19T08:33:45.951749+00:00'
+  total_emitters: 2
+  source: NOAA VIIRS DNB Monthly
+emitters:
+- rank: 1
+  coordinates:
+    lat: 52.036035726728436
+    lon: 4.604988725217697
+  avg_radiance: 4523.16650390625
+  address:
+    formatted: Abraham Kroesweg 27, 2742 KV Waddinxveen, Netherlands
+    street: Abraham Kroesweg
+    city: Waddinxveen
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2742 KV
+    place_id: ChIJBdPfY-DRxUcRGMErjasoHpY
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses:
+  - name: Den Houter Gerbera
+    place_id: ChIJB6b8Y-DRxUcRZhhM11Z__C8
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Abraham Kroesweg 27, Waddinxveen
+    distance_m: 121.93000533429654
+    rating: null
+    relevance_score: 0.078554657519707
+    confidence_score: 0.4829384970661369
+    perplexity_analysis:
+      grow_light_likelihood: 0.5
+      lighting_evidence: Den Houter Gerbera uses a modern climate computer to control
+        the greenhouse climate and watering, but there is no direct mention of artificial
+        grow lights, LED, or HPS lighting on the company or affiliated sites.
+      primary_crops:
+      - gerbera
+      size_hectares: null
+      instagram_handle: null
+      sources:
+      - https://www.summitgerbera.com/en/denhoutergerbera
+      - https://vdplas.com/en-gb/discover-sustainability-in-gerberas-from-summit-gerbera
+    streetview_link: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=52.03681,4.6037265
+    coordinates:
+      lat: 52.03681
+      lon: 4.6037265
+    streetview: null
+  - name: Summit Gerbera
+    place_id: ChIJB6b8Y-DRxUcR2cAym5Y5R_Q
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Abraham Kroesweg 27, Waddinxveen
+    distance_m: 121.93000533429654
+    rating: null
+    relevance_score: 0.078554657519707
+    confidence_score: 0.4829384970661369
+    perplexity_analysis:
+      grow_light_likelihood: 0.5
+      lighting_evidence: The greenhouse is a meticulously air-conditioned environment
+        where heat, humidity, light, water, and nutrition are fine-tuned in detail
+        for the best and most sustainable growth of the colorful gerberas. However,
+        there is no explicit mention of artificial grow lights, LED, HPS, or supplemental
+        lighting systems on any official or industry sources reviewed.
+      primary_crops:
+      - gerbera
+      size_hectares: 2.4
+      instagram_handle: null
+      sources:
+      - https://www.summitgerbera.com/en/kwekerijdezuidplas
+      - https://vdplas.com/en-gb/discover-sustainability-in-gerberas-from-summit-gerbera
+    streetview_link: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=52.03681,4.6037265
+    coordinates:
+      lat: 52.03681
+      lon: 4.6037265
+    streetview: null
+  streetview: null
+- rank: 2
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.6117260898485934
+  avg_radiance: 3158.71337890625
+  address:
+    formatted: Abraham Kroesweg 54, 2742 KX Waddinxveen, Netherlands
+    street: Abraham Kroesweg
+    city: Waddinxveen
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2742 KX
+    place_id: ChIJNfxtY9zRxUcRCDmeUWDlDR0
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses:
+  - name: Porta Nova
+    place_id: ChIJB1sGLdzRxUcRIYQHhJ6L8kY
+    types:
+    - florist
+    - point_of_interest
+    - store
+    - establishment
+    vicinity: Abr, Abraham Kroesweg 31, Waddinxveen
+    distance_m: 361.34150870928846
+    rating: 4.7
+    relevance_score: 0.000854741627538699
+    confidence_score: 0.1915975473872135
+    perplexity_analysis:
+      grow_light_likelihood: 0.0
+      lighting_evidence: Porta Nova has opted for sustainability measures such as
+        (...) LED (...) in their greenhouses.
+      primary_crops:
+      - Red Naomi roses
+      size_hectares: null
+      instagram_handle: null
+      sources:
+      - https://thursd.com/articles/porta-nova-introduces-the-greenest-rose-in-the-netherlands
+      - https://www.rednaomi.com/visit-portanova/
+    streetview_link: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=52.03964309999999,4.6103058
+    coordinates:
+      lat: 52.03964309999999
+      lon: 4.6103058
+    streetview: null
+  - name: HortiClean BV
+    place_id: ChIJNfIs2k7QxUcROJReH418dFw
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Zesde Tochtweg 2a, Waddinxveen
+    distance_m: 277.0716132099631
+    rating: 4.0
+    relevance_score: 0.004391415884762322
+    confidence_score: 0.0
+    perplexity_analysis: null
+    streetview_link: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=52.043978,4.60818
+    coordinates:
+      lat: 52.043978
+      lon: 4.60818
+    streetview: null
+  streetview: null

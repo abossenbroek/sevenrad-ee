@@ -1,0 +1,16 @@
+{
+  "type": "Feature",
+  "properties": {
+    "name": "Moerkapelle"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[
+      [4.465, 51.996],
+      [4.465, 52.096],
+      [4.665, 52.096],
+      [4.665, 51.996],
+      [4.465, 51.996]
+    ]]
+  }
+}

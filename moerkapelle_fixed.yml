@@ -1,0 +1,181 @@
+metadata:
+  exported_at: '2025-10-19T07:15:50.007417+00:00'
+  total_emitters: 3
+  source: NOAA VIIRS DNB Monthly
+emitters:
+- rank: 1
+  coordinates:
+    lat: 52.036035726728436
+    lon: 4.604988725217697
+  avg_radiance: 4523.16650390625
+  address:
+    formatted: Abraham Kroesweg 27, 2742 KV Waddinxveen, Netherlands
+    street: Abraham Kroesweg
+    city: Waddinxveen
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2742 KV
+    place_id: ChIJBdPfY-DRxUcRGMErjasoHpY
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses:
+  - name: Summit Gerbera
+    place_id: ChIJB6b8Y-DRxUcR2cAym5Y5R_Q
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Abraham Kroesweg 27, Waddinxveen
+    distance_m: 121.93000533429654
+    rating: null
+    relevance_score: 0.078554657519707
+    confidence_score: 0.7859824039751379
+  - name: Den Houter Gerbera
+    place_id: ChIJB6b8Y-DRxUcRZhhM11Z__C8
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Abraham Kroesweg 27, Waddinxveen
+    distance_m: 121.93000533429654
+    rating: null
+    relevance_score: 0.078554657519707
+    confidence_score: 0.5531840966393932
+  - name: J.J.Uithol
+    place_id: ChIJEbka1-HRxUcRt-z0a8Mhk3Y
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Abraham Kroesweg 15, Waddinxveen
+    distance_m: 349.94343754220637
+    rating: null
+    relevance_score: 0.0008216227034615731
+    confidence_score: 0.4777915734064783
+  - name: SoliD Plants Kwekerijen | Japanse Esdoorn
+    place_id: ChIJMe8dwmjQxUcReBNEL5W-0u0
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Abraham Kroesweg 21, Waddinxveen
+    distance_m: 178.167574607471
+    rating: 5.0
+    relevance_score: 0.03401240610921199
+    confidence_score: 0.36982459142663804
+  streetview: null
+- rank: 2
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.6117260898485934
+  avg_radiance: 3158.71337890625
+  address:
+    formatted: Abraham Kroesweg 54, 2742 KX Waddinxveen, Netherlands
+    street: Abraham Kroesweg
+    city: Waddinxveen
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2742 KX
+    place_id: ChIJNfxtY9zRxUcRCDmeUWDlDR0
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses:
+  - name: Porta Nova
+    place_id: ChIJB1sGLdzRxUcRIYQHhJ6L8kY
+    types:
+    - florist
+    - point_of_interest
+    - store
+    - establishment
+    vicinity: Abr, Abraham Kroesweg 31, Waddinxveen
+    distance_m: 361.34150870928846
+    rating: 4.7
+    relevance_score: 0.000854741627538699
+    confidence_score: 0.5197083472878167
+  - name: van den Dool Cultures bv
+    place_id: ChIJK5ZkltzRxUcRvNuhidoXdGY
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Zesde Tochtweg 1K, Waddinxveen
+    distance_m: 404.84243904623804
+    rating: 5.0
+    relevance_score: 0.00036539659810148184
+    confidence_score: 0.29757878047688097
+  - name: J. Vrolijk Transport B.V.
+    place_id: ChIJ4flxgdrRxUcRaMivtFLGsT0
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Onderweg 22, Waddinxveen
+    distance_m: 568.6168154885542
+    rating: 3.9
+    relevance_score: 1.2798582774092908e-05
+    confidence_score: 0.12941495535343375
+  - name: HortiClean BV
+    place_id: ChIJNfIs2k7QxUcROJReH418dFw
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Zesde Tochtweg 2a, Waddinxveen
+    distance_m: 277.0716132099631
+    rating: 4.0
+    relevance_score: 0.004391415884762322
+    confidence_score: 0.0
+  streetview: null
+- rank: 3
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.598251360586801
+  avg_radiance: 2982.510009765625
+  address:
+    formatted: Van Hasseltweg 20, 2751 GZ Moerkapelle, Netherlands
+    street: Van Hasseltweg
+    city: Moerkapelle
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2751 GZ
+    place_id: ChIJbZqeISHOxUcRCbJjnSy7Zsg
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses:
+  - name: De Zuidplas Holding B.V.
+    place_id: ChIJ5-r7zSDOxUcRjjXeSVwwVUc
+    types:
+    - finance
+    - point_of_interest
+    - establishment
+    vicinity: Van Hasseltweg 5, Moerkapelle
+    distance_m: 487.28429338360166
+    rating: 5.0
+    relevance_score: 7.025603746520464e-05
+    confidence_score: 0.4441399808564551
+  - name: Anthuriumkwekerij Evanty
+    place_id: ChIJ87n1jtjRxUcR7l5bw9usnPY
+    types:
+    - florist
+    - point_of_interest
+    - store
+    - establishment
+    vicinity: Van Hasseltweg 32, Moerkapelle
+    distance_m: 456.25006679171963
+    rating: 4.4
+    relevance_score: 0.00012546273527548786
+    confidence_score: 0.4139296366548034
+  - name: Double Check Lily
+    place_id: ChIJY6fQeyHOxUcRwYSKk709UpU
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Van Hasseltweg 9, Moerkapelle
+    distance_m: 260.4684719954053
+    rating: 4.4
+    relevance_score: 0.00629581672757215
+    confidence_score: 0.2989556201958574
+  - name: We Art Design - Buitenreclame en binnenreclame
+    place_id: ChIJ5-r7zSDOxUcRIYLqiRDA-cs
+    types:
+    - point_of_interest
+    - establishment
+    vicinity: Van Hasseltweg 24, Moerkapelle
+    distance_m: 82.54160510845328
+    rating: null
+    relevance_score: 0.17270115294949964
+    confidence_score: 0.27523751846746397
+  streetview: null

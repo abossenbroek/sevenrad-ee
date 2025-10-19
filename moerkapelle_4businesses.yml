@@ -1,0 +1,56 @@
+metadata:
+  exported_at: '2025-10-19T07:06:48.400038+00:00'
+  total_emitters: 3
+  source: NOAA VIIRS DNB Monthly
+emitters:
+- rank: 1
+  coordinates:
+    lat: 52.036035726728436
+    lon: 4.604988725217697
+  avg_radiance: 4523.16650390625
+  address:
+    formatted: Abraham Kroesweg 27, 2742 KV Waddinxveen, Netherlands
+    street: Abraham Kroesweg
+    city: Waddinxveen
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2742 KV
+    place_id: ChIJBdPfY-DRxUcRGMErjasoHpY
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses: []
+  streetview: null
+- rank: 2
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.6117260898485934
+  avg_radiance: 3158.71337890625
+  address:
+    formatted: Abraham Kroesweg 54, 2742 KX Waddinxveen, Netherlands
+    street: Abraham Kroesweg
+    city: Waddinxveen
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2742 KX
+    place_id: ChIJNfxtY9zRxUcRCDmeUWDlDR0
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses: []
+  streetview: null
+- rank: 3
+  coordinates:
+    lat: 52.04277309135933
+    lon: 4.598251360586801
+  avg_radiance: 2982.510009765625
+  address:
+    formatted: Van Hasseltweg 20, 2751 GZ Moerkapelle, Netherlands
+    street: Van Hasseltweg
+    city: Moerkapelle
+    state: Zuid-Holland
+    country: Netherlands
+    postal_code: 2751 GZ
+    place_id: ChIJbZqeISHOxUcRCbJjnSy7Zsg
+    quality_score: 1.0
+    match_type: ROOFTOP
+  businesses: []
+  streetview: null

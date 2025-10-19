@@ -337,16 +337,18 @@ def _check_streetview_availability(coords: Coordinates) -> bool:
 
 
 def get_street_view_images(
-    coords: Coordinates, rank: int, images_dir: Path | None = None
+    coords: Coordinates,
+    sub_dir_name: str,
+    images_dir: Path | None = None,
 ) -> StreetViewImages:
     """
     Get Street View images from four cardinal directions.
 
-    Saves images to specified directory or default images/streetview/{rank}/.
+    Saves images to a specified subdirectory.
 
     Args:
         coords: Center coordinates
-        rank: Emitter rank (for organizing saved images)
+        sub_dir_name: Name for the subdirectory to store images (e.g., business name)
         images_dir: Base directory for images (defaults to settings.images_dir)
 
     Returns:
@@ -366,7 +368,7 @@ def get_street_view_images(
 
     # Create directory for images
     base_dir = images_dir if images_dir is not None else settings.images_dir
-    image_dir = base_dir / "streetview" / str(rank)
+    image_dir = base_dir / "streetview" / sub_dir_name
     image_dir.mkdir(parents=True, exist_ok=True)
 
     # Download images for four cardinal directions

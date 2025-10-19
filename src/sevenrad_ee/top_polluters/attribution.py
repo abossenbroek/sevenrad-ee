@@ -14,6 +14,7 @@ prompts to minimize API calls while maximizing attribution accuracy.
 import asyncio
 import json
 import logging
+import math
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -45,6 +46,55 @@ MAX_LIKELIHOOD_SCORE_WEIGHT = 0.5  # Maximum contribution from grow light likeli
 ENERGY_CROP_MULTIPLIER = 1.15  # Boost for energy-intensive crops
 LARGE_OPERATION_MULTIPLIER = 1.10  # Boost for large operations
 LARGE_GREENHOUSE_THRESHOLD_HA = 5.0  # Hectares threshold for "large" operation
+
+# Tiered crop heuristics (validated by industry research)
+# Based on Philips Horticulture/GE lighting deployments and regional patterns (NL/CA)
+TIER_1_CROPS = {
+    "cannabis",
+    "tomato",
+    "pepper",
+    "cucumber",
+    "rose",
+}  # 95% likelihood - energy-intensive crops requiring year-round supplemental lighting
+
+TIER_2_CROPS = {
+    "lettuce",
+    "leafy greens",
+    "leafy_greens",
+    "herbs",
+    "basil",
+    "strawberry",
+    "chrysanthemum",
+    "gerbera",
+}  # 85% likelihood - controlled environment agriculture with high light requirements
+
+TIER_3_CROPS = {
+    "young plants",
+    "young_plants",
+    "alstroemeria",
+    "lisianthus",
+    "eggplant",
+}  # 65% likelihood - crops with moderate supplemental lighting needs
+
+# Tier scoring probabilities
+TIER_1_SCORE = 0.95
+TIER_2_SCORE = 0.85
+TIER_3_SCORE = 0.65
+
+# Lighting keywords for evidence-based scoring
+LIGHTING_KEYWORDS = {
+    "led",
+    "hps",
+    "son-t",
+    "high pressure sodium",
+    "assimilation",
+    "supplemental light",
+    "supplemental lighting",
+    "artificial light",
+    "grow light",
+    "photoperiod",
+}
+EVIDENCE_TEXT_SCORE = 0.85  # Score when lighting keywords found in evidence text
 
 
 # Pydantic models for structured Perplexity responses
@@ -79,7 +129,7 @@ class AttributionResult:
     distance_from_pixel_m: float
     perplexity_analysis: Optional[PerplexityAnalysis]
     confidence_score: float
-    confidence_factors: dict[str, float] = field(default_factory=dict)
+    confidence_factors: dict[str, float | str] = field(default_factory=dict)
     api_error: Optional[str] = None
 
 
@@ -137,7 +187,7 @@ class PerplexityGreenhouseAnalyzer:
         """
         Analyze greenhouse operation using Perplexity AI with structured JSON.
 
-        Uses official perplexityai SDK with sonar-small-32k-online model
+        Uses official perplexityai SDK with sonar model (2025)
         for real-time web search and factual data retrieval.
 
         Args:
@@ -168,23 +218,38 @@ class PerplexityGreenhouseAnalyzer:
             "Cache MISS for business: %s - querying Perplexity API", business.name
         )
 
-        # Construct structured JSON prompt
+        # Construct structured JSON prompt with anti-greenwashing instructions
         business_info = business.name
         location_info = location_context
         prompt = (
-            f"Analyze greenhouse operation: {business_info} near {location_info}.\n\n"
-            "Focus ONLY on verifiable information from company websites, "
-            "agricultural databases, or industry reports.\n\n"
-            "For grow_light_likelihood: Estimate the probability (0.0-1.0) that this "
-            "operation uses artificial grow lights based on:\n"
-            "- Crop type (flowers like gerbera, roses require high light; "
-            "tomatoes, peppers need supplemental lighting)\n"
-            "- Explicit mentions of LED/HPS lighting, controlled "
-            "environment, or year-round production\n"
-            "- DO NOT speculate about schedules or practices unless "
-            "explicitly stated\n\n"
-            "For lighting_evidence: Quote or paraphrase ONLY factual "
-            "statements from sources. Do not infer practices.\n\n"
+            f"Analyze greenhouse operation: {business_info} near {location_info} "
+            "to determine if it uses artificial lighting that could cause "
+            "nighttime light pollution.\n\n"
+            "Focus ONLY on verifiable information from official websites, "
+            "industry reports, or agricultural databases.\n\n"
+            "CRITICAL ANTI-GREENWASHING INSTRUCTIONS:\n"
+            "- Ignore ALL sustainability marketing claims "
+            "(LED adoption, energy efficiency, CO2 reduction)\n"
+            "- ANY mention of artificial lighting "
+            "(LED, HPS, SON-T, assimilation lighting) is EVIDENCE of grow lights\n"
+            "- Companies often claim 'LED' for sustainability image "
+            "while still using high-intensity lights\n"
+            "- Crop type is MORE reliable than tech claims "
+            "(roses/gerberas = likely SON-T despite LED marketing)\n\n"
+            "For grow_light_likelihood: Estimate probability (0.0-1.0) based on:\n"
+            "1. Crop type (HIGHEST priority):\n"
+            "   - Roses, gerberas, tomatoes, peppers, cucumbers "
+            "→ VERY HIGH likelihood\n"
+            "   - Year-round production or controlled environment "
+            "→ HIGH likelihood\n"
+            "2. Any lighting technology mention "
+            "(LED, HPS, SON-T, supplemental lighting) → Evidence of grow lights\n"
+            "3. DO NOT reduce likelihood for 'sustainable' or "
+            "'energy efficient' claims\n\n"
+            "For lighting_evidence: Quote ANY mention of lighting technology, "
+            "energy use, or controlled environment.\n"
+            "Include sustainability claims about lighting as they confirm "
+            "artificial light presence.\n\n"
             "For instagram_handle: Find official Instagram account if available "
             "(return handle WITHOUT @ symbol, "
             "e.g., 'summitgerbera' not '@summitgerbera').\n\n"
@@ -193,7 +258,7 @@ class PerplexityGreenhouseAnalyzer:
             "Do not add commentary outside the JSON block.\n\n"
             "{\n"
             '  "grow_light_likelihood": float,  // 0.0-1.0 probability\n'
-            '  "lighting_evidence": "...",  // FACTUAL quotes only, or null\n'
+            '  "lighting_evidence": "...",  // ANY lighting tech mentions or quotes\n'
             '  "primary_crops": ["...", "..."],\n'
             '  "size_hectares": float,  // or null\n'
             '  "instagram_handle": "...",  // Without @ symbol, or null\n'
@@ -222,9 +287,9 @@ class PerplexityGreenhouseAnalyzer:
             )
 
             try:
-                logger.debug("Sending request to Perplexity sonar-pro model...")
+                logger.debug("Sending request to Perplexity sonar model...")
                 response = await self.client.chat.completions.create(
-                    model="sonar-pro",
+                    model="sonar",
                     messages=messages,  # type: ignore[arg-type]
                 )
 
@@ -294,18 +359,170 @@ class PerplexityGreenhouseAnalyzer:
         return None
 
 
+# Log-odds helper functions for Bayesian-style probability scaling
+
+
+def _logit(p: float) -> float:
+    """
+    Convert probability to log-odds (logit function).
+
+    Args:
+        p: Probability value between 0.0 and 1.0
+
+    Returns:
+        Log-odds value (unbounded real number)
+
+    """
+    # Clamp to prevent log(0) or log(negative)
+    p = min(max(p, 1e-9), 1 - 1e-9)
+    return math.log(p / (1 - p))
+
+
+def _sigmoid(logit: float) -> float:
+    """
+    Convert log-odds to probability (sigmoid function).
+
+    Args:
+        logit: Log-odds value (unbounded real number)
+
+    Returns:
+        Probability value between 0.0 and 1.0
+
+    """
+    return 1 / (1 + math.exp(-logit))
+
+
+def _get_distance_adjustment(
+    distance_meters: float, max_distance: float = 1000
+) -> float:
+    """
+    Calculate log-odds adjustment for distance from pixel center.
+
+    Linear interpolation: +1.5 at 0m, -1.5 at max_distance.
+
+    Args:
+        distance_meters: Distance from pixel center in meters
+        max_distance: Maximum search distance (default 1000m)
+
+    Returns:
+        Log-odds adjustment value
+
+    """
+    if distance_meters > max_distance:
+        return -1.5
+    return 1.5 - (distance_meters / max_distance) * 3.0
+
+
+def _get_size_adjustment(size_hectares: Optional[float]) -> float:
+    """
+    Calculate log-odds adjustment for greenhouse size.
+
+    Uses log scale: larger greenhouses get higher confidence boost.
+
+    Args:
+        size_hectares: Greenhouse size in hectares (None if unknown)
+
+    Returns:
+        Log-odds adjustment value (0.0 if size unknown)
+
+    """
+    if not size_hectares or size_hectares <= 0:
+        return 0.0
+    return 0.5 * math.log(size_hectares)
+
+
+def _get_type_adjustment(business_types: list[str]) -> float:
+    """
+    Calculate log-odds adjustment for business type.
+
+    Args:
+        business_types: List of business types from Google Places
+
+    Returns:
+        Log-odds adjustment value (+1.1 for greenhouse types, 0.0 otherwise)
+
+    """
+    greenhouse_types = {"greenhouse", "nursery", "horticulture"}
+    is_greenhouse = any(t.lower() in greenhouse_types for t in business_types)
+    return 1.1 if is_greenhouse else 0.0
+
+
+def _get_evidence_based_likelihood(
+    analysis: PerplexityAnalysis,
+) -> tuple[float, str]:
+    """
+    Derive grow light likelihood from multiple signals using MAX approach.
+
+    This function combines several signals to determine the likelihood of grow
+    light usage, preventing over-reliance on the AI's direct score. It returns
+    the highest likelihood found and the name of the signal that produced it.
+
+    Signals used (in priority order):
+    1. Tiered crop heuristics (95%, 85%, 65% based on crop type)
+    2. Evidence keywords (85% if lighting keywords found in text)
+    3. AI likelihood (direct score from Perplexity)
+
+    Args:
+        analysis: The PerplexityAnalysis object for a business
+
+    Returns:
+        Tuple of (highest_likelihood_score, signal_name)
+
+    """
+    signals: dict[str, float] = {}
+
+    # Signal 1: AI's direct score (fallback)
+    if analysis.grow_light_likelihood is not None:
+        signals["ai_likelihood"] = analysis.grow_light_likelihood
+
+    # Signal 2: Evidence text keyword analysis
+    if analysis.lighting_evidence:
+        text = analysis.lighting_evidence.lower()
+        if any(kw in text for kw in LIGHTING_KEYWORDS):
+            signals["evidence_keyword"] = EVIDENCE_TEXT_SCORE
+
+    # Signal 3-5: Tiered crop heuristics (highest priority)
+    for crop in analysis.primary_crops:
+        crop_lower = crop.lower()
+        # Check tier 1 first (highest confidence)
+        if any(tier1 in crop_lower for tier1 in TIER_1_CROPS):
+            signals["tier1_crop"] = TIER_1_SCORE
+            break  # Stop at highest tier found
+        # Check tier 2
+        if any(tier2 in crop_lower for tier2 in TIER_2_CROPS):
+            signals["tier2_crop"] = TIER_2_SCORE
+        # Check tier 3
+        elif any(tier3 in crop_lower for tier3 in TIER_3_CROPS):
+            signals["tier3_crop"] = TIER_3_SCORE
+
+    if not signals:
+        return 0.0, "no_signals"
+
+    # Find the strongest signal (highest score)
+    best_signal_name = max(signals, key=lambda k: signals[k])
+    best_score = signals[best_signal_name]
+
+    return best_score, best_signal_name
+
+
 def calculate_confidence(
     perplexity: Optional[PerplexityAnalysis],
     distance_m: float,
     business_types: list[str],
     max_distance: float = 1000,
-) -> tuple[float, dict[str, float]]:
+) -> tuple[float, dict[str, float | str]]:
     """
-    Calculate attribution confidence using improved multi-factor algorithm.
+    Calculate attribution confidence using log-odds based Bayesian scoring.
 
-    Uses continuous distance decay (not step functions) and treats night
-    lighting as a veto condition. Perplexity signals act as multipliers
-    on the base score.
+    This implementation uses log-odds space to properly combine multiple
+    signals without requiring clamping. The approach:
+    1. Start with base probability from strongest signal (crop/evidence/AI)
+    2. Convert to log-odds (unbounded space)
+    3. Add adjustments for distance, size, and type
+    4. Convert back to probability using sigmoid
+
+    This ensures scores naturally stay in [0,1] range without clamping,
+    and strong evidence properly dominates the final score.
 
     Args:
         perplexity: Perplexity analysis result (None if failed)
@@ -321,99 +538,73 @@ def calculate_confidence(
     logger.debug("  Distance: %.1fm", distance_m)
     logger.debug("  Business types: %s", business_types)
 
-    factors: dict[str, float] = {}
-
-    # NO VETO - allow all businesses to contribute proportionally
     if perplexity is None:
         logger.info("No Perplexity analysis - confidence = 0.0")
         return 0.0, {"analysis_failed": 0.0}
 
-    # CONTINUOUS DISTANCE SCORE (not step function)
-    distance_score = MAX_DISTANCE_SCORE_WEIGHT * (1 - (distance_m / max_distance))
-    factors["distance"] = round(distance_score, 3)
+    # Step 1: Get base probability from strongest signal
+    base_likelihood, evidence_reason = _get_evidence_based_likelihood(perplexity)
 
-    # BUSINESS TYPE SCORE
-    greenhouse_types = {"greenhouse", "nursery", "horticulture"}
-    agri_types = {"agricultural", "farming", "agri"}
+    # Ensure minimum probability to prevent log(0)
+    base_probability = max(base_likelihood, 0.01)
 
-    if any(t.lower() in greenhouse_types for t in business_types):
-        type_score = GREENHOUSE_TYPE_SCORE
-    elif any(t.lower() in agri_types for t in business_types):
-        type_score = AGRICULTURE_TYPE_SCORE
-    else:
-        type_score = 0.0
-    factors["business_type"] = type_score
+    logger.debug("Base likelihood from %s: %.3f", evidence_reason, base_probability)
 
-    # BASE SCORE from distance + type
-    base_score = distance_score + type_score
+    # Step 2: Convert to log-odds
+    base_logit = _logit(base_probability)
+    logger.debug("Base log-odds: %.3f", base_logit)
 
-    # GROW LIGHT LIKELIHOOD SCORE (distance-weighted)
-    # Use distance as weighting factor: closer = higher weight
-    distance_weight = 1 - (distance_m / max_distance)  # 1.0 at center, 0.0 at boundary
+    # Step 3: Calculate adjustments in log-odds space
+    distance_adj = _get_distance_adjustment(distance_m, max_distance)
+    size_adj = _get_size_adjustment(perplexity.size_hectares)
+    type_adj = _get_type_adjustment(business_types)
 
-    if perplexity.grow_light_likelihood is not None:
-        # Direct likelihood score (0.0-1.0) weighted by distance
-        # Maximum contribution when at pixel center
-        likelihood_score = (
-            MAX_LIKELIHOOD_SCORE_WEIGHT
-            * perplexity.grow_light_likelihood
-            * distance_weight
-        )
-        factors["grow_light_likelihood"] = round(perplexity.grow_light_likelihood, 3)
-        factors["grow_light_score"] = round(likelihood_score, 3)
-        logger.debug(
-            "Grow light likelihood: %.3f x distance_weight: %.3f = score: %.3f",
-            perplexity.grow_light_likelihood,
-            distance_weight,
-            likelihood_score,
-        )
-    else:
-        # No lighting information - score remains 0
-        likelihood_score = 0.0
-        factors["no_lighting_info"] = 0.0
-        logger.debug("No lighting information available → score: 0.000")
+    logger.debug("Distance adjustment: %.3f", distance_adj)
+    logger.debug("Size adjustment: %.3f", size_adj)
+    logger.debug("Type adjustment: %.3f", type_adj)
 
-    # MULTIPLIERS (signals amplify base score)
-    multiplier = 1.0
+    # Step 4: Combine in log-odds space
+    final_logit = base_logit + distance_adj + size_adj + type_adj
+    logger.debug("Final log-odds: %.3f", final_logit)
 
-    # Energy-intensive crops boost
-    energy_crops = {"tomato", "pepper", "cucumber", "flower", "rose"}
-    if any(crop.lower() in energy_crops for crop in perplexity.primary_crops):
-        multiplier *= ENERGY_CROP_MULTIPLIER
-        factors["energy_crops"] = ENERGY_CROP_MULTIPLIER - 1.0
+    # Step 5: Convert back to probability
+    final_confidence = _sigmoid(final_logit)
 
-    # Large operation boost
-    if (
-        perplexity.size_hectares
-        and perplexity.size_hectares > LARGE_GREENHOUSE_THRESHOLD_HA
-    ):
-        multiplier *= LARGE_OPERATION_MULTIPLIER
-        factors["large_operation"] = LARGE_OPERATION_MULTIPLIER - 1.0
-
-    # Calculate total score
-    # The pre-clamped score can exceed 1.0 by design. Multipliers for strong
-    # signals (e.g., energy crops) are intended to boost already high-confidence
-    # candidates, and min() ensures the final score remains a valid probability.
-    total_score = min((base_score + likelihood_score) * multiplier, 1.0)
-    factors["total"] = round(total_score, 3)
+    # Build factor breakdown for transparency
+    factors: dict[str, float | str] = {
+        "base_likelihood": round(base_probability, 3),
+        "evidence_reason": evidence_reason,
+        "ai_grow_light_likelihood": round(perplexity.grow_light_likelihood or 0.0, 3),
+        "distance_m": round(distance_m, 1),
+        "distance_adj": round(distance_adj, 3),
+        "size_hectares": (
+            round(perplexity.size_hectares, 2) if perplexity.size_hectares else 0.0
+        ),
+        "size_adj": round(size_adj, 3),
+        "type_adj": round(type_adj, 3),
+        "base_logit": round(base_logit, 3),
+        "final_logit": round(final_logit, 3),
+        "final_confidence": round(final_confidence, 3),
+    }
 
     logger.info("Confidence calculation complete:")
-    logger.info("  Distance score: %.3f", factors["distance"])
-    logger.info("  Business type score: %.3f", factors["business_type"])
-    if "grow_light_likelihood" in factors:
-        logger.info(
-            "  Grow light likelihood (raw): %.3f", factors["grow_light_likelihood"]
-        )
-        logger.info(
-            "  Grow light score (weighted): %.3f", factors.get("grow_light_score", 0.0)
-        )
-    else:
-        logger.info("  No lighting info: %.3f", factors.get("no_lighting_info", 0.0))
-    logger.info("  Base score: %.3f", base_score)
-    logger.info("  Multiplier: %.3f", multiplier)
-    logger.info("  TOTAL CONFIDENCE: %.3f", total_score)
+    logger.info("  Evidence source: %s", evidence_reason)
+    logger.info("  Base likelihood: %.3f", base_probability)
+    logger.info("  AI likelihood (raw): %.3f", perplexity.grow_light_likelihood or 0.0)
+    logger.info("  Distance: %.1fm → adjustment: %.3f", distance_m, distance_adj)
+    logger.info(
+        "  Size: %s ha → adjustment: %.3f",
+        perplexity.size_hectares or "unknown",
+        size_adj,
+    )
+    logger.info("  Type adjustment: %.3f", type_adj)
+    logger.info("  Base log-odds: %.3f", base_logit)
+    logger.info("  Final log-odds: %.3f", final_logit)
+    logger.info(
+        "  FINAL CONFIDENCE: %.3f (%.1f%%)", final_confidence, final_confidence * 100
+    )
 
-    return total_score, factors
+    return final_confidence, factors
 
 
 async def scan_pixel_for_attribution(  # noqa: PLR0915

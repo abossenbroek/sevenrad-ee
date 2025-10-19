@@ -116,3 +116,12 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "perplexity.*"
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "api: marks tests that make real API calls (Perplexity, Earth Engine, Google Maps)",
+]
+# By default, skip slow tests unless explicitly requested
+addopts = "-m 'not slow'"
+testpaths = ["tests"]
