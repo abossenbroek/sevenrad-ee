@@ -79,12 +79,36 @@ uv run mypy src/sevenrad_ee
 uv run pytest
 ```
 
+## Features
+
+### VIIRS Top Polluters
+
+Identify and analyze top light-emitting locations using NOAA VIIRS DNB satellite data:
+
+- Query Google Earth Engine for brightest nighttime light patches
+- Optional enrichment with Google Maps APIs (geocoding, business lookup, Street View)
+- Export results to YAML with comprehensive metadata
+
+**Quick Start:**
+
+```bash
+uv run viirs-top-polluters \
+  --region my_region.geojson \
+  --start-date 2024-01-01 \
+  --end-date 2024-12-31 \
+  --businesses
+```
+
+📖 **Full Documentation**: [VIIRS Top Polluters Guide](src/sevenrad_ee/top_polluters/README.md)
+
 ## Project Structure
 
 ```
 .
 ├── src/
 │   └── sevenrad_ee/          # Main package
+│       ├── top_polluters/    # VIIRS top emitters analysis
+│       └── ...               # Other modules
 ├── tests/                    # Test files
 ├── pyproject.toml            # Project configuration
 ├── .mise.toml                # Tool version management
