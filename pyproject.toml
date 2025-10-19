@@ -74,6 +74,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "src/sevenrad_ee/top_polluters/cli.py" = ["B008"]  # Typer CLI pattern
+"src/sevenrad_ee/operations/generate_viirs_maps.py" = ["B008"]  # Typer CLI pattern
 
 [tool.mypy]
 python_version = "3.12"

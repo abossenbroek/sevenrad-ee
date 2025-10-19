@@ -7,12 +7,11 @@ to generate nighttime light composite maps for specified regions and time period
 
 from __future__ import annotations
 
-import argparse
-import sys
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
+import typer
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -31,6 +30,13 @@ else:
 
 # Initialize Rich console for colorful output
 console = Console()
+
+# Create Typer app for maps subcommand
+maps_app = typer.Typer(
+    help="Generate VIIRS DNB composite maps for regions",
+    no_args_is_help=True,
+    rich_markup_mode="rich",
+)
 
 
 def initialize_earth_engine() -> None:
@@ -208,108 +214,57 @@ def display_summary(
     console.print("\n")
 
 
-def parse_arguments() -> argparse.Namespace:
-    """
-    Parse command-line arguments.
-
-    Returns:
-        Parsed command-line arguments
-
-    """
-    # Build available regions help text
-    available_regions = ", ".join(KnownRegion.all_regions())
-
-    parser = argparse.ArgumentParser(
-        description="Generate VIIRS nighttime light maps using Google Earth Engine",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=f"""
-Available Regions:
-  {available_regions}
-
-  Use --list-maps to see full descriptions
-
-Examples:
-  # List available maps with descriptions
-  uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
-      --list-maps
-
-  # Generate all maps for 2020
-  uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
-      --start-date 2020-01-01 \\
-      --end-date 2020-12-31 \\
-      --maps all
-
-  # Generate specific maps (use region codes)
-  uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
-      --start-date 2020-01-01 \\
-      --end-date 2020-12-31 \\
-      --maps us,europe,china
-
-  # Generate just Moerkappele
-  uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
-      --start-date 2020-01-01 \\
-      --end-date 2020-12-31 \\
-      --maps netherlands_moerkappele
-
-  # With custom config file
-  uv run python -m sevenrad_ee.operations.generate_viirs_maps \\
-      --start-date 2020-01-01 \\
-      --end-date 2020-12-31 \\
-      --maps all \\
-      --config /path/to/custom_config.js
-        """,
-    )
-
-    parser.add_argument(
-        "--list-maps",
-        action="store_true",
-        help="List available map regions with descriptions and exit",
-    )
-
-    parser.add_argument(
+@maps_app.command()
+def main(  # noqa: C901, PLR0912, PLR0915, PLR0913
+    start_date: Optional[str] = typer.Option(
+        None,
         "--start-date",
-        type=str,
         help="Start date in YYYY-MM-DD format",
-    )
-
-    parser.add_argument(
+        metavar="DATE",
+    ),
+    end_date: Optional[str] = typer.Option(
+        None,
         "--end-date",
-        type=str,
         help="End date in YYYY-MM-DD format",
-    )
-
-    parser.add_argument(
+        metavar="DATE",
+    ),
+    maps: Optional[str] = typer.Option(
+        None,
         "--maps",
-        type=str,
-        help=(
-            f"Maps to generate: 'all' or comma-separated list. "
-            f"Available: {available_regions}"
-        ),
-    )
-
-    parser.add_argument(
+        help="Maps to generate: 'all' or comma-separated list",
+        metavar="REGION",
+    ),
+    list_maps: bool = typer.Option(
+        False,
+        "--list-maps",
+        help="List available map regions with descriptions and exit",
+        is_flag=True,
+    ),
+    config: Optional[Path] = typer.Option(
+        None,
         "--config",
-        type=str,
-        default=None,
         help="Path to JavaScript config file (default: ./extract_geotiffs.js)",
-    )
-
-    parser.add_argument(
+    ),
+    output_dir: Optional[Path] = typer.Option(
+        None,
         "--output-dir",
-        type=str,
-        default=None,
-        help="Output directory for saving results (optional)",
-    )
+        help="Output directory for saving results",
+    ),
+) -> None:
+    r"""
+    Generate VIIRS DNB composite maps for specified regions and time periods.
 
-    return parser.parse_args()
+    Examples:
+      # List available maps
+      uv run viirs maps --list-maps
 
+      # Generate all maps for 2020
+      uv run viirs maps --start-date 2020-01-01 \
+          --end-date 2020-12-31 --maps all
 
-def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
-    """
-    Run the VIIRS map generation CLI.
-
-    Returns:
-        Exit code (0 for success, 1 for failure)
+      # Generate specific maps
+      uv run viirs maps --start-date 2020-01-01 \
+          --end-date 2020-12-31 --maps us,europe
 
     """
     # Display header
@@ -322,22 +277,16 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
     )
 
     try:
-        # Parse arguments
-        args = parse_arguments()
-
         # Determine config file path
-        if args.config:
-            config_file = Path(args.config)
-        else:
-            config_file = Path.cwd() / "extract_geotiffs.js"
+        config_file = config if config else Path.cwd() / "extract_geotiffs.js"
 
         # Handle --list-maps option
-        if args.list_maps:
+        if list_maps:
             list_available_maps(config_file if config_file.exists() else None)
-            return 0
+            raise typer.Exit(0)
 
         # Validate required arguments when not listing maps
-        if not args.start_date or not args.end_date or not args.maps:
+        if not start_date or not end_date or not maps:
             console.print(
                 "[red]✗[/red] --start-date, --end-date, and --maps are required",
                 style="bold red",
@@ -345,7 +294,7 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
             console.print(
                 "\n[yellow]Tip:[/yellow] Use --list-maps to see available regions"
             )
-            return 1
+            raise typer.Exit(1)
 
         if not config_file.exists():
             console.print(
@@ -355,7 +304,7 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
             console.print(
                 "\n[yellow]Tip:[/yellow] Specify config file with --config option"
             )
-            return 1
+            raise typer.Exit(1)
 
         # Load configuration
         console.print(f"[yellow]Loading configuration from {config_file}...[/yellow]")
@@ -365,15 +314,15 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
             console.print(
                 "[red]✗[/red] No regions found in config file", style="bold red"
             )
-            return 1
+            raise typer.Exit(1)
 
         console.print(f"[green]✓[/green] Found {len(regions)} region(s) in config")
 
         # Determine which maps to process
-        if args.maps.lower() == "all":
+        if maps.lower() == "all":
             maps_to_process = list(regions.keys())
         else:
-            maps_to_process = [m.strip() for m in args.maps.split(",")]
+            maps_to_process = [m.strip() for m in maps.split(",")]
 
             # Validate map names
             invalid_maps = [m for m in maps_to_process if m not in regions]
@@ -383,23 +332,20 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
                     style="bold red",
                 )
                 available = ", ".join(sorted(regions.keys()))
-                console.print(
-                    f"\n[yellow]Available in config:[/yellow] {available}"
-                )
+                console.print(f"\n[yellow]Available in config:[/yellow] {available}")
                 console.print(
                     "\n[dim]Run with --list-maps to see full descriptions[/dim]"
                 )
-                return 1
+                raise typer.Exit(1)
 
         # Prepare output directory
-        output_dir = Path(args.output_dir) if args.output_dir else None
         if output_dir:
             output_dir.mkdir(parents=True, exist_ok=True)
 
         # Display summary
         display_summary(
-            start_date=args.start_date,
-            end_date=args.end_date,
+            start_date=start_date,
+            end_date=end_date,
             maps=maps_to_process,
             config_file=config_file,
             output_dir=output_dir,
@@ -417,8 +363,8 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
         for map_name in maps_to_process:
             region_config = regions[map_name]
             composite = generate_viirs_composite(
-                start_date=args.start_date,
-                end_date=args.end_date,
+                start_date=start_date,
+                end_date=end_date,
                 region_name=map_name,
                 region=region_config,
             )
@@ -443,18 +389,16 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915, PLR0911
                 f"palette colors={len(vis_config.palette)}[/dim]"
             )
 
-        return 0
-
     except KeyboardInterrupt:
         console.print("\n[yellow]Operation cancelled by user[/yellow]")
-        return 1
+        raise typer.Exit(1) from None
     except Exception as e:
         console.print(f"\n[bold red]Error:[/bold red] {e}", style="bold red")
         import traceback
 
         console.print(f"\n[dim]{traceback.format_exc()}[/dim]")
-        return 1
+        raise typer.Exit(1) from e
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    maps_app()
