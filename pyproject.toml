@@ -23,6 +23,7 @@ dependencies = [
     "googlemaps~=4.10.0",
     "pyyaml~=6.0.0",
     "requests~=2.31.0",
+    "perplexityai~=0.17.0",
 ]
 
 [project.optional-dependencies]
@@ -106,4 +107,12 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "yaml"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "perplexity"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "perplexity.*"
 ignore_missing_imports = true

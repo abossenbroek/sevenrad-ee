@@ -5,22 +5,27 @@ Identifies top light emitters using VIIRS DNB satellite data
 with optional enrichment from Google Maps APIs.
 """
 
+import asyncio
+import logging
 from datetime import date
 from pathlib import Path
 
 import click
 import ee
 from rich.console import Console
+from rich.logging import RichHandler
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from . import enrichment, export
+from .attribution import scan_pixel_for_attribution
 from .cache import cache
 from .earth_engine import get_top_emitters
-from .models import TopEmitter
+from .models import Business, TopEmitter
 
 console = Console()
+logger = logging.getLogger(__name__)
 
 
 def initialize_earth_engine() -> None:
@@ -89,6 +94,19 @@ def initialize_earth_engine() -> None:
     help="Download Street View imagery.",
 )
 @click.option(
+    "--attribute-greenhouses",
+    is_flag=True,
+    default=False,
+    help="Use AI to identify greenhouse operations causing light pollution.",
+)
+@click.option(
+    "--max-businesses",
+    type=click.IntRange(1, 20),
+    default=5,
+    show_default=True,
+    help="Maximum businesses to analyze per pixel (for attribution).",
+)
+@click.option(
     "--output",
     type=click.Path(dir_okay=False, writable=True, path_type=Path),
     default=Path("results.yml"),
@@ -101,7 +119,14 @@ def initialize_earth_engine() -> None:
     default=False,
     help="Clear all caches before running.",
 )
-def top_polluters(  # noqa: PLR0913, C901
+@click.option(
+    "--verbose",
+    "-v",
+    is_flag=True,
+    default=False,
+    help="Enable verbose logging for debugging.",
+)
+def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
     region: Path,
     start_date: str,
     end_date: str,
@@ -109,8 +134,11 @@ def top_polluters(  # noqa: PLR0913, C901
     geocode: bool,
     businesses: bool,
     streetview: bool,
+    attribute_greenhouses: bool,
+    max_businesses: int,
     output: Path,
     clear_cache: bool,
+    verbose: bool,
 ) -> None:
     """
     Find top VIIRS DNB light emitters in a geographic region.
@@ -119,6 +147,35 @@ def top_polluters(  # noqa: PLR0913, C901
     500m x 500m patches, with optional enrichment from Google Maps APIs.
     REGION is the path to a GeoJSON file defining the geographic boundary.
     """
+    # Configure logging
+    if verbose:
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            handlers=[RichHandler(console=console, rich_tracebacks=True)],
+            force=True,
+        )
+        logger.info("Verbose logging enabled (DEBUG level)")
+    else:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(message)s",
+            handlers=[RichHandler(console=console, show_time=False, show_path=False)],
+            force=True,
+        )
+
+    logger.info("Starting VIIRS Top Polluters CLI")
+    logger.debug(
+        "Parameters: region=%s, n=%d, geocode=%s, businesses=%s, "
+        "streetview=%s, attribute_greenhouses=%s",
+        region,
+        n_emitters,
+        geocode,
+        businesses,
+        streetview,
+        attribute_greenhouses,
+    )
+
     # Display header
     console.print(
         Panel.fit(
@@ -196,8 +253,15 @@ def top_polluters(  # noqa: PLR0913, C901
         console.print(f"\n[bold]4. Downloading Street View imagery[/bold]")
         _enrich_streetview(emitters)
 
-    # Step 5: Export to YAML
-    console.print(f"\n[bold]5. Exporting to {output}[/bold]")
+    # Step 5: Greenhouse Attribution (optional, AI-powered)
+    if attribute_greenhouses:
+        step_num = 5 if streetview else (4 if businesses else (3 if geocode else 2))
+        console.print(f"\n[bold]{step_num}. AI Greenhouse Attribution Analysis[/bold]")
+        _run_attribution_analysis(emitters, region.stem, max_businesses)
+
+    # Final Step: Export to YAML
+    final_step = 6 if attribute_greenhouses else 5
+    console.print(f"\n[bold]{final_step}. Exporting to {output}[/bold]")
     try:
         export.export_yaml(emitters, output)
         console.print(f"[green]✓[/green] Exported to {output}")
@@ -300,6 +364,97 @@ def _enrich_streetview(emitters: list[TopEmitter]) -> None:
     console.print(
         f"[green]✓[/green] Downloaded imagery for {available_count}/{len(emitters)} locations"  # noqa: E501
     )
+
+
+def _run_attribution_analysis(
+    emitters: list[TopEmitter], region_name: str, max_businesses: int
+) -> None:
+    """
+    Run AI-powered greenhouse attribution analysis on top emitters.
+
+    Args:
+        emitters: List of top emitters to analyze
+        region_name: Name of region for context (e.g., "moerkapelle")
+        max_businesses: Maximum number of businesses to analyze per pixel
+
+    """
+    logger.info("Starting attribution analysis for %d emitters", len(emitters))
+    logger.info("Region context: %s", region_name)
+    logger.info("Max businesses to analyze per pixel: %d", max_businesses)
+    logger.debug("Will analyze top 5 emitters maximum to conserve API quota")
+
+    console.print(
+        "[cyan]Running AI-powered attribution analysis using Perplexity...[/cyan]\n"
+    )
+
+    async def analyze_emitters() -> None:
+        for emitter in emitters[:5]:  # Analyze top 5 to conserve API quota
+            logger.info(
+                "Processing emitter rank %d: %.6f°N, %.6f°E (radiance: %.2f)",
+                emitter.rank,
+                emitter.coordinates.lat,
+                emitter.coordinates.lon,
+                emitter.avg_radiance,
+            )
+            console.print(f"\n[yellow]─[/yellow] Rank {emitter.rank}")
+
+            # Capture attribution results (FIX: was discarding return value)
+            attribution_results = await scan_pixel_for_attribution(
+                pixel_center=emitter.coordinates,
+                pixel_radiance=emitter.avg_radiance,
+                location_context=region_name.replace("_", " ").title(),
+                confidence_threshold=0.85,
+                max_businesses_to_analyze=max_businesses,
+            )
+
+            # Convert AttributionResult → Business and attach to emitter
+            if attribution_results:
+                logger.info(
+                    "Attaching %d attribution results to emitter rank %d",
+                    len(attribution_results),
+                    emitter.rank,
+                )
+                updated_businesses = []
+                for result in attribution_results:
+                    # Unpack existing Business data (including place_id)
+                    business_data = result.business.model_dump()
+                    # Update distance with actual pixel-to-business distance
+                    business_data["distance_m"] = result.distance_from_pixel_m
+                    # Add attribution confidence score
+                    business_data["confidence_score"] = result.confidence_score
+                    # Add raw Perplexity analysis (if available)
+                    if result.perplexity_analysis:
+                        business_data["perplexity_analysis"] = (
+                            result.perplexity_analysis.model_dump()
+                        )
+                    updated_businesses.append(Business(**business_data))
+
+                # Results already sorted by confidence (highest first)
+                emitter.businesses = updated_businesses
+                logger.debug(
+                    "Top business: %s (place_id: %s, confidence: %.2f)",
+                    updated_businesses[0].name,
+                    updated_businesses[0].place_id,
+                    updated_businesses[0].confidence_score or 0.0,
+                )
+            else:
+                logger.warning(
+                    "No attribution results for emitter rank %d", emitter.rank
+                )
+
+            logger.debug("Completed analysis for emitter rank %d", emitter.rank)
+
+    try:
+        logger.debug("Starting async event loop for attribution analysis...")
+        asyncio.run(analyze_emitters())
+        logger.info("Attribution analysis complete for all emitters")
+    except KeyboardInterrupt:
+        logger.warning("Attribution analysis interrupted by user")
+        console.print("\n[yellow]Attribution analysis interrupted by user[/yellow]")
+    except Exception as e:
+        logger.exception("Attribution analysis failed with exception: %s", e)
+        console.print(f"\n[red]Attribution analysis failed:[/red] {e}")
+        console.print("[yellow]Tip:[/yellow] Ensure PERPLEXITY_API_KEY is set in .env")
 
 
 def _display_summary(emitters: list[TopEmitter]) -> None:

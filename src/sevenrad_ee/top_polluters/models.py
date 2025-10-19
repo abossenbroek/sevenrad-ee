@@ -6,7 +6,7 @@ emitters, and enriched data from various APIs.
 """
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -63,6 +63,13 @@ class Business(BaseModel):
     rating: Optional[float] = None
     relevance_score: float = Field(
         ..., description="Calculated relevance score based on proximity, type, rating."
+    )
+    confidence_score: Optional[float] = Field(
+        default=None, description="Attribution confidence score from AI analysis."
+    )
+    perplexity_analysis: Optional[dict[str, Any]] = Field(
+        default=None,
+        description="Raw Perplexity AI analysis with crops, lighting, sources, etc.",
     )
 
 

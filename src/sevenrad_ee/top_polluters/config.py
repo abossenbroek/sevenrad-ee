@@ -42,6 +42,13 @@ class Settings(BaseSettings):
         default=100,
         description="Search radius for nearby businesses in meters.",
     )
+    perplexity_api_key: str | None = Field(
+        default=None,
+        description=(
+            "Perplexity API key for greenhouse attribution "
+            "(or set PERPLEXITY_API_KEY env var)."
+        ),
+    )
 
 
 # Create a singleton instance of the settings
