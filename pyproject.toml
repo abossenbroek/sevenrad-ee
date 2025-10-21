@@ -16,15 +16,29 @@ dependencies = [
     "google-auth~=2.37.0",
     "google-cloud-storage~=2.19.0",
     "rich~=13.9.0",
+    "click~=8.1.0",
+    "pydantic~=2.8.0",
+    "pydantic-settings~=2.4.0",
+    "python-dotenv~=1.0.0",
+    "googlemaps~=4.10.0",
+    "pyyaml~=6.0.0",
+    "requests~=2.31.0",
+    "perplexityai~=0.17.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest~=8.3.0",
+    "pytest-cov~=4.1.0",
+    "vcrpy~=5.1.0",
+    "pytest-vcr~=1.0.2",
     "ruff~=0.8.0",
     "mypy~=1.13.0",
     "pre-commit~=4.0.0",
 ]
+
+[project.scripts]
+viirs = "sevenrad_ee.cli:main"
 
 [tool.ruff]
 target-version = "py312"
@@ -59,6 +73,16 @@ ignore = [
     "D212",   # multi-line-summary-first-line (conflicts with D213)
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",    # assert usage (normal in pytest)
+    "S603",    # subprocess call without shell=True (safe in tests)
+    "S607",    # partial executable path (normal for test commands)
+    "PLR2004", # magic values in comparisons (acceptable in tests)
+    "PLR0913", # too many arguments (acceptable for test fixtures)
+    "ARG002",  # unused function arguments (fixtures may not be used directly)
+]
+
 [tool.mypy]
 python_version = "3.12"
 strict = true
@@ -76,3 +100,28 @@ follow_imports = "normal"
 [[tool.mypy.overrides]]
 module = "ee"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "googlemaps"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "yaml"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "perplexity"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "perplexity.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "api: marks tests that make real API calls (Perplexity, Earth Engine, Google Maps)",
+]
+# By default, skip slow tests unless explicitly requested
+addopts = "-m 'not slow'"
+testpaths = ["tests"]

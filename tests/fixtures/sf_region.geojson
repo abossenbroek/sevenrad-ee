@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "San Francisco Bay Area (Test Region)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-122.5, 37.7],
+            [-122.5, 37.9],
+            [-122.3, 37.9],
+            [-122.3, 37.7],
+            [-122.5, 37.7]
+          ]
+        ]
+      }
+    }
+  ]
+}
