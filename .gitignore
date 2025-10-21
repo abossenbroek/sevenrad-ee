@@ -257,3 +257,13 @@ test_*.yml
 demo_*.yml
 zen_generated.code
 *.log
+
+# Region-specific test outputs (e.g., moerkapelle_*.yml)
+# These are generated when running the CLI on test regions
+moerkapelle*.yml
+*_top*.yml
+*_fixed.yml
+*_clean.yml
+*_with_*.yml
+*_businesses.yml
+*_results.yml
