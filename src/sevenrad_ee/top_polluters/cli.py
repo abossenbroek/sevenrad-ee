@@ -19,6 +19,11 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
+from sevenrad_ee.data.js_config_parser import (
+    KnownRegion,
+    load_viirs_config,
+)
+
 from . import enrichment, export
 from .attribution import HIGH_LIKELIHOOD_THRESHOLD, scan_pixel_for_attribution
 from .cache import cache
@@ -27,6 +32,45 @@ from .models import Business, TopEmitter
 
 console = Console()
 logger = logging.getLogger(__name__)
+
+
+def list_available_maps(config_file: Path | None = None) -> None:
+    """
+    Display available map regions with descriptions.
+
+    Args:
+        config_file: Optional path to config file to show actual availability
+
+    """
+    console.print("\n[bold cyan]Available Map Regions:[/bold cyan]\n")
+
+    # Show known regions with display names
+    display_names = KnownRegion.display_names()
+    table = Table(show_header=True, header_style="bold cyan")
+    table.add_column("Region Code", style="green", no_wrap=True)
+    table.add_column("Description", style="white")
+    table.add_column("Status", style="yellow")
+
+    # If config file provided, check which are actually available
+    available_regions = set()
+    if config_file and config_file.exists():
+        regions, _ = load_viirs_config(config_file)
+        available_regions = set(regions.keys())
+
+    for region_code in KnownRegion.all_regions():
+        description = display_names.get(region_code, region_code)
+        if config_file:
+            status = (
+                "✓ Available" if region_code in available_regions else "✗ Not in config"
+            )
+        else:
+            status = "Check config file"
+        table.add_row(region_code, description, status)
+
+    console.print(table)
+    console.print(
+        "\n[dim]Use --regions to select: e.g., --regions drc or --regions moerkapelle[/dim]\n"  # noqa: E501
+    )
 
 
 def initialize_earth_engine() -> None:
@@ -50,20 +94,43 @@ def initialize_earth_engine() -> None:
 
 
 @click.command(name="top-polluters")
-@click.argument(
-    "region",
+@click.option(
+    "--regions",
+    type=str,
+    default=None,
+    help="Region code (e.g., 'drc', 'moerkapelle'). "
+    "Mutually exclusive with --region-file.",
+)
+@click.option(
+    "--region-file",
     type=click.Path(exists=True, dir_okay=False, readable=True, path_type=Path),
+    default=None,
+    help="Path to GeoJSON file defining custom region. "
+    "Mutually exclusive with --regions.",
+)
+@click.option(
+    "--list-maps",
+    is_flag=True,
+    default=False,
+    help="List available map regions with descriptions and exit",
+)
+@click.option(
+    "--config",
+    "config_path",
+    type=click.Path(exists=False, dir_okay=False, path_type=Path),
+    default=None,
+    help="Path to JavaScript config file (default: ./extract_geotiffs.js)",
 )
 @click.option(
     "--start-date",
-    required=True,
     type=str,
+    default=None,
     help="Start date in YYYY-MM-DD format",
 )
 @click.option(
     "--end-date",
-    required=True,
     type=str,
+    default=None,
     help="End date in YYYY-MM-DD format",
 )
 @click.option(
@@ -135,9 +202,12 @@ def initialize_earth_engine() -> None:
     help="Directory for Street View images.",
 )
 def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
-    region: Path,
-    start_date: str,
-    end_date: str,
+    regions: str | None,
+    region_file: Path | None,
+    list_maps: bool,
+    config_path: Path | None,
+    start_date: str | None,
+    end_date: str | None,
     n_emitters: int,
     geocode: bool,
     businesses: bool,
@@ -154,7 +224,9 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
 
     Queries NOAA VIIRS DNB monthly satellite data to identify the brightest
     500m x 500m patches, with optional enrichment from Google Maps APIs.
-    REGION is the path to a GeoJSON file defining the geographic boundary.
+
+    Specify region using either --regions (named region from config) or
+    --region-file (path to custom GeoJSON file).
     """
     # Configure logging
     if verbose:
@@ -175,9 +247,10 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
 
     logger.info("Starting VIIRS Top Polluters CLI")
     logger.debug(
-        "Parameters: region=%s, n=%d, geocode=%s, businesses=%s, "
+        "Parameters: regions=%s, region_file=%s, n=%d, geocode=%s, businesses=%s, "
         "streetview=%s, attribute_greenhouses=%s",
-        region,
+        regions,
+        region_file,
         n_emitters,
         geocode,
         businesses,
@@ -193,6 +266,44 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
             border_style="cyan",
         )
     )
+
+    # Determine config file path
+    config_file = config_path if config_path else Path.cwd() / "extract_geotiffs.js"
+
+    # Handle --list-maps option
+    if list_maps:
+        list_available_maps(config_file if config_file.exists() else None)
+        raise click.exceptions.Exit(0)
+
+    # Validate that exactly one of --regions or --region-file is provided
+    if not regions and not region_file:
+        console.print(
+            "[red]✗[/red] Must provide either --regions or --region-file",
+            style="bold red",
+        )
+        console.print(
+            "\n[yellow]Tip:[/yellow] Use --list-maps to see available regions"
+        )
+        raise click.exceptions.Exit(1)
+
+    if regions and region_file:
+        console.print(
+            "[red]✗[/red] Cannot use both --regions and --region-file",
+            style="bold red",
+        )
+        console.print(
+            "\n[yellow]Tip:[/yellow] Choose one: --regions for named regions, "
+            "--region-file for custom GeoJSON"
+        )
+        raise click.exceptions.Exit(1)
+
+    # Validate required date parameters
+    if not start_date or not end_date:
+        console.print(
+            "[red]✗[/red] --start-date and --end-date are required",
+            style="bold red",
+        )
+        raise click.exceptions.Exit(1)
 
     # Initialize Earth Engine
     try:
@@ -224,8 +335,74 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
         )
         raise click.exceptions.Exit(1)
 
+    # Prepare region (named region or custom GeoJSON file)
+    if regions:
+        # Handle named region from config file
+        if not config_file.exists():
+            console.print(
+                f"[red]✗[/red] Config file not found: {config_file}",
+                style="bold red",
+            )
+            console.print(
+                "\n[yellow]Tip:[/yellow] Specify config file with --config option"
+            )
+            raise click.exceptions.Exit(1)
+
+        # Load configuration
+        console.print(f"[yellow]Loading configuration from {config_file}...[/yellow]")
+        regions_config, _ = load_viirs_config(config_file)
+
+        if not regions_config:
+            console.print(
+                "[red]✗[/red] No regions found in config file", style="bold red"
+            )
+            raise click.exceptions.Exit(1)
+
+        console.print(
+            f"[green]✓[/green] Found {len(regions_config)} region(s) in config"
+        )
+
+        # Parse and validate region codes
+        # Note: Unlike viirs maps, top-polluters requires a SINGLE region
+        region_codes = [r.strip() for r in regions.split(",")]
+        if len(region_codes) > 1:
+            console.print(
+                "[red]✗[/red] top-polluters requires a single region, not multiple",
+                style="bold red",
+            )
+            console.print(
+                f"\n[yellow]Tip:[/yellow] Use --regions {region_codes[0]} "
+                "(process one region at a time)"
+            )
+            raise click.exceptions.Exit(1)
+
+        region_code = region_codes[0]
+        if region_code not in regions_config:
+            console.print(
+                f"[red]✗[/red] Unknown region: {region_code}",
+                style="bold red",
+            )
+            available = ", ".join(sorted(regions_config.keys()))
+            console.print(f"\n[yellow]Available in config:[/yellow] {available}")
+            console.print("\n[dim]Run with --list-maps to see full descriptions[/dim]")
+            raise click.exceptions.Exit(1)
+
+        # Convert RegionConfig to ee.Geometry
+        region_config = regions_config[region_code]
+        region_geometry = ee.Geometry.Rectangle(region_config.to_ee_rectangle())
+        region_name = region_code  # For display/logging
+    else:
+        # Use custom GeoJSON file (existing behavior)
+        # region_file is guaranteed to be Path here (validated earlier)
+        assert region_file is not None  # noqa: S101
+        region_geometry = region_file
+        region_name = region_file.stem  # For display/logging
+
     # Step 1: Query Earth Engine
-    console.print(f"\n[bold]1. Querying VIIRS DNB ({start_date} to {end_date})[/bold]")
+    console.print(
+        f"\n[bold]1. Querying VIIRS DNB for '{region_name}' "
+        f"({start_date} to {end_date})[/bold]"
+    )
 
     with Progress(
         SpinnerColumn(),
@@ -234,7 +411,7 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
     ) as progress:
         task = progress.add_task("Loading VIIRS DNB data...", total=None)
         try:
-            emitters = get_top_emitters(region, start, end, n_emitters)
+            emitters = get_top_emitters(region_geometry, start, end, n_emitters)
             progress.update(
                 task, description=f"[green]✓[/green] Found {len(emitters)} emitters"
             )
@@ -261,7 +438,7 @@ def top_polluters(  # noqa: PLR0913, C901, PLR0915, PLR0912
     if attribute_greenhouses:
         step_num = 4 if businesses or geocode else 2
         console.print(f"\n[bold]{step_num}. AI Greenhouse Attribution Analysis[/bold]")
-        _run_attribution_analysis(emitters, region.stem, max_businesses)
+        _run_attribution_analysis(emitters, region_name, max_businesses)
 
     # Step 5: Conditional Street View (optional)
     if streetview:
