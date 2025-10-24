@@ -9,7 +9,7 @@ import hashlib
 import json
 from datetime import date
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import ee
 
@@ -64,13 +64,13 @@ def _parse_geojson(geojson_path: Path) -> Any:  # noqa: ANN401
 
 
 def _generate_cache_key(
-    geojson_path: Path, start_date: date, end_date: date, n: int
+    region: Path | ee.Geometry, start_date: date, end_date: date, n: int
 ) -> str:
     """
     Generate deterministic cache key for EE query.
 
     Args:
-        geojson_path: Path to GeoJSON file
+        region: Path to GeoJSON file or ee.Geometry object
         start_date: Query start date
         end_date: Query end date
         n: Number of top emitters to return
@@ -79,17 +79,22 @@ def _generate_cache_key(
         SHA256 hash (truncated to 16 chars)
 
     """
-    # Read GeoJSON content for cache key
-    geojson_content = geojson_path.read_text()
+    # Generate region identifier for cache key
+    if isinstance(region, Path):
+        # Read GeoJSON content for cache key
+        region_id = region.read_text()
+    else:
+        # Use geometry's serialized JSON for cache key
+        region_id = json.dumps(region.getInfo(), sort_keys=True)
 
     # Create key from all parameters
-    key_str = f"{geojson_content}:{start_date.isoformat()}:{end_date.isoformat()}:{n}"
+    key_str = f"{region_id}:{start_date.isoformat()}:{end_date.isoformat()}:{n}"
     hash_digest = hashlib.sha256(key_str.encode()).hexdigest()
     return f"ee_emitters:{hash_digest[:16]}"
 
 
 def get_top_emitters(
-    region_path: Path,
+    region: Path | ee.Geometry,
     start_date: date,
     end_date: date,
     n: int = 20,
@@ -102,7 +107,7 @@ def get_top_emitters(
     reflecting the physical resolution of the VIIRS DNB sensor.
 
     Args:
-        region_path: Path to GeoJSON file defining the region
+        region: Path to GeoJSON file or ee.Geometry object defining the region
         start_date: Start date for temporal filter
         end_date: End date for temporal filter
         n: Number of top emitters to return (default: 20)
@@ -123,13 +128,15 @@ def get_top_emitters(
         raise ValueError(msg)
 
     # Check cache first
-    cache_key = _generate_cache_key(region_path, start_date, end_date, n)
+    cache_key = _generate_cache_key(region, start_date, end_date, n)
     cached_result = cache.get(cache_key)
     if cached_result is not None:
         return cached_result  # type: ignore[no-any-return]
 
-    # Parse GeoJSON
-    geometry = _parse_geojson(region_path)
+    # Handle region type (Path or ee.Geometry)
+    geometry = (
+        region if isinstance(region, ee.Geometry) else _parse_geojson(region)
+    )
 
     # Query VIIRS DNB collection
     viirs = ee.ImageCollection("NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG")
