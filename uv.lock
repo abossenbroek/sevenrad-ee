@@ -442,14 +442,14 @@ wheels = [
 
 [[package]]
 name = "dspy-ai"
-version = "2.5.43"
+version = "3.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dspy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/36/11/1bfb758690025801cd69200ae2c16fbbe47c695186c73b7ee2df6573bd3e/dspy-ai-2.5.43.tar.gz", hash = "sha256:873026e148baac0055c2acd8fef16e8503bbc77f713ca9549f4580f95b3c1e5a", size = 262489, upload-time = "2024-12-13T15:02:44.589Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a3/4a/bfc9d1ae8dee0ecc93b8d224b5836aef1ad343618a258f564e82c2261516/dspy_ai-3.0.3.tar.gz", hash = "sha256:5dbf284164a49581ef5891d0a2888237c383dca97d5ec80b073ce702f17d3773", size = 1113, upload-time = "2025-08-31T18:49:38.986Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/00/aad1c9bf759176254e092ca2eeebc4b07f156f9898d16180fa8cc4339720/dspy_ai-2.5.43-py3-none-any.whl", hash = "sha256:b1209baf24816a425c23173af036667792f343fe6c95973f524d3b425fb66498", size = 344534, upload-time = "2024-12-13T15:02:41.745Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/1d/858209ed97f5749a791d1a28726ff3ae2471729f6ae1f83c6e05482ee603/dspy_ai-3.0.3-py3-none-any.whl", hash = "sha256:53ba0669f4cfef9c28dd23a5a88765f31eaebcc403d1170ea6bc6255ad77fe15", size = 1096, upload-time = "2025-08-31T18:49:38.146Z" },
 ]
 
 [[package]]
@@ -2122,7 +2122,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = "~=8.1.0" },
-    { name = "dspy-ai", specifier = "~=2.5.0" },
+    { name = "dspy-ai", specifier = "~=3.0.3" },
     { name = "earthengine-api", specifier = "~=1.1.0" },
     { name = "google-auth", specifier = "~=2.37.0" },
     { name = "google-cloud-storage", specifier = "~=2.19.0" },
