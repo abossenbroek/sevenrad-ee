@@ -37,6 +37,9 @@ dev = [
     "mypy~=1.13.0",
     "pre-commit~=4.0.0",
 ]
+data-augmentation = [
+    "marimo~=0.9.0",
+]
 
 [project.scripts]
 viirs = "sevenrad_ee.cli:main"

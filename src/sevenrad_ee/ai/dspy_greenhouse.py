@@ -22,9 +22,15 @@ except ImportError as e:
     )
     raise ImportError(msg) from e
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from typing import Literal
+
+from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
 logger = logging.getLogger(__name__)
+
+
+# Constants for Phase 2 validation
+HIGH_CONFIDENCE_THRESHOLD = 0.8  # Min confidence for tier-2 + Dutch terms
 
 
 # Enums for structured outputs
@@ -149,6 +155,188 @@ class GreenhouseLightingAnalysis(BaseModel):
         return self
 
 
+# Phase 2: Enhanced Pydantic models for hierarchical classification with Dutch guidance
+
+
+class EvidenceSource(BaseModel):
+    """
+    Evidence source with URL, quote, and quality tier.
+
+    This model represents a single piece of evidence from web research,
+    classified by source quality tier for confidence scoring.
+    """
+
+    url: str = Field(..., description="Source URL")
+    quote: str = Field(..., description="Relevant quote from source")
+    tier: Literal[
+        "company_website",
+        "supplier_case_study",
+        "job_posting",
+        "trade_media_nl",
+        "general_web",
+    ] = Field(..., description="Source quality tier classification")
+
+
+class GreenhouseDetectionOutput(BaseModel):
+    """
+    Validated greenhouse detection output with hierarchical logic enforcement.
+
+    This model enforces Phase 2 requirements:
+    - Hierarchical gating (not greenhouse → growlight must be UNKNOWN)
+    - Dutch terminology tracking
+    - Evidence quality tiers
+    - Confidence scoring based on evidence quality
+    """
+
+    is_greenhouse: Literal["YES", "NO"] = Field(
+        ..., description="Is this a greenhouse/kwekerij/nursery?"
+    )
+    uses_growlight: Literal["YES", "NO", "UNKNOWN"] = Field(
+        ...,
+        description=(
+            "Does this greenhouse use artificial lighting (assimilatiebelichting)? "
+            "MUST be UNKNOWN if is_greenhouse=NO"
+        ),
+    )
+    species_grown: list[str] = Field(
+        default_factory=list,
+        description="List of species/crops grown (e.g., ['roses', 'tomatoes'])",
+    )
+    dutch_terms_found: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Dutch horticultural terms found in sources "
+            "(e.g., 'assimilatiebelichting', 'kwekerij', 'belichte teelt')"
+        ),
+    )
+    evidence_sources: list[EvidenceSource] = Field(
+        default_factory=list,
+        description="List of source URLs with quotes and tier classification",
+    )
+    confidence: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "Classification confidence 0.0-1.0. "
+            "High confidence (>0.8) requires Dutch sources + tier-2 evidence"
+        ),
+    )
+    rationale: str = Field(
+        ...,
+        description=(
+            "Brief explanation of classification decision mentioning "
+            "key evidence, source quality, and uncertainty factors"
+        ),
+    )
+
+    @field_validator("uses_growlight")
+    @classmethod
+    def validate_hierarchical_logic(
+        cls, v: Literal["YES", "NO", "UNKNOWN"], info: ValidationInfo
+    ) -> Literal["YES", "NO", "UNKNOWN"]:
+        """Enforce hierarchical gating: not greenhouse → growlight must be UNKNOWN."""
+        if info.data.get("is_greenhouse") == "NO" and v != "UNKNOWN":
+            msg = "uses_growlight must be UNKNOWN when is_greenhouse=NO"
+            raise ValueError(msg)
+        return v
+
+    @field_validator("confidence")
+    @classmethod
+    def validate_confidence_matches_evidence(
+        cls, v: float, info: ValidationInfo
+    ) -> float:
+        """Ensure confidence aligns with evidence quality."""
+        sources = info.data.get("evidence_sources", [])
+
+        # Count tier-2 sources
+        tier2_count = sum(
+            1
+            for s in sources
+            if s.tier in ["company_website", "supplier_case_study", "job_posting"]
+        )
+
+        if v > HIGH_CONFIDENCE_THRESHOLD and tier2_count == 0:
+            msg = (
+                f"High confidence (>{HIGH_CONFIDENCE_THRESHOLD}) "
+                "requires at least one tier-2 source"
+            )
+            raise ValueError(msg)
+
+        return v
+
+
+class GreenhouseClassificationValidator:
+    """
+    Validate hierarchical classification logic and evidence quality.
+
+    This validator implements Phase 2 business rules:
+    1. Hierarchical gating (not greenhouse → growlight = UNKNOWN)
+    2. Evidence requirement (uses_growlight=YES requires evidence)
+    3. Confidence-evidence alignment (high confidence requires tier-2 sources)
+    4. Dutch terminology requirement (high confidence requires Dutch terms)
+    """
+
+    @staticmethod
+    def validate(
+        prediction: GreenhouseDetectionOutput,
+    ) -> tuple[bool, str]:
+        """
+        Validate prediction follows all hierarchical rules.
+
+        Args:
+            prediction: Greenhouse detection output to validate
+
+        Returns:
+            Tuple of (is_valid, error_message)
+            - is_valid: True if all rules pass, False otherwise
+            - error_message: Empty string if valid, error description if invalid
+
+        """
+        # Rule 1: Hierarchical gating
+        if prediction.is_greenhouse == "NO" and prediction.uses_growlight != "UNKNOWN":
+            return (
+                False,
+                f"uses_growlight must be UNKNOWN when is_greenhouse=NO, "
+                f"got {prediction.uses_growlight}",
+            )
+
+        # Rule 2: Evidence requirement
+        if prediction.uses_growlight == "YES" and not prediction.evidence_sources:
+            return (
+                False,
+                "uses_growlight=YES requires evidence_sources to be non-empty",
+            )
+
+        # Rule 3: Confidence-evidence alignment
+        tier2_count = sum(
+            1
+            for s in prediction.evidence_sources
+            if s.tier in ["company_website", "supplier_case_study", "job_posting"]
+        )
+
+        if prediction.confidence > HIGH_CONFIDENCE_THRESHOLD and tier2_count == 0:
+            return (
+                False,
+                f"High confidence ({prediction.confidence:.2f}) requires "
+                f"at least one tier-2 source, found {tier2_count}",
+            )
+
+        # Rule 4: Dutch terminology requirement
+        if (
+            prediction.confidence > HIGH_CONFIDENCE_THRESHOLD
+            and len(prediction.dutch_terms_found) == 0
+        ):
+            return (
+                False,
+                f"High confidence ({prediction.confidence:.2f}) requires "
+                "Dutch terminology evidence",
+            )
+
+        # All rules passed
+        return True, ""
+
+
 # DSPy Signatures
 
 
@@ -240,6 +428,107 @@ class GreenhouseDetectionSignature(Signature):  # type: ignore[misc]
             "3. Dutch agricultural sources (kasmagazine.nl, onderglas.nl)\n"
             "4. General sources\n"
             "\nInclude WUR URLs if used as tie-breaker."
+        )
+    )
+
+
+# Phase 2: Enhanced DSPy Signature with Dutch-first guidance
+
+
+class GreenhouseClassification(Signature):  # type: ignore[misc]
+    """
+    Classify Dutch greenhouse companies using Perplexity Sonar web search.
+
+    CRITICAL: This is a web-search-only classifier. Use Perplexity Sonar to find
+    evidence from Dutch horticultural sources.
+
+    SEARCH STRATEGY (Dutch-First):
+    1. Start with Dutch company websites and trade media
+    2. Look for Dutch terminology:
+       - Greenhouse: "kwekerij", "glastuinbouw", "teler", "kassen"
+       - Lighting: "assimilatiebelichting", "assimilatieverlichting", "kunstlicht",
+                  "belichte teelt", "LED-belichting", "SON-T lampen"
+       - Suppliers: "Signify", "Philips Hortilux", "Priva", "Hoogendoorn"
+    3. Prioritize these source types:
+       - Tier 2 (highest): Company websites, supplier case studies, job postings
+       - Tier 1: Dutch trade media (Groenten&Fruit, Floraldaily NL, KAS Magazine)
+       - Tier 0.5: General web sources
+    4. Check for negative indicators:
+       - "onbelichte teelt" (unlit cultivation)
+       - "daglichtkas" (daylight greenhouse only)
+       - Summer-only crops with no winter operation
+
+    HIERARCHICAL LOGIC:
+    - If is_greenhouse = NO → uses_growlight MUST be UNKNOWN
+    - If is_greenhouse = YES → determine uses_growlight based on evidence
+    - If evidence insufficient → uses_growlight = UNKNOWN (prefer precision)
+    - Species provides validation (roses/tomatoes often use lighting)
+    """
+
+    # Input fields
+    location_name: str = dspy.InputField(desc="Company name and location to classify")
+    location_area: str = dspy.InputField(desc="Geographic area (city, region)")
+
+    # Hierarchical outputs with gating
+    is_greenhouse: str = dspy.OutputField(
+        desc=(
+            "Is this a greenhouse/kwekerij/nursery? Answer 'YES' or 'NO'. "
+            "Use web search to verify."
+        )
+    )
+
+    uses_growlight: str = dspy.OutputField(
+        desc=(
+            "Does this greenhouse use artificial lighting (assimilatiebelichting)? "
+            "Answer 'YES', 'NO', or 'UNKNOWN'. "
+            "ONLY answer YES if is_greenhouse=YES AND you have evidence. "
+            "Answer UNKNOWN if insufficient evidence. "
+            "Answer NO only with explicit negative evidence (e.g., 'onbelichte teelt')."
+        )
+    )
+
+    species_grown: str = dspy.OutputField(
+        desc=(
+            "Comma-separated list of species/crops grown (e.g., 'roses,tomatoes'). "
+            "Empty string if unknown. Species helps validate lighting usage: "
+            "roses/orchids/gerbera often require lighting; lettuce/herbs sometimes; "
+            "cucumbers/peppers less common."
+        )
+    )
+
+    # Evidence capture (critical for validation)
+    dutch_terms_found: str = dspy.OutputField(
+        desc=(
+            "Comma-separated Dutch horticultural terms found in sources. "
+            "Examples: 'assimilatiebelichting,kwekerij,belichte teelt,"
+            "SON-T,LED-belichting'. More Dutch terms = higher confidence."
+        )
+    )
+
+    evidence_sources: str = dspy.OutputField(
+        desc=(
+            "JSON list of source dictionaries with format: "
+            "[{'url': '...', 'quote': '...', 'tier': 'company_website'}, ...]. "
+            "Tiers: company_website, supplier_case_study, job_posting (tier 2); "
+            "trade_media_nl (tier 1); general_web (tier 0.5)."
+        )
+    )
+
+    confidence: float = dspy.OutputField(
+        desc=(
+            "Classification confidence 0.0-1.0. "
+            "High confidence (>0.8) requires: Dutch sources + "
+            "Dutch terminology + tier 2 evidence. "
+            "Medium (0.5-0.8): Some Dutch evidence or tier 1 sources. "
+            "Low (<0.5): Only general web sources or ambiguous evidence."
+        )
+    )
+
+    rationale: str = dspy.OutputField(
+        desc=(
+            "Brief explanation of classification decision. "
+            "Mention: key evidence found, source quality, Dutch terminology, "
+            "and any uncertainty factors."
         )
     )
 
