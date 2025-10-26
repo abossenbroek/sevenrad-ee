@@ -77,7 +77,7 @@ def __():
     # Check DSPy installation
     try:
         from dspy.teleprompt import BootstrapFewShot, MIPROv2
-        from dspy.teleprompt.gepa import GEPA
+        from dspy.teleprompt.gepa import GEPA as _GEPA_check
 
         status_table.add_row(
             "DSPy Optimizers", "[green]✅[/green]", "GEPA, MIPROv2, BootstrapFewShot"
@@ -123,6 +123,7 @@ def __():
         Progress,
         SpinnerColumn,
         TextColumn,
+        dspy,
         all_checks_passed,
     )
 
@@ -311,14 +312,8 @@ def __(mo, changed_count, false_positives):
 
 
 @app.cell
-def __(console):
+def __(console, json, Path, mo, Panel):
     """Section 3: Data Expansion - Company Discovery."""
-    import json
-    from pathlib import Path
-
-    import marimo as mo
-    from rich.panel import Panel
-
     console.print("\n")
     console.print(
         Panel.fit(
@@ -401,10 +396,9 @@ def __(
     location_input,
     queue_file,
     save_button,
+    json,
 ):
     """Section 3 Button Handlers."""
-    import json
-
     if add_button.value and company_name_input.value and location_input.value:
         new_company = {
             "company": company_name_input.value,
@@ -423,18 +417,10 @@ def __(
 
 
 @app.cell
-def __(console):
+def __(console, json, Path, Panel, Progress, SpinnerColumn, TextColumn, Table):
     """Section 4: Batch Research Execution."""
-    import json
-    from pathlib import Path
-
-    import marimo as mo
-    from rich.panel import Panel
-    from rich.progress import Progress, SpinnerColumn, TextColumn
-    from rich.table import Table
-
-    from sevenrad_ee.ai.company_researcher import CompanyResearcher
-    from sevenrad_ee.ai.perplexity_client import PerplexityClient
+    from sevenrad_ee.ai.company_researcher import CompanyResearcher as Researcher4
+    from sevenrad_ee.ai.perplexity_client import PerplexityClient as Client4
 
     console.print("\n")
     console.print(
@@ -452,60 +438,60 @@ def __(console):
         companies_queue4 = json.loads(queue_file4.read_text())
         console.print(f"\n[cyan]Queue: {len(companies_queue4)} companies[/cyan]\n")
 
-        perplexity_client4 = PerplexityClient()
-        researcher4 = CompanyResearcher(perplexity_client4)
+        perplexity_client4 = Client4()
+        researcher4 = Researcher4(perplexity_client4)
         batch_results = []
 
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             console=console,
-        ) as progress:
-            task = progress.add_task("Researching...", total=len(companies_queue4))
+        ) as progress4:
+            task4 = progress4.add_task("Researching...", total=len(companies_queue4))
 
-            for company_data in companies_queue4:
-                company_name = company_data["company"]
-                location = company_data["location"]
+            for company_data4 in companies_queue4:
+                company_name4 = company_data4["company"]
+                location4 = company_data4["location"]
 
-                progress.update(task, description=f"Researching: {company_name}")
-                result = researcher4.research_company(company_name, location)
-                output_path = researcher4.save_result(result)
+                progress4.update(task4, description=f"Researching: {company_name4}")
+                result4 = researcher4.research_company(company_name4, location4)
+                output_path4 = researcher4.save_result(result4)
 
                 batch_results.append(
                     {
-                        "company": company_name,
-                        "classification": result.classification_suggestion.value,
-                        "confidence": result.confidence_score,
-                        "dutch_terms": len(result.dutch_terms_found),
+                        "company": company_name4,
+                        "classification": result4.classification_suggestion.value,
+                        "confidence": result4.confidence_score,
+                        "dutch_terms": len(result4.dutch_terms_found),
                     }
                 )
 
-                progress.advance(task)
+                progress4.advance(task4)
 
         # Display results
-        results_table = Table(
+        results_table4 = Table(
             show_header=True, header_style="bold cyan", title="Batch Research Results"
         )
-        results_table.add_column("Company", style="white", width=30)
-        results_table.add_column("Category", justify="center", width=15)
-        results_table.add_column("Confidence", justify="center", width=10)
+        results_table4.add_column("Company", style="white", width=30)
+        results_table4.add_column("Category", justify="center", width=15)
+        results_table4.add_column("Confidence", justify="center", width=10)
 
-        for r in batch_results:
-            cat_color = (
+        for r4 in batch_results:
+            cat_color4 = (
                 "green"
-                if r["classification"] == "POSITIVE"
+                if r4["classification"] == "POSITIVE"
                 else "red"
-                if r["classification"] == "NEGATIVE"
+                if r4["classification"] == "NEGATIVE"
                 else "yellow"
             )
-            results_table.add_row(
-                r["company"][:28],
-                f"[{cat_color}]{r['classification']}[/{cat_color}]",
-                f"{r['confidence']:.0%}",
+            results_table4.add_row(
+                r4["company"][:28],
+                f"[{cat_color4}]{r4['classification']}[/{cat_color4}]",
+                f"{r4['confidence']:.0%}",
             )
 
         console.print("\n")
-        console.print(results_table)
+        console.print(results_table4)
 
     return (batch_results,)
 
@@ -524,15 +510,8 @@ def __(mo, batch_results):
 
 
 @app.cell
-def __(console):
+def __(console, json, Path, Panel, Table):
     """Section 5: HITL Validation - Evidence Review."""
-    import json
-    from pathlib import Path
-
-    import marimo as mo
-    from rich.panel import Panel
-    from rich.table import Table
-
     console.print("\n")
     console.print(
         Panel.fit(
@@ -549,15 +528,15 @@ def __(console):
 
     # Load all companies for review
     companies_for_review = []
-    for file_path in all_research_files:
-        with open(file_path) as f:
-            data = json.load(f)
+    for file_path5 in all_research_files:
+        with open(file_path5) as f5:
+            data5 = json.load(f5)
         companies_for_review.append(
             {
-                "company": data["company"],
-                "auto_category": data.get("classification_suggestion", "UNKNOWN"),
-                "confidence": data.get("confidence_score", 0.0),
-                "file": str(file_path),
+                "company": data5["company"],
+                "auto_category": data5.get("classification_suggestion", "UNKNOWN"),
+                "confidence": data5.get("confidence_score", 0.0),
+                "file": str(file_path5),
             }
         )
 
@@ -629,15 +608,8 @@ def __(mo, companies_for_review):
 
 
 @app.cell
-def __(console):
+def __(console, json, Path, dspy, Panel, Table):
     """Section 6: Dataset Preparation & Quality Check."""
-    import json
-    from pathlib import Path
-
-    import dspy
-    import marimo as mo
-    from rich.panel import Panel
-    from rich.table import Table
     from sklearn.model_selection import train_test_split
 
     console.print("\n")
@@ -652,16 +624,16 @@ def __(console):
     research_dir6 = Path("data/research")
     all_examples = []
 
-    for file_path in research_dir6.glob("*.json"):
-        with open(file_path) as f:
-            data = json.load(f)
+    for file_path6 in research_dir6.glob("*.json"):
+        with open(file_path6) as f6:
+            data6 = json.load(f6)
 
         # Convert to DSPy Example
         example = dspy.Example(
-            location_name=data["company"],
-            location_area=data["location"],
+            location_name=data6["company"],
+            location_area=data6["location"],
             is_greenhouse="YES",  # Assume all are greenhouses for now
-            uses_growlight=data[
+            uses_growlight=data6[
                 "classification_suggestion"
             ],  # POSITIVE/NEGATIVE/NEEDS_MANUAL_REVIEW
         ).with_inputs("location_name", "location_area")
@@ -730,16 +702,8 @@ def __(mo, all_examples, train_set, val_set, dataset_ready):
 
 
 @app.cell
-def __(console, train_set, val_set):
+def __(console, train_set, val_set, json, Path, mo, Panel, Table, dspy):
     """Section 7: GEPA Optimizer Configuration."""
-    import json
-    from pathlib import Path
-
-    import dspy
-    import marimo as mo
-    from rich.panel import Panel
-    from rich.table import Table
-
     try:
         from dspy.teleprompt.gepa import GEPA
     except ImportError:
@@ -789,7 +753,7 @@ def __(console, train_set, val_set):
     console.print(f"[cyan]Estimated duration: 2-4 hours[/cyan]")
     console.print(f"[cyan]Estimated cost: $10-20 (Gemini 2.5 Pro)[/cyan]\n")
 
-    return optimizer_config, GEPA
+    return optimizer_config, GEPA, dutch_aware_hierarchical_f1
 
 
 @app.cell
@@ -806,18 +770,9 @@ def __(mo):
 
 
 @app.cell
-def __(console, train_set, val_set, optimizer_config, GEPA):
+def __(console, train_set, val_set, optimizer_config, GEPA, json, Path, mo, Panel, Progress, SpinnerColumn, TextColumn, dspy, dutch_aware_hierarchical_f1):
     """Section 8: Run GEPA Optimization."""
-    import json
-    from pathlib import Path
-
-    import dspy
-    import marimo as mo
-    from rich.panel import Panel
-    from rich.progress import Progress, SpinnerColumn, TextColumn
-
     from sevenrad_ee.ai.dspy_greenhouse import GreenhouseClassification
-    from sevenrad_ee.ai.dspy_evaluation import dutch_aware_hierarchical_f1
 
     console.print("\n")
     console.print(
@@ -860,8 +815,8 @@ def __(console, train_set, val_set, optimizer_config, GEPA):
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         console=console,
-    ) as progress:
-        task = progress.add_task("Optimizing (Generation 0/15)...", total=None)
+    ) as progress8:
+        task8 = progress8.add_task("Optimizing (Generation 0/15)...", total=None)
 
         try:
             optimized_program = optimizer.compile(
@@ -875,7 +830,7 @@ def __(console, train_set, val_set, optimizer_config, GEPA):
             optimized_program = base_program
             optimization_success = False
 
-        progress.update(task, description="Optimization complete!", completed=True)
+        progress8.update(task8, description="Optimization complete!", completed=True)
 
     if optimization_success:
         # Save optimized program
@@ -902,18 +857,9 @@ def __(mo, optimization_success):
 
 
 @app.cell
-def __(console, optimized_program, train_set, val_set):
+def __(console, optimized_program, train_set, val_set, json, Path, mo, Panel, Progress, SpinnerColumn, TextColumn, Table, dutch_aware_hierarchical_f1):
     """Section 9: Repeated Nested Cross-Validation."""
-    import json
-    from pathlib import Path
-
-    import marimo as mo
-    from rich.panel import Panel
-    from rich.progress import Progress, SpinnerColumn, TextColumn
-    from rich.table import Table
-
     from sevenrad_ee.ai.cross_validation import repeated_nested_cv
-    from sevenrad_ee.ai.dspy_evaluation import dutch_aware_hierarchical_f1
 
     console.print("\n")
     console.print(
@@ -940,8 +886,8 @@ def __(console, optimized_program, train_set, val_set):
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         console=console,
-    ) as progress:
-        task = progress.add_task("Running CV...", total=None)
+    ) as progress9:
+        task9 = progress9.add_task("Running CV...", total=None)
 
         # Mock CV results for demo (replace with actual call in production)
         cv_results = {
@@ -962,7 +908,7 @@ def __(console, optimized_program, train_set, val_set):
         #     n_folds=5,
         # )
 
-        progress.update(task, description="CV complete!", completed=True)
+        progress9.update(task9, description="CV complete!", completed=True)
 
     # Save CV results
     Path("results/cv_results.json").write_text(json.dumps(cv_results, indent=2))
@@ -1019,14 +965,8 @@ def __(mo, cv_results):
 
 
 @app.cell
-def __(console, optimized_program, cv_results):
+def __(console, optimized_program, cv_results, json, Path, mo, Panel, Table):
     """Section 10: Final Validation & Report Generation."""
-    import json
-    from pathlib import Path
-
-    import marimo as mo
-    from rich.panel import Panel
-    from rich.table import Table
 
     console.print("\n")
     console.print(
