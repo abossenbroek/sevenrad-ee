@@ -7,6 +7,7 @@ greenhouse companies using Perplexity Sonar API with evidence categorization.
 
 from pathlib import Path
 
+import dspy
 from rich.console import Console
 
 from sevenrad_ee.ai.company_research_models import (
@@ -16,6 +17,10 @@ from sevenrad_ee.ai.company_research_models import (
     EvidenceItem,
     EvidenceSourceTier,
     QueryResult,
+)
+from sevenrad_ee.ai.evidence_classifier import (
+    EvidenceCategory,
+    GrowLightEvidenceClassifier,
 )
 from sevenrad_ee.ai.perplexity_cache import PerplexityResponse
 from sevenrad_ee.ai.perplexity_client import PerplexityAPIError, PerplexityClient
@@ -66,6 +71,8 @@ class CompanyResearcher:
 
         """
         self.client = client
+        # Initialize LLM-based evidence classifier for semantic understanding
+        self.evidence_classifier = dspy.Predict(GrowLightEvidenceClassifier)
 
     def research_company(
         self,
@@ -122,6 +129,7 @@ class CompanyResearcher:
                     query_source=f"query_{i}",
                     evidence=evidence,
                     dutch_terms=dutch_terms,
+                    company_name=company_name,
                 )
 
             except PerplexityAPIError as e:
@@ -174,50 +182,50 @@ class CompanyResearcher:
         query_source: str,
         evidence: Evidence,
         dutch_terms: set[str],
+        company_name: str,
     ) -> None:
         """
-        Categorize evidence from a query response.
+        Categorize evidence using LLM semantic classification.
 
         Args:
             response: Perplexity API response
             query_source: Source identifier (e.g., 'query_1')
             evidence: Evidence container to populate
             dutch_terms: Set to collect Dutch terms found
+            company_name: Company name for context
 
         """
         content_lower = response.content.lower()
 
-        # Extract Dutch terms
+        # Extract Dutch terms (keep for statistics/debugging)
         for term in DUTCH_POSITIVE_TERMS | DUTCH_NEGATIVE_TERMS:
             if term in content_lower:
                 dutch_terms.add(term)
 
-        # Check for positive indicators
-        has_positive = any(term in content_lower for term in DUTCH_POSITIVE_TERMS)
-        has_supplier = any(supplier in content_lower for supplier in SUPPLIER_NAMES)
+        # Use LLM to semantically classify the evidence
+        classification = self.evidence_classifier(
+            company_name=company_name, evidence_text=response.content
+        )
 
-        # Check for negative indicators
-        has_negative = any(term in content_lower for term in DUTCH_NEGATIVE_TERMS)
+        category = EvidenceCategory(classification.evidence_category)
 
-        # Categorize based on content
+        # Create evidence items for all citations
         for citation in response.citations:
-            # Determine evidence tier
             tier = self._classify_source_tier(citation.url, response.content)
 
-            # Create evidence item
             item = EvidenceItem(
                 url=citation.url,
-                snippet=response.content[:200],  # First 200 chars as snippet
+                snippet=response.content[:200],
                 source=query_source,
                 tier=tier,
             )
 
-            # Categorize
-            if has_negative and not has_positive:
-                evidence.negative.append(item)
-            elif has_positive or has_supplier:
+            # Categorize based on LLM's semantic understanding
+            if category == EvidenceCategory.POSITIVE:
                 evidence.positive.append(item)
-            else:
+            elif category == EvidenceCategory.NEGATIVE:
+                evidence.negative.append(item)
+            else:  # NEUTRAL or AMBIGUOUS
                 evidence.ambiguous.append(item)
 
     def _classify_source_tier(self, url: str, content: str) -> EvidenceSourceTier:
@@ -280,7 +288,7 @@ class CompanyResearcher:
 
     def _suggest_classification(self, evidence: Evidence) -> ClassificationSuggestion:
         """
-        Suggest classification based on evidence.
+        Suggest classification, prioritizing negative evidence.
 
         Args:
             evidence: Categorized evidence
@@ -292,10 +300,18 @@ class CompanyResearcher:
         pos_count = len(evidence.positive)
         neg_count = len(evidence.negative)
 
-        if pos_count >= MIN_POSITIVE_EVIDENCE_FOR_CLASSIFICATION and neg_count == 0:
-            return ClassificationSuggestion.POSITIVE
-        elif neg_count >= MIN_NEGATIVE_EVIDENCE_FOR_CLASSIFICATION and pos_count == 0:
+        # Strong negative evidence is definitive
+        if neg_count >= MIN_NEGATIVE_EVIDENCE_FOR_CLASSIFICATION:
+            # Contradictory evidence needs manual review
+            if pos_count > 0:
+                return ClassificationSuggestion.NEEDS_MANUAL_REVIEW
             return ClassificationSuggestion.NEGATIVE
+
+        # Positive evidence
+        elif pos_count >= MIN_POSITIVE_EVIDENCE_FOR_CLASSIFICATION:
+            return ClassificationSuggestion.POSITIVE
+
+        # Insufficient evidence either way
         else:
             return ClassificationSuggestion.NEEDS_MANUAL_REVIEW
 
