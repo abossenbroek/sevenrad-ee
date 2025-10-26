@@ -91,6 +91,27 @@ ignore = [
     "PLR0913", # too many arguments (acceptable for test fixtures)
     "ARG002",  # unused function arguments (fixtures may not be used directly)
 ]
+"notebooks/dspy_optimization_pipeline.py" = [
+    "N807",    # Function name should not start and end with `__` (Marimo cell convention)
+    "ANN202",  # Missing return type annotation for private function (Marimo cells)
+    "ANN001",  # Missing type annotation for function argument (Marimo auto-infers)
+    "ANN204",  # Missing return type annotation for special method __init__
+    "PLR1711", # Useless return statement at end of function (Marimo cell returns)
+    "PLR0915", # Too many statements (complex cells are acceptable)
+    "PLR0913", # Too many arguments (Marimo cell dependencies)
+    "I001",    # Import block is un-sorted or un-formatted (Marimo auto-imports)
+    "D213",    # Multi-line docstring summary should start at second line
+    "N806",    # Variable in function should be lowercase (Marimo variables)
+    "N803",    # Argument name should be lowercase (DSPy class names)
+    "N814",    # Camelcase imported as constant (MIPROv2 as GEPA fallback)
+    "B007",    # Loop control variable not used within loop body
+    "B018",    # Found useless expression (Marimo display convention)
+    "E501",    # Line too long (acceptable in interactive notebooks)
+    "PLR2004", # Magic value used in comparison
+    "SIM108",  # Use ternary operator (if-else blocks clearer in notebooks)
+    "T201",    # print found (acceptable in interactive notebooks)
+    "ARG001",  # Unused function argument (Marimo cell dependencies)
+]
 
 [tool.mypy]
 python_version = "3.12"
