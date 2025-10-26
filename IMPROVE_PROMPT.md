@@ -80,6 +80,24 @@ Your current DSPy greenhouse detection system suffers from **severe overfitting*
    - ✅ All code quality checks pass (mypy clean, ruff clean)
    - ✅ Ready for Phase 3 metric integration
 
+6. **Phase 3: Dutch-Aware Hierarchical F1 Metric (Day 0)**
+   - ✅ Created `dutch_aware_hierarchical_f1()` metric returning (score, feedback) tuple
+   - ✅ Implemented 3-component weighted scoring:
+     * 70%: Hierarchical classification (is_greenhouse + uses_growlight)
+     * 15%: Dutch terminology detection (16 Dutch terms)
+     * 15%: Evidence quality (tier-based scoring)
+   - ✅ Comprehensive feedback generation for GEPA reflection:
+     * Misclassification details with expected vs. predicted
+     * Missing Dutch terminology with search suggestions
+     * Evidence quality warnings
+     * Confidence-evidence alignment checks
+   - ✅ Created `dutch_aware_f1_score_only()` wrapper for BootstrapFewShot/MIPROv2
+   - ✅ Added constants: DUTCH_TERMS set, SOURCE_TIER_SCORES, thresholds
+   - ✅ Comprehensive test coverage (27 tests, all passing)
+   - ✅ All code quality checks pass (ruff format, ruff check, mypy clean)
+   - ✅ Zero regressions (existing tests still pass)
+   - ✅ Ready for Phase 4 optimizer integration
+
 ### 🔄 In Progress
 
 *Nothing currently in progress*
@@ -91,8 +109,7 @@ Your current DSPy greenhouse detection system suffers from **severe overfitting*
    - ⏳ Step 3: Build CLI tool for batch research
    - ⏳ Step 4: Scaled collection + HITL validation (60-65 examples)
 
-2. **Phase 3-6: Metrics & Optimization (Days 6-11)**
-   - ⏳ Phase 3: Dutch-aware feedback metric
+2. **Phase 4-6: Optimizer & Deployment (Days 7-11)**
    - ⏳ Phase 4: GEPA/MIPRO optimizer configuration
    - ⏳ Phase 5: Repeated nested cross-validation
    - ⏳ Phase 6: Production deployment

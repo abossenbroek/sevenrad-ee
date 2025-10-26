@@ -3,6 +3,9 @@ Evaluation metrics for DSPy greenhouse growlight detection.
 
 This module provides F1 score and accuracy metrics for evaluating
 the performance of the greenhouse detection system.
+
+Phase 3: Dutch-aware hierarchical F1 metric with feedback generation
+for GEPA optimizer reflection mechanism.
 """
 
 import logging
@@ -18,6 +21,39 @@ except ImportError as e:
 from sevenrad_ee.ai.dspy_greenhouse import GrowlightUsage
 
 logger = logging.getLogger(__name__)
+
+# Phase 3: Dutch terminology reference for scoring
+DUTCH_TERMS = {
+    "assimilatiebelichting",
+    "assimilatieverlichting",
+    "kunstlicht",
+    "kassen",
+    "kwekerij",
+    "teler",
+    "glastuinbouw",
+    "belichte",
+    "led-belichting",
+    "son-t",
+    "groeilicht",
+    "teeltspecialist",
+    "assimilatielampen",
+    "onbelichte teelt",
+    "daglichtkas",
+    "hybride belichting",
+}
+
+# Phase 3: Source tier scoring weights
+SOURCE_TIER_SCORES = {
+    "company_website": 2.0,
+    "supplier_case_study": 2.0,
+    "job_posting": 2.0,
+    "trade_media_nl": 1.0,
+    "general_web": 0.5,
+}
+
+# Phase 3: Thresholds for feedback generation
+MIN_DUTCH_TERMS_FOR_GOOD_FEEDBACK = 3
+HIGH_CONFIDENCE_THRESHOLD_FOR_WARNING = 0.8
 
 
 def greenhouse_f1_metric(
@@ -278,3 +314,305 @@ def calculate_classification_metrics(  # noqa: C901
         "growlight_recall": gl_recall,
         "growlight_f1": gl_f1,
     }
+
+
+# Phase 3: Dutch-aware hierarchical F1 metric with feedback
+
+
+def dutch_aware_hierarchical_f1(  # noqa: C901, PLR0912, PLR0915
+    example: dspy.Example,
+    prediction: Any,  # noqa: ANN401
+    trace: Any | None = None,  # noqa: ANN401
+) -> tuple[float, str]:
+    """
+    Hierarchical F1 metric with Dutch terminology weighting and textual feedback.
+
+    This metric is designed for GEPA optimizer's reflection mechanism. It returns:
+    1. A score (0.0-1.0) for optimization
+    2. Textual feedback explaining successes/failures for reflection model
+
+    Scoring Components:
+    - 70%: Hierarchical classification accuracy (is_greenhouse + uses_growlight)
+    - 15%: Dutch terminology detection (rewards finding Dutch terms)
+    - 15%: Evidence quality (rewards tier-2 Dutch sources)
+
+    Args:
+        example: Ground truth example with is_greenhouse and uses_growlight fields
+        prediction: Model prediction with classification and evidence fields
+        trace: Optional execution trace (unused)
+
+    Returns:
+        Tuple of (score, feedback):
+        - score: Float between 0.0 and 1.0
+        - feedback: String with detailed explanation for reflection
+
+    Example:
+        >>> example = dspy.Example(
+        ...     is_greenhouse="YES",
+        ...     uses_growlight="YES",
+        ...     location_name="Porta Nova"
+        ... )
+        >>> prediction = ...  # From DSPy model
+        >>> score, feedback = dutch_aware_hierarchical_f1(example, prediction)
+        >>> print(f"Score: {score:.2f}")
+        >>> print(f"Feedback: {feedback}")
+
+    """
+    del trace  # Unused parameter
+
+    feedback_parts = []
+
+    # Component 1: Hierarchical Classification (70% weight)
+    # --------------------------------------------------------
+
+    # Extract predicted values
+    if hasattr(prediction, "is_greenhouse"):
+        pred_is_greenhouse = str(prediction.is_greenhouse).strip().upper()
+    else:
+        logger.warning("Prediction missing is_greenhouse field")
+        return 0.0, "FATAL: Prediction missing is_greenhouse field"
+
+    if hasattr(prediction, "uses_growlight"):
+        pred_uses_growlight = str(prediction.uses_growlight).strip().upper()
+    else:
+        logger.warning("Prediction missing uses_growlight field")
+        return 0.0, "FATAL: Prediction missing uses_growlight field"
+
+    # Extract ground truth (normalize to uppercase strings)
+    true_is_greenhouse = str(example.is_greenhouse).strip().upper()
+    true_uses_growlight = str(example.uses_growlight).strip().upper()
+
+    # Greenhouse classification
+    gh_correct = pred_is_greenhouse == true_is_greenhouse
+    gh_score = 1.0 if gh_correct else 0.0
+
+    if not gh_correct:
+        feedback_parts.append(
+            f"MISCLASSIFIED is_greenhouse: predicted {pred_is_greenhouse}, "
+            f"expected {true_is_greenhouse}"
+        )
+
+    # Growlight classification (only if greenhouse=YES in ground truth)
+    if true_is_greenhouse == "YES":
+        gl_correct = pred_uses_growlight == true_uses_growlight
+        gl_score = 1.0 if gl_correct else 0.0
+
+        if not gl_correct:
+            feedback_parts.append(
+                f"MISCLASSIFIED uses_growlight: predicted {pred_uses_growlight}, "
+                f"expected {true_uses_growlight}"
+            )
+
+            # Specific Dutch term guidance
+            if hasattr(example, "location_name"):
+                company_lower = example.location_name.lower()
+                pred_terms_lower = []
+                if hasattr(prediction, "dutch_terms_found"):
+                    if isinstance(prediction.dutch_terms_found, list):
+                        pred_terms_lower = [
+                            t.lower() for t in prediction.dutch_terms_found
+                        ]
+                    elif isinstance(prediction.dutch_terms_found, str):
+                        pred_terms_lower = [
+                            t.strip().lower()
+                            for t in prediction.dutch_terms_found.split(",")
+                            if t.strip()
+                        ]
+
+                if "assimilatie" in company_lower and not any(
+                    "assimilatie" in t for t in pred_terms_lower
+                ):
+                    feedback_parts.append(
+                        "MISSED 'assimilatie' terminology in company name - "
+                        "this is a strong signal for growlight usage"
+                    )
+
+                # Check for common Dutch grower terms
+                lighting_terms = ["kwekerij", "teler", "rozen", "orchidee"]
+                for term in lighting_terms:
+                    if term in company_lower:
+                        feedback_parts.append(
+                            f"Company name contains '{term}' - "
+                            f"search for '{term} + assimilatiebelichting' might help"
+                        )
+    else:
+        # If not a greenhouse, growlight should be UNKNOWN
+        gl_score = 1.0 if pred_uses_growlight == "UNKNOWN" else 0.0
+
+        if gl_score == 0.0:
+            feedback_parts.append(
+                f"LOGIC ERROR: is_greenhouse=NO but "
+                f"uses_growlight={pred_uses_growlight} (should be UNKNOWN)"
+            )
+
+    classification_score = (gh_score + gl_score) / 2.0
+
+    # Component 2: Dutch Terminology Detection (15% weight)
+    # ------------------------------------------------------
+
+    pred_dutch_terms = []
+    if hasattr(prediction, "dutch_terms_found"):
+        if isinstance(prediction.dutch_terms_found, list):
+            pred_dutch_terms = prediction.dutch_terms_found
+        elif isinstance(prediction.dutch_terms_found, str):
+            # Handle comma-separated string format
+            pred_dutch_terms = [
+                t.strip() for t in prediction.dutch_terms_found.split(",") if t.strip()
+            ]
+
+    found_terms = {t.lower() for t in pred_dutch_terms}
+    matching_terms = found_terms & DUTCH_TERMS
+
+    dutch_score = len(matching_terms) / max(len(DUTCH_TERMS), 1)
+
+    if len(matching_terms) == 0:
+        feedback_parts.append(
+            "NO Dutch terminology found - search strategy may be ineffective. "
+            "Try searches like: '{company} assimilatiebelichting', "
+            "'{company} kwekerij belichte teelt'"
+        )
+    elif len(matching_terms) >= MIN_DUTCH_TERMS_FOR_GOOD_FEEDBACK:
+        feedback_parts.append(
+            f"GOOD: Found {len(matching_terms)} Dutch terms: "
+            f"{', '.join(list(matching_terms)[:5])}"
+        )
+    else:
+        feedback_parts.append(
+            f"Found {len(matching_terms)} Dutch terms - "
+            "could find more with better queries"
+        )
+
+    # Component 3: Evidence Quality (15% weight)
+    # -------------------------------------------
+
+    pred_evidence_sources = []
+    if hasattr(prediction, "evidence_sources"):
+        if isinstance(prediction.evidence_sources, list):
+            pred_evidence_sources = prediction.evidence_sources
+        elif isinstance(prediction.evidence_sources, str):
+            # Try parsing JSON string
+            try:
+                import json
+
+                pred_evidence_sources = json.loads(prediction.evidence_sources)
+            except (json.JSONDecodeError, ValueError):
+                # If parsing fails, treat as empty
+                pred_evidence_sources = []
+
+    if not pred_evidence_sources:
+        evidence_score = 0.0
+        feedback_parts.append(
+            "NO evidence sources provided - "
+            "predictions must be backed by URLs and quotes"
+        )
+    else:
+        total_tier_score = 0.0
+        for source in pred_evidence_sources:
+            if isinstance(source, dict):
+                tier = source.get("tier", "general_web")
+            elif hasattr(source, "tier"):
+                tier = source.tier
+            else:
+                tier = "general_web"
+
+            total_tier_score += SOURCE_TIER_SCORES.get(tier, 0.5)
+
+        max_possible_score = len(pred_evidence_sources) * 2.0
+        evidence_score = (
+            total_tier_score / max_possible_score if max_possible_score > 0 else 0.0
+        )
+
+        tier2_count = 0
+        for source in pred_evidence_sources:
+            if isinstance(source, dict):
+                tier = source.get("tier", "general_web")
+            elif hasattr(source, "tier"):
+                tier = source.tier
+            else:
+                tier = "general_web"
+
+            if tier in ["company_website", "supplier_case_study", "job_posting"]:
+                tier2_count += 1
+
+        if tier2_count == 0:
+            feedback_parts.append(
+                "LOW-QUALITY sources (no tier-2 evidence) - "
+                "prioritize company websites, supplier case studies, or job postings"
+            )
+        else:
+            feedback_parts.append(
+                f"GOOD: {tier2_count} tier-2 sources found (high-quality evidence)"
+            )
+
+    # Weighted Total Score
+    # --------------------
+
+    total_score = (
+        classification_score * 0.70 + dutch_score * 0.15 + evidence_score * 0.15
+    )
+
+    # Final Feedback Assembly
+    # -----------------------
+
+    if not feedback_parts:
+        feedback = (
+            f"✓ CORRECT classification | "
+            f"Found {len(matching_terms)} Dutch terms | "
+            f"{len(pred_evidence_sources)} sources"
+        )
+    else:
+        feedback = " | ".join(feedback_parts)
+
+    # Add confidence check
+    pred_confidence = getattr(prediction, "confidence", None)
+    if pred_confidence is not None:
+        tier2_count = sum(
+            1
+            for source in pred_evidence_sources
+            if (
+                source.get("tier")
+                if isinstance(source, dict)
+                else getattr(source, "tier", None)
+            )
+            in ["company_website", "supplier_case_study", "job_posting"]
+        )
+
+        if pred_confidence > HIGH_CONFIDENCE_THRESHOLD_FOR_WARNING and tier2_count == 0:
+            feedback += (
+                " | WARNING: High confidence without tier-2 evidence is unreliable"
+            )
+
+    return total_score, feedback
+
+
+def dutch_aware_f1_score_only(
+    example: dspy.Example,
+    prediction: Any,  # noqa: ANN401
+) -> float:
+    """
+    Return F1 score without feedback (for BootstrapFewShot/MIPROv2 compatibility).
+
+    This is a backward-compatible wrapper around dutch_aware_hierarchical_f1
+    that returns only the score component, dropping the feedback text.
+
+    Use this metric with optimizers that expect a single float return value
+    (BootstrapFewShot, MIPROv2). Use dutch_aware_hierarchical_f1 directly
+    for GEPA optimizer which requires (score, feedback) tuples.
+
+    Args:
+        example: Ground truth example
+        prediction: Model prediction
+
+    Returns:
+        Float score between 0.0 and 1.0
+
+    Example:
+        >>> from dspy.teleprompt import BootstrapFewShot
+        >>> optimizer = BootstrapFewShot(
+        ...     metric=dutch_aware_f1_score_only,
+        ...     max_bootstrapped_demos=5
+        ... )
+
+    """
+    score, _ = dutch_aware_hierarchical_f1(example, prediction)
+    return score
