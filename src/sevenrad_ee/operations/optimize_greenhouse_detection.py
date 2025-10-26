@@ -22,10 +22,24 @@ from typing import Any
 
 try:
     import dspy
-    from dspy.teleprompt import BootstrapFewShot
 except ImportError as e:
     msg = "dspy-ai package required. Install with: uv pip install -e '.[dev]'"
     raise ImportError(msg) from e
+
+# Phase 4: Try GEPA first, fallback to MIPROv2, then BootstrapFewShot
+try:
+    from dspy.teleprompt.gepa import GEPA
+
+    OPTIMIZER_TYPE = "GEPA"
+except ImportError:
+    try:
+        from dspy.teleprompt import MIPROv2
+
+        OPTIMIZER_TYPE = "MIPROv2"
+    except ImportError:
+        from dspy.teleprompt import BootstrapFewShot
+
+        OPTIMIZER_TYPE = "BootstrapFewShot"
 
 from rich.console import Console
 from rich.panel import Panel
@@ -34,6 +48,8 @@ from rich.table import Table
 
 from sevenrad_ee.ai.dspy_evaluation import (
     combined_f1_metric,
+    dutch_aware_f1_score_only,  # Phase 4: For MIPROv2/BootstrapFewShot
+    dutch_aware_hierarchical_f1,  # Phase 4: For GEPA (returns score, feedback)
     greenhouse_f1_metric,
     growlight_accuracy_metric,
 )
@@ -82,6 +98,134 @@ def configure_perplexity_api() -> dspy.LM:
     )
 
     return lm
+
+
+def configure_gemini_teacher() -> dspy.LM:
+    """
+    Configure Gemini 2.5 Pro as teacher model for DSPy optimization.
+
+    This is the recommended teacher model for Phase 4 based on IMPROVE_PROMPT.md:
+    - Excellent Dutch language support (critical for greenhouse terminology)
+    - 1M token context window
+    - Cost-effective compared to GPT-5 Pro
+    - Strong reasoning capabilities for generating examples and reflection
+
+    Returns:
+        Configured DSPy LM instance for Gemini 2.5 Pro
+
+    Raises:
+        ValueError: If GEMINI_API_KEY environment variable not set
+
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        msg = (
+            "GEMINI_API_KEY environment variable not set. "
+            "Export with: export GEMINI_API_KEY='your-key'"
+        )
+        raise ValueError(msg)
+
+    lm = dspy.LM(
+        "gemini/gemini-2.5-pro",
+        api_key=api_key,
+    )
+
+    return lm
+
+
+def configure_optimizer(
+    teacher_lm: dspy.LM,
+    student_lm: dspy.LM,
+) -> Any:  # noqa: ANN401
+    """
+    Configure the best available optimizer with recommended parameters.
+
+    This function implements Phase 4 optimizer configuration from IMPROVE_PROMPT.md:
+    - Priority 1: GEPA (Genetic Pareto optimization with reflection)
+    - Priority 2: MIPROv2 (Bayesian optimization with instruction tuning)
+    - Priority 3: BootstrapFewShot (example-only optimization)
+
+    Args:
+        teacher_lm: Teacher model for generating examples/reflection (Gemini 2.5 Pro)
+        student_lm: Student model being optimized (Perplexity Sonar)
+
+    Returns:
+        Configured optimizer instance (GEPA, MIPROv2, or BootstrapFewShot)
+
+    """
+    if OPTIMIZER_TYPE == "GEPA":
+        console.print("[cyan]Using GEPA optimizer (research: 80.7% → 97.8%)[/cyan]")
+
+        # GEPA configuration for small datasets (from IMPROVE_PROMPT.md)
+        # GEPA requires (score, feedback) metric
+        optimizer = GEPA(
+            metric=dutch_aware_hierarchical_f1,
+            # Evolutionary parameters
+            generations=15,  # Number of prompt evolution iterations
+            population_size=8,  # Prompts to maintain in Pareto frontier
+            mutation_probability=0.5,  # Chance of reflective mutation
+            # Models
+            reflection_model=teacher_lm,  # Gemini 2.5 Pro for analyzing failures
+            task_model=student_lm,  # Perplexity Sonar being optimized
+            # Validation strategy
+            validation_strategy="cross_validate",
+            num_folds=5,  # 5-fold CV during optimization
+            # Performance
+            num_threads=4,
+        )
+
+        console.print(
+            "  Generations: 15 | Population: 8 | Validation: 5-fold CV\n"
+            f"  Teacher: {teacher_lm.model} (Gemini 2.5 Pro)\n"
+            f"  Student: {student_lm.model} (Perplexity Sonar)\n"
+            "  Expected F1: 95-98%"
+        )
+
+    elif OPTIMIZER_TYPE == "MIPROv2":
+        console.print("[cyan]Using MIPROv2 optimizer (reliable fallback)[/cyan]")
+
+        # MIPROv2 accepts score-only metric
+        optimizer = MIPROv2(
+            metric=dutch_aware_f1_score_only,
+            prompt_model=teacher_lm,  # Gemini 2.5 Pro
+            task_model=student_lm,  # Perplexity Sonar
+            # Auto-tuning
+            auto="medium",  # Auto-select hyperparameters
+            # Bayesian optimization parameters
+            num_candidates=10,  # Instruction variants to try
+            # Few-shot parameters
+            max_bootstrapped_demos=4,
+            max_labeled_demos=6,
+            # Performance
+            num_threads=4,
+        )
+
+        console.print(
+            "  Candidates: 10 | Auto-tune: medium | Demos: 4+6\n"
+            f"  Teacher: {teacher_lm.model} (Gemini 2.5 Pro)\n"
+            f"  Student: {student_lm.model} (Perplexity Sonar)\n"
+            "  Expected F1: 90-93%"
+        )
+
+    else:  # BootstrapFewShot
+        console.print("[yellow]Using BootstrapFewShot (baseline)[/yellow]")
+
+        # BootstrapFewShot accepts score-only metric
+        optimizer = BootstrapFewShot(
+            metric=dutch_aware_f1_score_only,
+            max_bootstrapped_demos=5,
+            max_labeled_demos=10,
+            teacher_settings={"lm": teacher_lm},
+        )
+
+        console.print(
+            "  Demos: 5+10\n"
+            f"  Teacher: {teacher_lm.model} (Gemini 2.5 Pro)\n"
+            f"  Student: {student_lm.model} (Perplexity Sonar)\n"
+            "  Expected F1: 85-90%"
+        )
+
+    return optimizer
 
 
 def evaluate_example(
@@ -211,30 +355,37 @@ def phase1_baseline_evaluation(lm: dspy.LM) -> PhaseResults:
     }
 
 
-def phase2_optimization(lm: dspy.LM, baseline_results: PhaseResults) -> PhaseResults:
+def phase2_optimization(
+    student_lm: dspy.LM,
+    teacher_lm: dspy.LM,
+    baseline_results: PhaseResults,
+) -> PhaseResults:
     """
-    Phase 2: Optimize predictor with BootstrapFewShot.
+    Phase 2: Optimize predictor with GEPA/MIPROv2/BootstrapFewShot.
+
+    This phase implements Phase 4 optimizer configuration from IMPROVE_PROMPT.md,
+    using the best available optimizer (GEPA > MIPROv2 > BootstrapFewShot).
 
     Args:
-        lm: Configured DSPy language model
+        student_lm: Student model being optimized (Perplexity Sonar)
+        teacher_lm: Teacher model for examples/reflection (Gemini 2.5 Pro)
         baseline_results: Results from Phase 1 for comparison
 
     Returns:
         Dictionary with optimized results and improvement metrics
 
     """
-    console.print("\n[bold cyan]Phase 2: BootstrapFewShot Optimization[/bold cyan]\n")
+    console.print(f"\n[bold cyan]Phase 2: {OPTIMIZER_TYPE} Optimization[/bold cyan]\n")
 
-    with dspy.context(lm=lm):
+    with dspy.context(lm=student_lm):
         # Get training data
         training_set = get_training_set()
 
-        # Initialize optimizer
-        console.print("Initializing BootstrapFewShot teleprompter...")
-        optimizer = BootstrapFewShot(
-            metric=combined_f1_metric,
-            max_bootstrapped_demos=5,
-            max_labeled_demos=10,
+        # Initialize optimizer with Phase 4 configuration
+        console.print(f"Initializing {OPTIMIZER_TYPE} optimizer...")
+        optimizer = configure_optimizer(
+            teacher_lm=teacher_lm,
+            student_lm=student_lm,
         )
 
         # Compile optimized predictor
@@ -424,10 +575,13 @@ def generate_markdown_report(
 
 ## Executive Summary
 
-This report documents the three-phase optimization of greenhouse growlight detection using DSPy's BootstrapFewShot teleprompter.
+This report documents the three-phase optimization of greenhouse growlight detection using DSPy's {OPTIMIZER_TYPE} optimizer (Phase 4 implementation).
 
 ### Key Findings
 
+- **Optimizer**: {OPTIMIZER_TYPE}
+- **Teacher Model**: Gemini 2.5 Pro (Dutch language support)
+- **Student Model**: Perplexity Sonar
 - **Training Set**: {phase1_results['n_examples']} examples
 - **Validation Set**: {phase3_results['n_examples']} hold-out examples
 - **Baseline Combined F1**: {phase1_results['aggregate_metrics']['combined_f1']:.2%}
@@ -464,13 +618,38 @@ Evaluated unoptimized GreenhouseDetector on {phase1_results['n_examples']} train
     report += f"""
 ---
 
-## Phase 2: BootstrapFewShot Optimization
+## Phase 2: {OPTIMIZER_TYPE} Optimization
 
-Applied DSPy BootstrapFewShot optimization with:
-- `max_bootstrapped_demos=5`
-- `max_labeled_demos=10`
-- `metric=combined_f1_metric`
+Applied DSPy {OPTIMIZER_TYPE} optimization with Phase 4 configuration:
+- **Optimizer**: {OPTIMIZER_TYPE}
+- **Teacher Model**: Gemini 2.5 Pro (1M context, excellent Dutch support)
+- **Student Model**: Perplexity Sonar (web search capabilities)
+- **Metric**: {"dutch_aware_hierarchical_f1" if OPTIMIZER_TYPE == "GEPA" else "dutch_aware_f1_score_only"}
 
+**{OPTIMIZER_TYPE} Parameters:**
+"""
+
+    # Add optimizer-specific parameters
+    if OPTIMIZER_TYPE == "GEPA":
+        report += """- Generations: 15
+- Population Size: 8
+- Mutation Probability: 0.5
+- Validation Strategy: 5-fold cross-validation
+- Threads: 4
+"""
+    elif OPTIMIZER_TYPE == "MIPROv2":
+        report += """- Auto-tuning: medium
+- Candidates: 10
+- Max Bootstrapped Demos: 4
+- Max Labeled Demos: 6
+- Threads: 4
+"""
+    else:  # BootstrapFewShot
+        report += """- Max Bootstrapped Demos: 5
+- Max Labeled Demos: 10
+"""
+
+    report += """
 ### Optimized Metrics
 
 | Metric | Baseline | Optimized | Improvement |
@@ -568,7 +747,10 @@ Validated optimized model on {phase3_results['n_examples']} never-seen examples.
   - Reviewing example quality
 """
 
-    if phase3_results["aggregate_metrics"]["combined_f1"] >= STRONG_VALIDATION_THRESHOLD:
+    if (
+        phase3_results["aggregate_metrics"]["combined_f1"]
+        >= STRONG_VALIDATION_THRESHOLD
+    ):
         report += """
 ✓ Strong validation performance (≥90% F1) indicates good generalization
 """
@@ -667,7 +849,8 @@ def main() -> int:
     console.print(
         Panel.fit(
             "[bold cyan]DSPy Greenhouse Detection Optimization[/bold cyan]\n"
-            "Three-Phase Pipeline: Baseline → Optimization → Validation",
+            f"Three-Phase Pipeline with {OPTIMIZER_TYPE}: "
+            "Baseline → Optimization → Validation",
             border_style="cyan",
         )
     )
@@ -675,20 +858,27 @@ def main() -> int:
     args = parse_arguments()
 
     try:
-        # Configure Perplexity API
-        console.print("\n[bold]Configuring Perplexity Sonar API...[/bold]")
-        lm = configure_perplexity_api()
-        dspy.configure(lm=lm)
-        console.print("[green]✓[/green] API configured")
+        # Phase 4: Configure student model (Perplexity Sonar)
+        console.print("\n[bold]Configuring student model (Perplexity Sonar)...[/bold]")
+        student_lm = configure_perplexity_api()
+        dspy.configure(lm=student_lm)
+        console.print("[green]✓[/green] Student model configured")
+
+        # Phase 4: Configure teacher model (Gemini 2.5 Pro)
+        console.print("\n[bold]Configuring teacher model (Gemini 2.5 Pro)...[/bold]")
+        teacher_lm = configure_gemini_teacher()
+        console.print("[green]✓[/green] Teacher model configured")
 
         # Phase 1: Baseline
-        phase1_results = phase1_baseline_evaluation(lm)
+        phase1_results = phase1_baseline_evaluation(student_lm)
 
-        # Phase 2: Optimization
-        phase2_results = phase2_optimization(lm, phase1_results)
+        # Phase 2: Optimization (Phase 4 enhancement)
+        phase2_results = phase2_optimization(student_lm, teacher_lm, phase1_results)
 
         # Phase 3: Validation
-        phase3_results = phase3_validation(lm, phase2_results["optimized_detector"])
+        phase3_results = phase3_validation(
+            student_lm, phase2_results["optimized_detector"]
+        )
 
         # Save optimized model
         console.print("\n[bold]Saving optimized model...[/bold]")

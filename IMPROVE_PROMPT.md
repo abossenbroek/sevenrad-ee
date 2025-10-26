@@ -98,6 +98,22 @@ Your current DSPy greenhouse detection system suffers from **severe overfitting*
    - ✅ Zero regressions (existing tests still pass)
    - ✅ Ready for Phase 4 optimizer integration
 
+7. **Phase 4: GEPA/MIPROv2 Optimizer Configuration (Day 0)**
+   - ✅ Added optimizer import hierarchy with fallback (GEPA → MIPROv2 → BootstrapFewShot)
+   - ✅ Updated metric imports to use Phase 3 Dutch-aware metrics
+   - ✅ Created `configure_gemini_teacher()` function for Gemini 2.5 Pro teacher model
+   - ✅ Created `configure_optimizer()` function with recommended parameters:
+     * GEPA: 15 generations, population 8, mutation 0.5, 5-fold CV
+     * MIPROv2: auto="medium", 10 candidates, 4+6 demos
+     * BootstrapFewShot: 5+10 demos (fallback)
+   - ✅ Updated `phase2_optimization()` to use teacher-student model configuration
+   - ✅ Enhanced console output showing optimizer type, teacher model, student model
+   - ✅ Updated markdown report to include optimizer configuration details
+   - ✅ All code quality checks pass (ruff format, ruff check, mypy clean)
+   - ✅ Verified GEPA imports successfully from DSPy GitHub installation
+   - ✅ **Active Optimizer: GEPA** (confirmed via import test)
+   - ✅ Ready for Phase 1 data expansion (Steps 2-4)
+
 ### 🔄 In Progress
 
 *Nothing currently in progress*
@@ -109,8 +125,7 @@ Your current DSPy greenhouse detection system suffers from **severe overfitting*
    - ⏳ Step 3: Build CLI tool for batch research
    - ⏳ Step 4: Scaled collection + HITL validation (60-65 examples)
 
-2. **Phase 4-6: Optimizer & Deployment (Days 7-11)**
-   - ⏳ Phase 4: GEPA/MIPRO optimizer configuration
+2. **Phase 5-6: Cross-Validation & Deployment (Days 7-11)**
    - ⏳ Phase 5: Repeated nested cross-validation
    - ⏳ Phase 6: Production deployment
 
