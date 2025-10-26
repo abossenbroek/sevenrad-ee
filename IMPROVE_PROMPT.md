@@ -114,6 +114,21 @@ Your current DSPy greenhouse detection system suffers from **severe overfitting*
    - ✅ **Active Optimizer: GEPA** (confirmed via import test)
    - ✅ Ready for Phase 1 data expansion (Steps 2-4)
 
+8. **Phase 5: Repeated Nested Cross-Validation (Day 0)**
+   - ✅ Created `src/sevenrad_ee/ai/cross_validation.py` with `repeated_nested_cv()` function
+   - ✅ Added scikit-learn~=1.5.0 and numpy~=1.26.0 dependencies to pyproject.toml
+   - ✅ Implemented RepeatedStratifiedKFold with configurable repeats (default: 10) and folds (default: 5)
+   - ✅ Added Rich-based progress indicators (SpinnerColumn, TextColumn)
+   - ✅ Implemented overfitting detection with thresholds:
+     * SEVERE_OVERFITTING_THRESHOLD = 0.15 (>15% gap)
+     * MODERATE_OVERFITTING_THRESHOLD = 0.10 (10-15% gap)
+     * HIGH_VARIANCE_THRESHOLD = 0.05 (>5% std)
+   - ✅ Return comprehensive statistics dict with mean_f1, std_f1, train_f1, overfitting_gap, fold_scores, detailed_results
+   - ✅ Full type hints and comprehensive docstrings
+   - ✅ All code quality checks pass (ruff format, ruff check, mypy clean)
+   - ✅ Added sklearn to mypy overrides in pyproject.toml
+   - ✅ Ready for Phase 1 data expansion (Steps 2-4) to test cross-validation framework
+
 ### 🔄 In Progress
 
 *Nothing currently in progress*
@@ -125,8 +140,7 @@ Your current DSPy greenhouse detection system suffers from **severe overfitting*
    - ⏳ Step 3: Build CLI tool for batch research
    - ⏳ Step 4: Scaled collection + HITL validation (60-65 examples)
 
-2. **Phase 5-6: Cross-Validation & Deployment (Days 7-11)**
-   - ⏳ Phase 5: Repeated nested cross-validation
+2. **Phase 6: Production Deployment (Days 10-11)**
    - ⏳ Phase 6: Production deployment
 
 ### 📊 Success Metrics Tracking

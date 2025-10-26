@@ -23,6 +23,8 @@ dependencies = [
     "googlemaps~=4.10.0",
     "pyyaml~=6.0.0",
     "requests~=2.31.0",
+    "numpy~=1.26.0",
+    "scikit-learn~=1.5.0",
     "perplexityai~=0.17.0",
     "dspy @ git+https://github.com/stanfordnlp/dspy.git",  # Using GitHub due to broken PyPI 3.0.3 (dspy-ai)
 ]
@@ -130,6 +132,14 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "dspy.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "sklearn"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "sklearn.*"
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
