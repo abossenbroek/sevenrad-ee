@@ -31,6 +31,7 @@ def __():
     from dotenv import load_dotenv
     from rich.console import Console
     from rich.panel import Panel
+    from rich.progress import Progress, SpinnerColumn, TextColumn
     from rich.table import Table
 
     load_dotenv()
@@ -112,7 +113,18 @@ def __():
 
     all_checks_passed = pipeline_state["api_keys_configured"]
 
-    return console, status_table, pipeline_state, api_keys, all_checks_passed
+    return (
+        console,
+        json,
+        Path,
+        mo,
+        Panel,
+        Table,
+        Progress,
+        SpinnerColumn,
+        TextColumn,
+        all_checks_passed,
+    )
 
 
 @app.cell
@@ -126,18 +138,10 @@ def __(mo, all_checks_passed):
 
 
 @app.cell
-def __(console):
+def __(console, json, Path, Panel, Progress, SpinnerColumn, TextColumn, Table):
     """Section 2: Re-classify Existing 19 Companies."""
-    import json
-    from pathlib import Path
-
-    import marimo as mo
-    from rich.panel import Panel
-    from rich.progress import Progress, SpinnerColumn, TextColumn
-    from rich.table import Table
-
-    from sevenrad_ee.ai.company_researcher import CompanyResearcher
-    from sevenrad_ee.ai.perplexity_client import PerplexityClient
+    from sevenrad_ee.ai.company_researcher import CompanyResearcher as Researcher2
+    from sevenrad_ee.ai.perplexity_client import PerplexityClient as Client2
 
     console.print("\n")
     console.print(
@@ -147,14 +151,14 @@ def __(console):
         )
     )
 
-    research_dir = Path("data/research")
-    research_files = list(research_dir.glob("*.json"))
+    research_dir2 = Path("data/research")
+    research_files = list(research_dir2.glob("*.json"))
     console.print(
         f"\n[cyan]Found {len(research_files)} existing research files[/cyan]\n"
     )
 
-    perplexity_client = PerplexityClient()
-    researcher = CompanyResearcher(perplexity_client)
+    perplexity_client2 = Client2()
+    researcher2 = Researcher2(perplexity_client2)
 
     reclassification_results = []
 
@@ -162,70 +166,70 @@ def __(console):
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         console=console,
-    ) as progress:
-        task = progress.add_task(
+    ) as progress2:
+        task2 = progress2.add_task(
             "Re-classifying companies...", total=len(research_files)
         )
 
-        for file_path in research_files:
-            with open(file_path) as f:
-                data = json.load(f)
+        for file_path2 in research_files:
+            with open(file_path2) as f2:
+                data2 = json.load(f2)
 
-            company_name = data["company"]
-            progress.update(task, description=f"Re-classifying: {company_name}")
+            company_name2 = data2["company"]
+            progress2.update(task2, description=f"Re-classifying: {company_name2}")
 
-            old_classification = data.get("classification_suggestion", "UNKNOWN")
-            old_confidence = data.get("confidence_score", 0.0)
+            old_classification = data2.get("classification_suggestion", "UNKNOWN")
+            old_confidence = data2.get("confidence_score", 0.0)
 
             # Re-classify using NEW evidence classifier
-            from sevenrad_ee.ai.company_research_models import Evidence
-            from sevenrad_ee.ai.perplexity_cache import Citation, PerplexityResponse
+            from sevenrad_ee.ai.company_research_models import Evidence as Evidence2
+            from sevenrad_ee.ai.perplexity_cache import Citation as Citation2, PerplexityResponse as Response2
 
-            evidence = Evidence()
-            dutch_terms = set()
+            evidence2 = Evidence2()
+            dutch_terms2 = set()
 
-            for query_result in data["queries"]:
-                citations = [
-                    Citation(index=i, url=url, text="")
-                    for i, url in enumerate(query_result.get("citations", []))
+            for query_result2 in data2["queries"]:
+                citations2 = [
+                    Citation2(index=i, url=url, text="")
+                    for i, url in enumerate(query_result2.get("citations", []))
                 ]
-                mock_response = PerplexityResponse(
-                    id=query_result.get("response_id", "mock"),
-                    model=query_result.get("model", "mock"),
-                    content=query_result.get("content", ""),
-                    citations=citations,
+                mock_response2 = Response2(
+                    id=query_result2.get("response_id", "mock"),
+                    model=query_result2.get("model", "mock"),
+                    content=query_result2.get("content", ""),
+                    citations=citations2,
                     usage={"total_tokens": 0},
                 )
 
-                researcher._categorize_evidence(
-                    response=mock_response,
+                researcher2._categorize_evidence(
+                    response=mock_response2,
                     query_source="reclassification",
-                    evidence=evidence,
-                    dutch_terms=dutch_terms,
-                    company_name=company_name,
+                    evidence=evidence2,
+                    dutch_terms=dutch_terms2,
+                    company_name=company_name2,
                 )
 
-            new_suggestion = researcher._suggest_classification(evidence)
-            new_confidence = researcher._calculate_confidence(evidence, dutch_terms)
+            new_suggestion2 = researcher2._suggest_classification(evidence2)
+            new_confidence2 = researcher2._calculate_confidence(evidence2, dutch_terms2)
 
             # Update file
-            data["classification_suggestion"] = new_suggestion.value
-            data["confidence_score"] = new_confidence
-            data["evidence"] = evidence.model_dump()
-            data["dutch_terms_found"] = list(dutch_terms)
-            file_path.write_text(json.dumps(data, indent=2))
+            data2["classification_suggestion"] = new_suggestion2.value
+            data2["confidence_score"] = new_confidence2
+            data2["evidence"] = evidence2.model_dump()
+            data2["dutch_terms_found"] = list(dutch_terms2)
+            file_path2.write_text(json.dumps(data2, indent=2))
 
             reclassification_results.append(
                 {
-                    "company": company_name,
+                    "company": company_name2,
                     "old_classification": old_classification,
-                    "new_classification": new_suggestion.value,
-                    "changed": old_classification != new_suggestion.value,
-                    "new_confidence": new_confidence,
+                    "new_classification": new_suggestion2.value,
+                    "changed": old_classification != new_suggestion2.value,
+                    "new_confidence": new_confidence2,
                 }
             )
 
-            progress.advance(task)
+            progress2.advance(task2)
 
     # Save results
     Path("cache/reclassification_results.json").write_text(
@@ -233,40 +237,40 @@ def __(console):
     )
 
     # Create comparison table
-    comparison_table = Table(
+    comparison_table2 = Table(
         show_header=True, header_style="bold cyan", title="Reclassification Results"
     )
-    comparison_table.add_column("Company", style="white", width=30)
-    comparison_table.add_column("Old", justify="center", width=12)
-    comparison_table.add_column("New", justify="center", width=12)
-    comparison_table.add_column("Changed", justify="center", width=10)
+    comparison_table2.add_column("Company", style="white", width=30)
+    comparison_table2.add_column("Old", justify="center", width=12)
+    comparison_table2.add_column("New", justify="center", width=12)
+    comparison_table2.add_column("Changed", justify="center", width=10)
 
     changed_count = 0
-    for result in reclassification_results:
-        if result["changed"]:
+    for result2 in reclassification_results:
+        if result2["changed"]:
             changed_count += 1
-            comparison_table.add_row(
-                result["company"][:28],
-                f"[yellow]{result['old_classification']}[/yellow]",
-                f"[green]{result['new_classification']}[/green]",
+            comparison_table2.add_row(
+                result2["company"][:28],
+                f"[yellow]{result2['old_classification']}[/yellow]",
+                f"[green]{result2['new_classification']}[/green]",
                 "[yellow]⚠️[/yellow]",
             )
         else:
-            comparison_table.add_row(
-                result["company"][:28],
-                f"[dim]{result['old_classification']}[/dim]",
-                result["new_classification"],
+            comparison_table2.add_row(
+                result2["company"][:28],
+                f"[dim]{result2['old_classification']}[/dim]",
+                result2["new_classification"],
                 "[dim]—[/dim]",
             )
 
     console.print("\n")
-    console.print(comparison_table)
+    console.print(comparison_table2)
     console.print(
         f"\n[cyan]Changed: {changed_count}/{len(reclassification_results)}[/cyan]"
     )
 
     # Check false positives
-    KNOWN_NEGATIVES = [
+    KNOWN_NEGATIVES_S2 = [
         "P.J.J.M. Verbeek",
         "Kwekerij Ted Vijverberg",
         "Kwekerij Figaro",
@@ -278,7 +282,7 @@ def __(console):
     false_positives = [
         r
         for r in reclassification_results
-        if any(neg in r["company"] for neg in KNOWN_NEGATIVES)
+        if any(neg in r["company"] for neg in KNOWN_NEGATIVES_S2)
         and r["new_classification"] == "POSITIVE"
     ]
 
