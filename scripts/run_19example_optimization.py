@@ -381,6 +381,16 @@ def section4_gepa_config(train_set: list, val_set: list) -> tuple[dict, object]:
         )
         dspy.configure(lm=gemini_lm)
 
+    # Create GEPA-compatible metric wrapper
+    # GEPA expects: metric(gold, pred, trace, pred_name, pred_trace) -> (score, feedback)
+    # Our metric: dutch_aware_hierarchical_f1(example, prediction, trace) -> (score, feedback)
+    def gepa_metric_wrapper(gold, pred, trace, pred_name, pred_trace):
+        """Wrapper to adapt our metric to GEPA's 5-argument format."""
+        # gold = example (DSPy Example object)
+        # pred = prediction (model output)
+        # Ignore pred_name and pred_trace (not used by our metric)
+        return dutch_aware_hierarchical_f1(gold, pred, trace)
+
     # Configuration parameters
     config_table = Table(
         show_header=True, header_style="bold cyan", title="GEPA Configuration"
@@ -390,17 +400,16 @@ def section4_gepa_config(train_set: list, val_set: list) -> tuple[dict, object]:
 
     config_table.add_row("Teacher Model", "Gemini 2.5 Pro")
     config_table.add_row("Student Model", "Gemini 2.5 Pro")
-    config_table.add_row("Generations", "15")
-    config_table.add_row("Population Size", "8")
-    config_table.add_row("Mutation Probability", "0.5")
-    config_table.add_row("CV Folds", "5")
-    config_table.add_row("Metric", "Dutch-Aware Hierarchical F1")
+    config_table.add_row("Auto Preset", "medium")
+    config_table.add_row("Max Evaluations", "50")
+    config_table.add_row("Num Threads", "4")
+    config_table.add_row("Metric", "Dutch-Aware Hierarchical F1 (wrapped)")
 
     console.print(config_table)
 
     # Initialize optimizer config (using actual GEPA API)
     optimizer_config = {
-        "metric": dutch_aware_hierarchical_f1,
+        "metric": gepa_metric_wrapper,  # Use wrapper instead of direct function
         "auto": "medium",  # Preset: light/medium/heavy (medium = balanced)
         "reflection_lm": gemini_lm,  # Gemini 2.5 Pro for analyzing failures
         "reflection_minibatch_size": 3,  # Batch size for reflection
