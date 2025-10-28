@@ -383,15 +383,25 @@ def section4_gepa_config(train_set: list, val_set: list) -> tuple[dict, object]:
 
     # Create GEPA-compatible metric wrapper
     # GEPA calls metric in two different ways:
-    # 1. During evaluation: metric(example, prediction) - 2 args
-    # 2. During reflection: metric(gold, pred, trace, pred_name, pred_trace) - 5 args
+    # 1. During evaluation/scoring: metric(example, prediction) - needs numeric score only
+    # 2. During reflection: metric(gold, pred, trace, pred_name, pred_trace) - needs (score, feedback) tuple
     # Our metric: dutch_aware_hierarchical_f1(example, prediction, trace) -> (score, feedback)
     def gepa_metric_wrapper(gold, pred, trace=None, pred_name=None, pred_trace=None):
-        """Wrapper to adapt our metric to GEPA's variable argument format."""
+        """Wrapper to adapt our metric to GEPA's variable argument format and return type."""
         # gold = example (DSPy Example object)
         # pred = prediction (model output)
         # trace, pred_name, pred_trace are optional (used during reflection)
-        return dutch_aware_hierarchical_f1(gold, pred, trace)
+
+        # Call our metric (always returns tuple)
+        result = dutch_aware_hierarchical_f1(gold, pred, trace)
+        score, feedback = result
+
+        # During reflection (pred_name provided): return full tuple for feedback
+        # During evaluation (pred_name is None): return only numeric score for aggregation
+        if pred_name is not None:
+            return (score, feedback)
+        else:
+            return score
 
     # Configuration parameters
     config_table = Table(
@@ -527,6 +537,20 @@ def section6_cross_validation(
     )
     console.print("[yellow]⚠️  This will take 1-2 hours (50 runs)[/yellow]\n")
 
+    # Simplified evaluation-only CV (no nested optimization)
+    # This evaluates the already-optimized program across multiple CV folds
+    from sklearn.model_selection import RepeatedStratifiedKFold
+
+    n_repeats = 10
+    n_folds = 5
+    fold_scores = []
+
+    # Extract labels for stratification
+    labels = [
+        1 if ex.uses_growlight == "POSITIVE (uses growlights)" else 0
+        for ex in all_examples_cv
+    ]
+
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -534,17 +558,63 @@ def section6_cross_validation(
     ) as progress:
         task = progress.add_task("Running CV...", total=None)
 
-        # Run ACTUAL CV (no mock fallback - force real execution)
-        cv_results = repeated_nested_cv(
-            program_class=type(optimized_program),
-            optimizer_func=lambda t, v: optimized_program,  # Use pre-trained model
-            all_examples=all_examples_cv,
-            metric_func=dutch_aware_hierarchical_f1,
-            n_repeats=10,
-            n_folds=5,
-        )
+        # Run evaluation across CV folds (no optimization per fold)
+        rskf = RepeatedStratifiedKFold(n_splits=n_folds, n_repeats=n_repeats, random_state=42)
+
+        for fold_idx, (train_idx, val_idx) in enumerate(rskf.split(all_examples_cv, labels), 1):
+            # Get fold examples
+            val_fold = [all_examples_cv[i] for i in val_idx]
+
+            # Evaluate on validation fold
+            val_predictions = [
+                optimized_program(
+                    location_name=ex.location_name, location_area=ex.location_area
+                )
+                for ex in val_fold
+            ]
+
+            # Calculate fold score
+            fold_score_list = []
+            for ex, pred in zip(val_fold, val_predictions, strict=False):
+                result = dutch_aware_hierarchical_f1(ex, pred)
+                score = result[0] if isinstance(result, tuple) else result
+                fold_score_list.append(float(score))
+
+            fold_score = sum(fold_score_list) / len(fold_score_list) if fold_score_list else 0.0
+            fold_scores.append(fold_score)
+
+            if fold_idx % 10 == 0:
+                progress.update(
+                    task,
+                    description=f"CV progress: {fold_idx}/{n_repeats * n_folds} folds..."
+                )
 
         progress.update(task, description="CV complete!", completed=True)
+
+    # Calculate statistics
+    import numpy as np
+    mean_f1 = float(np.mean(fold_scores))
+    std_f1 = float(np.std(fold_scores))
+
+    # Calculate train F1 (on full train set)
+    train_predictions = [
+        optimized_program(location_name=ex.location_name, location_area=ex.location_area)
+        for ex in train_set
+    ]
+    train_scores = []
+    for ex, pred in zip(train_set, train_predictions, strict=False):
+        result = dutch_aware_hierarchical_f1(ex, pred)
+        score = result[0] if isinstance(result, tuple) else result
+        train_scores.append(float(score))
+    train_f1 = sum(train_scores) / len(train_scores) if train_scores else 0.0
+
+    cv_results = {
+        "mean_f1": mean_f1,
+        "std_f1": std_f1,
+        "train_f1": train_f1,
+        "overfitting_gap": train_f1 - mean_f1,
+        "fold_scores": fold_scores[:5],  # Save first 5 for brevity
+    }
 
     # Save CV results
     Path("results/19examples/cv_results.json").write_text(
