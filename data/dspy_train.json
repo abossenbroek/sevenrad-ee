@@ -1,0 +1,92 @@
+[
+  {
+    "location_name": "Vreugdenhil Bulbs & Plants",
+    "location_area": "Naaldwijk",
+    "is_greenhouse": "YES",
+    "uses_growlight": "POSITIVE (uses growlights)"
+  },
+  {
+    "location_name": "Van der Sar Plants",
+    "location_area": "'s Gravenzande",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  },
+  {
+    "location_name": "Marjoland",
+    "location_area": "Waddinxveen",
+    "is_greenhouse": "YES",
+    "uses_growlight": "POSITIVE (uses growlights)"
+  },
+  {
+    "location_name": "P.J.J.M. Verbeek en P.H.M. Verbeek",
+    "location_area": "Maasland",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  },
+  {
+    "location_name": "Van Onselen Aubergines B.V.",
+    "location_area": "'s Gravenzande",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEGATIVE (no growlights)"
+  },
+  {
+    "location_name": "Zentoo - MG GRAND B.V.",
+    "location_area": "Monster",
+    "is_greenhouse": "YES",
+    "uses_growlight": "POSITIVE (uses growlights)"
+  },
+  {
+    "location_name": "Batist Westmade",
+    "location_area": "Made",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  },
+  {
+    "location_name": "Kwekerij Ted Vijverberg B.V.",
+    "location_area": "De Lier",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  },
+  {
+    "location_name": "BM Roses",
+    "location_area": "Maasland",
+    "is_greenhouse": "YES",
+    "uses_growlight": "POSITIVE (uses growlights)"
+  },
+  {
+    "location_name": "Pannekoek Orchidee\u00ebn",
+    "location_area": "Berkel en Rodenrijs",
+    "is_greenhouse": "YES",
+    "uses_growlight": "POSITIVE (uses growlights)"
+  },
+  {
+    "location_name": "Kwekerij Figaro B.V.",
+    "location_area": "Naaldwijk",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  },
+  {
+    "location_name": "Vereijken Kwekerijen",
+    "location_area": "'s Gravenzande",
+    "is_greenhouse": "YES",
+    "uses_growlight": "POSITIVE (uses growlights)"
+  },
+  {
+    "location_name": "Tomatenkwekerij A. de Bruijn en Zn.",
+    "location_area": "Maasland",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEGATIVE (no growlights)"
+  },
+  {
+    "location_name": "Kwekerij De Opstal V.O.F.",
+    "location_area": "Naaldwijk",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  },
+  {
+    "location_name": "Kwekerij Overgaag",
+    "location_area": "Maasland",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  }
+]

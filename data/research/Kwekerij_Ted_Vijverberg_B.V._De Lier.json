@@ -1,0 +1,267 @@
+{
+  "company": "Kwekerij Ted Vijverberg B.V.",
+  "location": "De Lier",
+  "timestamp": "2025-10-25T18:05:36.172101",
+  "queries": [
+    {
+      "query": "\"Kwekerij Ted Vijverberg B.V.\" De Lier AND (assimilatiebelichting OR groeilicht OR \"belichte teelt\")",
+      "response_id": "42de94a3-e562-4c2e-ac01-de2135c07bc0",
+      "model": "sonar-pro",
+      "content": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van hun planten[1][3][5][7][9]. De kwekerij specialiseert zich in de teelt van **Dieffenbachia** en **Zamioculcas** en beschikt over een kas van 1.500 m\u00b2, waar een actief klimaat wordt gecre\u00eberd om optimale groeiomstandigheden te waarborgen[5][7][9].\n\nEssenti\u00eble context:\n- Er wordt in de kas veel aandacht besteed aan het monitoren en bijsturen van het klimaat, deels automatisch, om de planten sterk en gezond te houden[5].\n- Er is geen expliciete vermelding van het gebruik van assimilatiebelichting (zoals SON-T of LED), groeilicht, of belichte teelt in de bedrijfsbeschrijvingen, interviews of projectinformatie over Ted Vijverberg[5][7][9].\n- De focus ligt op ambachtelijke teelt en het leveren van gezonde kamerplanten aan groothandels in Europa[5][9].\n\nAanvullende relevante informatie:\n- In de regio Westland en De Lier is assimilatiebelichting en groeilicht wel gangbaar in de glastuinbouw, vooral bij bedrijven die zich richten op bloemen en vruchtgroenten, maar er zijn geen specifieke bronnen die dit bevestigen voor Ted Vijverberg B.V.[2][6][13].\n- Andere kwekers in de regio experimenteren met hybride belichtingssystemen (SON-T en LED) om productie en duurzaamheid te verhogen, maar deze informatie is niet direct van toepassing op Ted Vijverberg B.V.[2][6][13].\n\nSamengevat: Er is geen bewijs in de beschikbare bronnen dat Kwekerij Ted Vijverberg B.V. gebruikmaakt van assimilatiebelichting, groeilicht of belichte teelt. De nadruk ligt op klimaatbeheersing en ambachtelijke teelt van kamerplanten.",
+      "citations": [
+        "https://www.compadex.com/nl/businesses/nl/kwekerij-ted-vijverberg-b-v-27216883-00744972",
+        "https://www.onderglas.nl/gerberakwekerij-werpt-licht-op-bruikbaarheid-led-naast-son-t/",
+        "https://moestuinen.nl/kwekerij-ted-vijverberg-b-v-/",
+        "https://onhn.nl/nieuws/kwekerij-a-bakker-eerste-leliekweker-met-led-groeilicht/",
+        "https://swvantland.wixsite.com/bladmagazine/post/op-bezoek-bij-de-tuinder-ted-vijverberg",
+        "https://www.onderglas.nl/gaat-om-balans-meerproductie-en-vruchtgewicht/",
+        "https://www.waterbassin.nl/projecten/ted-vijverberg-de-lier",
+        "https://www.plantlighting.nl/publicaties/",
+        "https://www.floraxchange.nl/Account/Kweker/896/Ted-Vijverberg",
+        "https://thegreengentleman.nl/index.php/kwekers/",
+        "https://pietvijverberg.nl",
+        "https://www.redharvest.nl/nl/red-harvest",
+        "https://www.groentennieuws.nl/article/167432/belichte-teelt-wint-meer-en-meer-terrein/",
+        "https://www.westlandwerk.nl/bedrijf/tuinbouw-bloemkwekerij-cpm-van-dijk-de-lier-westland/618",
+        "https://en.wikipedia.org/wiki/Grow_light",
+        "https://edepot.wur.nl/422513"
+      ]
+    },
+    {
+      "query": "\"Kwekerij Ted Vijverberg B.V.\" AND (Signify OR Hortilux OR \"Philips LED\" OR Gavita)",
+      "response_id": "d7abae1c-5d9f-4734-847c-82074042887a",
+      "model": "sonar-pro",
+      "content": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe search results provide information about Ted Vijverberg's nursery operations in De Lier, Westland, where he cultivates zamioculcas and dieffenbachia plants on 1,500 square meters of greenhouse space[1]. The nursery grows these plants from cuttings imported from Tanzania and Guatemala, with zamioculcas requiring approximately one year of cultivation before being ready for customers[1].\n\nWhile the search results do include references to Signify appearing at horticultural trade shows like HortiContact[8], there is no documented relationship or partnership between Signify (or its lighting brands including Philips LED and Gavita) and Ted Vijverberg's nursery specifically.\n\nTed Vijverberg's operation focuses on creating an \"active climate\" in his greenhouse to maintain optimal growing conditions for his plants[1], but the search results do not specify which lighting systems or equipment suppliers he uses to achieve this climate control.",
+      "citations": [
+        "https://swvantland.wixsite.com/bladmagazine/post/op-bezoek-bij-de-tuinder-ted-vijverberg",
+        "https://www.signify.com/nl-nl/partner-program",
+        "https://pietvijverberg.nl/contact/",
+        "https://moestuinen.nl/kwekerij-ted-vijverberg-b-v-/",
+        "https://pietvijverberg.nl/kwekerij-piet-vijverberg-viert-25-jaar-phalaenopsisteelt-met-win-actie/",
+        "https://www.floraxchange.nl/Account/Kweker/896/Ted-Vijverberg",
+        "https://www.groentennieuws.nl/photos/album/12290/horticontact-2020/",
+        "https://www.hortidaily.com/photos/album/11494/horticontact-2024-gorinchem-netherlands/"
+      ]
+    },
+    {
+      "query": "\"Kwekerij Ted Vijverberg B.V.\" AND (\"onbelichte teelt\" OR \"daglichtkas\" OR \"zonder kunstlicht\")",
+      "response_id": "99dbff30-060f-42ec-850b-7eb280c3dd20",
+      "model": "sonar-pro",
+      "content": "Kwekerij Ted Vijverberg B.V. in De Lier is gespecialiseerd in de teelt van **Dieffenbachia** en **Zamioculcas** potplanten onder glas[4][6]. Er is geen direct bewijs in de beschikbare bronnen dat deze kwekerij gebruikmaakt van **onbelichte teelt**, een **daglichtkas**, of teelt **zonder kunstlicht**.\n\nDe beschikbare informatie beschrijft het bedrijf als een relatief kleine kwekerij (ca. 1500 m\u00b2 kas) waar planten worden opgekweekt uit stek, met veel aandacht voor een \u201cactief klimaat\u201d in de kas om optimale groei te realiseren[1]. De kasomstandigheden worden deels automatisch geregeld, maar er wordt niet expliciet vermeld dat er geen kunstlicht wordt gebruikt, noch dat er sprake is van een daglichtkas of onbelichte teelt[1][3][4][6].\n\n**Essenti\u00eble context:**\n- Ted Vijverberg teelt Dieffenbachia en Zamioculcas, beide kamerplanten die bekend staan om hun robuustheid[1][6].\n- De kas is gevestigd aan de Hoogweg 26 in De Lier en beslaat ongeveer 1500 m\u00b2[1][3][4][7].\n- Er wordt gesproken over het cre\u00ebren van een \u201cactief klimaat\u201d en het bijhouden van kasomstandigheden, maar zonder specifieke details over het gebruik van daglicht versus kunstlicht[1].\n\n**Aanvullende relevante informatie:**\n- De teelt gebeurt onder glas, wat standaard is voor potplanten in Nederland, maar dit zegt niets over het gebruik van kunstlicht[4].\n- Er zijn geen uitspraken of publicaties gevonden waarin Ted Vijverberg B.V. expliciet vermeldt dat zij onbelichte teelt toepassen of een daglichtkas gebruiken.\n\n**Conclusie op basis van beschikbare bronnen:**  \nEr is geen bevestiging dat Kwekerij Ted Vijverberg B.V. werkt met onbelichte teelt, een daglichtkas, of zonder kunstlicht. De teelt vindt plaats onder glas met aandacht voor klimaatregeling, maar verdere details over lichtgebruik ontbreken in de openbare informatie[1][3][4][6].",
+      "citations": [
+        "https://swvantland.wixsite.com/bladmagazine/post/op-bezoek-bij-de-tuinder-ted-vijverberg",
+        "https://www.harvesthouse.nl/onze-telers/vijverberg",
+        "https://www.waterbassin.nl/projecten/ted-vijverberg-de-lier",
+        "https://www.compadex.com/nl/businesses/nl/kwekerij-ted-vijverberg-b-v-27216883-00744972",
+        "https://pietvijverberg.nl",
+        "https://www.floraxchange.nl/Account/Kweker/896/Ted-Vijverberg",
+        "https://moestuinen.nl/kwekerij-ted-vijverberg-b-v-/"
+      ]
+    }
+  ],
+  "evidence": {
+    "positive": [],
+    "negative": [],
+    "ambiguous": [
+      {
+        "url": "https://www.compadex.com/nl/businesses/nl/kwekerij-ted-vijverberg-b-v-27216883-00744972",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.onderglas.nl/gerberakwekerij-werpt-licht-op-bruikbaarheid-led-naast-son-t/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://moestuinen.nl/kwekerij-ted-vijverberg-b-v-/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://onhn.nl/nieuws/kwekerij-a-bakker-eerste-leliekweker-met-led-groeilicht/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://swvantland.wixsite.com/bladmagazine/post/op-bezoek-bij-de-tuinder-ted-vijverberg",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.onderglas.nl/gaat-om-balans-meerproductie-en-vruchtgewicht/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.waterbassin.nl/projecten/ted-vijverberg-de-lier",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.plantlighting.nl/publicaties/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/896/Ted-Vijverberg",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://thegreengentleman.nl/index.php/kwekers/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://pietvijverberg.nl",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.redharvest.nl/nl/red-harvest",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.groentennieuws.nl/article/167432/belichte-teelt-wint-meer-en-meer-terrein/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.westlandwerk.nl/bedrijf/tuinbouw-bloemkwekerij-cpm-van-dijk-de-lier-westland/618",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Grow_light",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://edepot.wur.nl/422513",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare bronnen dat **Kwekerij Ted Vijverberg B.V.** in De Lier gebruikmaakt van assimilatiebelichting, groeilicht, of belichte teelt voor de productie van ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://swvantland.wixsite.com/bladmagazine/post/op-bezoek-bij-de-tuinder-ted-vijverberg",
+        "snippet": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.signify.com/nl-nl/partner-program",
+        "snippet": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://pietvijverberg.nl/contact/",
+        "snippet": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://moestuinen.nl/kwekerij-ted-vijverberg-b-v-/",
+        "snippet": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://pietvijverberg.nl/kwekerij-piet-vijverberg-viert-25-jaar-phalaenopsisteelt-met-win-actie/",
+        "snippet": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/896/Ted-Vijverberg",
+        "snippet": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.groentennieuws.nl/photos/album/12290/horticontact-2020/",
+        "snippet": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe ",
+        "source": "reclassification",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.hortidaily.com/photos/album/11494/horticontact-2024-gorinchem-netherlands/",
+        "snippet": "Based on the available search results, I was not able to find any information establishing a direct connection between Kwekerij Ted Vijverberg B.V. and Signify, Hortilux, Philips LED, or Gavita.\n\nThe ",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://swvantland.wixsite.com/bladmagazine/post/op-bezoek-bij-de-tuinder-ted-vijverberg",
+        "snippet": "Kwekerij Ted Vijverberg B.V. in De Lier is gespecialiseerd in de teelt van **Dieffenbachia** en **Zamioculcas** potplanten onder glas[4][6]. Er is geen direct bewijs in de beschikbare bronnen dat deze",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.harvesthouse.nl/onze-telers/vijverberg",
+        "snippet": "Kwekerij Ted Vijverberg B.V. in De Lier is gespecialiseerd in de teelt van **Dieffenbachia** en **Zamioculcas** potplanten onder glas[4][6]. Er is geen direct bewijs in de beschikbare bronnen dat deze",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.waterbassin.nl/projecten/ted-vijverberg-de-lier",
+        "snippet": "Kwekerij Ted Vijverberg B.V. in De Lier is gespecialiseerd in de teelt van **Dieffenbachia** en **Zamioculcas** potplanten onder glas[4][6]. Er is geen direct bewijs in de beschikbare bronnen dat deze",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.compadex.com/nl/businesses/nl/kwekerij-ted-vijverberg-b-v-27216883-00744972",
+        "snippet": "Kwekerij Ted Vijverberg B.V. in De Lier is gespecialiseerd in de teelt van **Dieffenbachia** en **Zamioculcas** potplanten onder glas[4][6]. Er is geen direct bewijs in de beschikbare bronnen dat deze",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://pietvijverberg.nl",
+        "snippet": "Kwekerij Ted Vijverberg B.V. in De Lier is gespecialiseerd in de teelt van **Dieffenbachia** en **Zamioculcas** potplanten onder glas[4][6]. Er is geen direct bewijs in de beschikbare bronnen dat deze",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/896/Ted-Vijverberg",
+        "snippet": "Kwekerij Ted Vijverberg B.V. in De Lier is gespecialiseerd in de teelt van **Dieffenbachia** en **Zamioculcas** potplanten onder glas[4][6]. Er is geen direct bewijs in de beschikbare bronnen dat deze",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://moestuinen.nl/kwekerij-ted-vijverberg-b-v-/",
+        "snippet": "Kwekerij Ted Vijverberg B.V. in De Lier is gespecialiseerd in de teelt van **Dieffenbachia** en **Zamioculcas** potplanten onder glas[4][6]. Er is geen direct bewijs in de beschikbare bronnen dat deze",
+        "source": "reclassification",
+        "tier": "company_website"
+      }
+    ]
+  },
+  "classification_suggestion": "NEEDS_MANUAL_REVIEW",
+  "dutch_terms_found": [
+    "zonder kunstlicht",
+    "onbelichte teelt",
+    "belichte teelt",
+    "groeilicht",
+    "kunstlicht",
+    "son-t",
+    "daglichtkas",
+    "assimilatiebelichting"
+  ],
+  "confidence_score": 0.3,
+  "notes": ""
+}
