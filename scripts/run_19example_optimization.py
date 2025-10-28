@@ -532,27 +532,15 @@ def section6_cross_validation(
     ) as progress:
         task = progress.add_task("Running CV...", total=None)
 
-        # Run ACTUAL CV (not mock)
-        try:
-            cv_results = repeated_nested_cv(
-                program_class=type(optimized_program),
-                optimizer_func=lambda t, v: optimized_program,  # Use pre-trained model
-                all_examples=all_examples_cv,
-                metric_func=dutch_aware_hierarchical_f1,
-                n_repeats=10,
-                n_folds=5,
-            )
-        except Exception as e:
-            console.print(f"[red]✗ CV failed: {e}[/red]")
-            console.print("[yellow]Using mock results for demo[/yellow]\n")
-            # Fallback to mock
-            cv_results = {
-                "mean_f1": 0.85,
-                "std_f1": 0.08,
-                "train_f1": 0.98,
-                "overfitting_gap": 0.13,
-                "fold_scores": [0.82, 0.88, 0.83, 0.87, 0.85],
-            }
+        # Run ACTUAL CV (no mock fallback - force real execution)
+        cv_results = repeated_nested_cv(
+            program_class=type(optimized_program),
+            optimizer_func=lambda t, v: optimized_program,  # Use pre-trained model
+            all_examples=all_examples_cv,
+            metric_func=dutch_aware_hierarchical_f1,
+            n_repeats=10,
+            n_folds=5,
+        )
 
         progress.update(task, description="CV complete!", completed=True)
 
