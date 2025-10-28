@@ -400,20 +400,19 @@ def section4_gepa_config(train_set: list, val_set: list) -> tuple[dict, object]:
 
     config_table.add_row("Teacher Model", "Gemini 2.5 Pro")
     config_table.add_row("Student Model", "Gemini 2.5 Pro")
-    config_table.add_row("Auto Preset", "medium")
-    config_table.add_row("Max Evaluations", "50")
+    config_table.add_row("Auto Preset", "medium (balanced)")
     config_table.add_row("Num Threads", "4")
     config_table.add_row("Metric", "Dutch-Aware Hierarchical F1 (wrapped)")
 
     console.print(config_table)
 
     # Initialize optimizer config (using actual GEPA API)
+    # Note: EXACTLY ONE of (auto, max_full_evals, max_metric_calls) must be set
     optimizer_config = {
         "metric": gepa_metric_wrapper,  # Use wrapper instead of direct function
-        "auto": "medium",  # Preset: light/medium/heavy (medium = balanced)
+        "auto": "medium",  # Preset: light/medium/heavy (automatically sets evals)
         "reflection_lm": gemini_lm,  # Gemini 2.5 Pro for analyzing failures
         "reflection_minibatch_size": 3,  # Batch size for reflection
-        "max_full_evals": 50,  # Limit on full evaluations (~15 generations equivalent)
         "num_threads": 4,  # Parallel processing
     }
 
