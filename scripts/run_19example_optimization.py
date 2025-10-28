@@ -398,17 +398,14 @@ def section4_gepa_config(train_set: list, val_set: list) -> tuple[dict, object]:
 
     console.print(config_table)
 
-    # Initialize optimizer
+    # Initialize optimizer config (using actual GEPA API)
     optimizer_config = {
         "metric": dutch_aware_hierarchical_f1,
-        "generations": 15,
-        "population_size": 8,
-        "mutation_probability": 0.5,
-        "reflection_model": gemini_lm,  # Gemini 2.5 Pro for analyzing failures
-        "task_model": gemini_lm,  # Gemini 2.5 Pro being optimized
-        "validation_strategy": "cross_validate",
-        "num_folds": 5,
-        "num_threads": 4,
+        "auto": "medium",  # Preset: light/medium/heavy (medium = balanced)
+        "reflection_lm": gemini_lm,  # Gemini 2.5 Pro for analyzing failures
+        "reflection_minibatch_size": 3,  # Batch size for reflection
+        "max_full_evals": 50,  # Limit on full evaluations (~15 generations equivalent)
+        "num_threads": 4,  # Parallel processing
     }
 
     Path("cache/optimizer_config.json").write_text(
