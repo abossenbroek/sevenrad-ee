@@ -382,13 +382,15 @@ def section4_gepa_config(train_set: list, val_set: list) -> tuple[dict, object]:
         dspy.configure(lm=gemini_lm)
 
     # Create GEPA-compatible metric wrapper
-    # GEPA expects: metric(gold, pred, trace, pred_name, pred_trace) -> (score, feedback)
+    # GEPA calls metric in two different ways:
+    # 1. During evaluation: metric(example, prediction) - 2 args
+    # 2. During reflection: metric(gold, pred, trace, pred_name, pred_trace) - 5 args
     # Our metric: dutch_aware_hierarchical_f1(example, prediction, trace) -> (score, feedback)
-    def gepa_metric_wrapper(gold, pred, trace, pred_name, pred_trace):
-        """Wrapper to adapt our metric to GEPA's 5-argument format."""
+    def gepa_metric_wrapper(gold, pred, trace=None, pred_name=None, pred_trace=None):
+        """Wrapper to adapt our metric to GEPA's variable argument format."""
         # gold = example (DSPy Example object)
         # pred = prediction (model output)
-        # Ignore pred_name and pred_trace (not used by our metric)
+        # trace, pred_name, pred_trace are optional (used during reflection)
         return dutch_aware_hierarchical_f1(gold, pred, trace)
 
     # Configuration parameters
