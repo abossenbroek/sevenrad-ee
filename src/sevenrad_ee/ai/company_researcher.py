@@ -37,6 +37,10 @@ DUTCH_POSITIVE_TERMS = {
     "led-belichting",
     "son-t",
     "assimilatielampen",
+    "sneller groeien",
+    "groeikracht",
+    "stengellengte",
+    "houdbaarheid",
 }
 
 DUTCH_NEGATIVE_TERMS = {
@@ -167,7 +171,8 @@ class CompanyResearcher:
         return [
             # Query 1: Positive signals
             f'"{company_name}" {location} AND '
-            f'(assimilatiebelichting OR groeilicht OR "belichte teelt")',
+            f'(assimilatiebelichting OR groeilicht OR "belichte teelt" OR '
+            f'"sneller groeien" OR groeikracht OR stengellengte)',
             # Query 2: Supplier associations
             f'"{company_name}" AND '
             f'(Signify OR Hortilux OR "Philips LED" OR Gavita)',
