@@ -3,9 +3,9 @@
 ## Results Summary
 
 ### Cross-Validation Performance
-- **Mean F1:** 85.00% ± 8.00%
-- **Train F1:** 98.00%
-- **Overfitting Gap:** 13.00%
+- **Mean F1:** 63.39% ± 6.65%
+- **Train F1:** 58.23%
+- **Overfitting Gap:** -5.16%
 
 ### Known Negatives Test
 - **False Positive Rate:** 0/6 (0%)
@@ -14,7 +14,7 @@
 
 ❌ Mean F1 ≥ 95%
 ❌ Std F1 ≤ 3%
-❌ Overfitting Gap < 10%
+✅ Overfitting Gap < 10%
 ✅ 0% False Positives on Known Negatives
 
 ## Baseline Assessment (19 Examples)
@@ -27,8 +27,8 @@ This baseline uses only 19 examples to establish expected performance with limit
 - Model memorizes training examples
 
 **Actual Results:**
-- Overfitting Gap: 13.00% (MODERATE)
-- Variance: 8.00% (HIGH)
+- Overfitting Gap: -5.16% (ACCEPTABLE)
+- Variance: 6.65% (HIGH)
 
 **Next Steps:**
 Run 40-example pipeline to compare:
