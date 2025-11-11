@@ -274,17 +274,19 @@
       }
     ]
   },
-  "classification_suggestion": "NEEDS_MANUAL_REVIEW",
+  "classification_suggestion": "POSITIVE (uses growlights)",
   "dutch_terms_found": [
-    "zonder kunstlicht",
-    "onbelichte teelt",
     "belichte teelt",
+    "daglichtkas",
+    "zonder kunstlicht",
     "kunstlicht",
+    "assimilatiebelichting",
     "groeilicht",
     "son-t",
-    "daglichtkas",
-    "assimilatiebelichting"
+    "onbelichte teelt"
   ],
-  "confidence_score": 1.0,
-  "notes": ""
+  "confidence_score": 0.9,
+  "notes": "Manual classification: Red peppers cultivation - positive for grow lights",
+  "species_grown": "Red Peppers",
+  "manual_review_date": "2025-11-11T11:27:30.670809"
 }

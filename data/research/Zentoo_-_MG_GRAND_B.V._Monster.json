@@ -268,13 +268,13 @@
   },
   "classification_suggestion": "POSITIVE (uses growlights)",
   "dutch_terms_found": [
-    "zonder kunstlicht",
-    "onbelichte teelt",
     "belichte teelt",
-    "groeilicht",
-    "kunstlicht",
     "daglichtkas",
-    "assimilatiebelichting"
+    "zonder kunstlicht",
+    "assimilatiebelichting",
+    "kunstlicht",
+    "groeilicht",
+    "onbelichte teelt"
   ],
   "confidence_score": 1.0,
   "notes": ""

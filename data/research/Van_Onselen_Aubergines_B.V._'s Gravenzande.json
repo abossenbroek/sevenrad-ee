@@ -282,13 +282,13 @@
   },
   "classification_suggestion": "NEGATIVE (no growlights)",
   "dutch_terms_found": [
-    "zonder kunstlicht",
-    "onbelichte teelt",
     "belichte teelt",
-    "kunstlicht",
-    "groeilicht",
     "daglichtkas",
-    "assimilatiebelichting"
+    "zonder kunstlicht",
+    "kunstlicht",
+    "assimilatiebelichting",
+    "groeilicht",
+    "onbelichte teelt"
   ],
   "confidence_score": 1.0,
   "notes": ""

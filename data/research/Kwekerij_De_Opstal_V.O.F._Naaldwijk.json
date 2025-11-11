@@ -271,15 +271,17 @@
       }
     ]
   },
-  "classification_suggestion": "NEEDS_MANUAL_REVIEW",
+  "classification_suggestion": "POSITIVE (uses growlights)",
   "dutch_terms_found": [
-    "zonder kunstlicht",
-    "onbelichte teelt",
     "belichte teelt",
-    "kunstlicht",
     "daglichtkas",
-    "assimilatiebelichting"
+    "zonder kunstlicht",
+    "kunstlicht",
+    "assimilatiebelichting",
+    "onbelichte teelt"
   ],
-  "confidence_score": 0.3,
-  "notes": ""
+  "confidence_score": 0.95,
+  "notes": "Manual classification: Roses cultivation - absolutely positive for grow lights",
+  "species_grown": "Roses",
+  "manual_review_date": "2025-11-11T11:27:30.669450"
 }

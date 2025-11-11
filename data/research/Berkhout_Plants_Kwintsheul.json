@@ -1,0 +1,307 @@
+{
+  "company": "Berkhout Plants",
+  "location": "Kwintsheul",
+  "timestamp": "2025-11-11T12:40:36.420357",
+  "queries": [
+    {
+      "query": "\"Berkhout Plants\" Kwintsheul AND (assimilatiebelichting OR groeilicht OR \"belichte teelt\")",
+      "response_id": "df03f202-68a3-4eb3-9179-4e5ddf3e1680",
+      "model": "sonar-pro",
+      "content": "I don't have information available about whether Berkhout Plants in Kwintsheul uses assimilation lighting, grow lights, or illuminated cultivation (belichte teelt) in their operations.\n\nThe search results provide details about Berkhout Plants as a family business specializing in growing potted chrysanthemums from the Chrysabella collection, their commitment to quality and environmental sustainability, and their product range. However, they do not contain any information about their use of artificial lighting systems or illuminated cultivation methods.\n\nTo find this specific information, you would need to contact Berkhout Plants directly or access more detailed technical documentation about their growing facilities.",
+      "citations": [
+        "https://www.berkhoutplants.com/index.php/en/berkhout-plants",
+        "https://berkhoutplants.com/index.php/en/",
+        "https://aiph.org/floraculture/news/customisation-makes-the-difference/",
+        "https://www.floraxchange.nl/Account/Kweker/448/Berkhout-Plants",
+        "https://www.chrysabella.nl/index.php/en/nieuws-berkhout-4/62-berkhout-nieuws-nl-3/113-nieuws-berkhout-16",
+        "https://www.royalvanzanten.com/en/inspirations/meet-the-grower-berkhout/"
+      ]
+    },
+    {
+      "query": "\"Berkhout Plants\" AND (Signify OR Hortilux OR \"Philips LED\" OR Gavita)",
+      "response_id": "48b1908b-2642-4486-9b0f-de1fc2429706",
+      "model": "sonar-pro",
+      "content": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association with Signify**, a major horticultural lighting company, but no direct information about partnerships with Hortilux, Philips LED, or Gavita in the available sources.\n\nBerkhout Plants is frequently mentioned in the context of the \"Sweet Kisses\" project, which involves multiple growers and is covered in horticultural media. Several of these media outlets, such as Hortibiz Insights, feature **Signify** in their podcasts and news, indicating a connection between Berkhout Plants and Signify, likely through industry events, innovation discussions, or collaborative projects[2][13][14][15]. However, the search results do not specify the technical details of any direct use of Signify (or Philips LED) lighting systems at Berkhout Plants.\n\nNo search results mention Berkhout Plants working with **Hortilux** or **Gavita**. The only lighting-related company consistently referenced in proximity to Berkhout Plants is Signify, often in the context of broader industry trends or collaborative initiatives, rather than explicit product deployment[2][13][14][15].\n\nKey details about Berkhout Plants:\n- **Main crop:** Chrysabella potted chrysanthemums[3][5].\n- **Location:** Kwintsheul, Netherlands[1][7].\n- **Collaborations:** Active in Sweet Kisses and other joint horticultural projects[2][6][8][10][12][13][14][15].\n- **Packaging partner:** JBB Packaging[5].\n- **Lighting technology:** No direct confirmation of Hortilux, Philips LED, or Gavita use; indirect association with Signify through industry media and events[2][13][14][15].\n\nIf you require specific technical details about Berkhout Plants' use of horticultural lighting systems (e.g., which LED brands or models are installed), further direct inquiry with the company or more specialized industry sources would be necessary, as the current search results do not provide this information.",
+      "citations": [
+        "https://www.royalvanzanten.com/en/inspirations/meet-the-grower-berkhout/",
+        "https://www.goedemorgentuinbouw.nl/nieuws/keten/sweet-kiss--ride",
+        "https://berkhoutplants.com/index.php/en/",
+        "https://www.podoslonami.pl/przeglad-informacji/chryzantemy-swiat-odmian-o-rozmaitych-mozliwosciach/",
+        "https://www.jbbpackaging.nl/en/portfolio",
+        "https://www.goedemorgenchrysant.nl/nieuws/evenement/trends-en-meer-op-relatiedag-sweet-kisses",
+        "https://companyinfo.nl/organisatieprofiel/teelt-van-potplanten-onder-glas/berkhout-plants-b-v-kwintsheul-64859681-000004432959",
+        "https://www.goedemorgenroos.nl/nieuws/sociaal/sweet-kisses-loopt-warm-voor-het-goede-doel",
+        "https://www.floraldaily.com/article/9002015/netherlands-berkhout-plants-starts-supply-of-rainbow-passion/",
+        "https://www.goedemorgenchrysant.nl/nieuws/internationaal/sweet-kisses-verkent-scandinavische-markt",
+        "https://www.fmgroup.fm/en/news/business/1128717543/fm-group-a-legacy-of-growth-and-innovation-in-the-flower-trade",
+        "https://www.goedemorgengerbera.nl/nieuws/keten/sweet-kiss--ride",
+        "https://www.goedemorgentuinbouw.nl/nieuws/internationaal/sweet-kisses-verkent-scandinavische-markt",
+        "https://www.goedemorgengerbera.nl/nieuws/sociaal/sweet-kisses-schenkt-planten-aan-ouderen",
+        "https://www.goedemorgentuinbouw.nl/nieuws/sociaal/1500-sweet-kisses-voor-verzorgingstehuizen-"
+      ]
+    },
+    {
+      "query": "\"Berkhout Plants\" AND (\"onbelichte teelt\" OR \"daglichtkas\" OR \"zonder kunstlicht\")",
+      "response_id": "7726cbba-8982-4c63-8504-ceeb66d90eb9",
+      "model": "sonar-pro",
+      "content": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexten over onbelichte teelt en belichtingsstrategie\u00ebn in de Nederlandse glastuinbouw, maar geen expliciete koppeling met Berkhout Plants.\n\nEssenti\u00eble context:\n\n- **Onbelichte teelt** verwijst naar het telen van gewassen in de kas zonder gebruik van kunstmatige belichting, waarbij men volledig afhankelijk is van natuurlijk daglicht[1][2][5]. Dit wordt vaak gedaan om energiekosten te besparen en de milieubelasting te verminderen.\n- **Daglichtkas** is een kasconcept waarbij het ontwerp is geoptimaliseerd voor maximale benutting van natuurlijk daglicht, soms met innovatieve kasconstructies of lichtdoorlatende materialen, zodat kunstlicht overbodig wordt.\n- In de literatuur over belichting en onbelichte teelt worden verschillende strategie\u00ebn en resultaten besproken, zoals het effect op productie, plantdichtheid, en energieverbruik[1][2][3][5]. Echter, Berkhout wordt in deze context alleen genoemd als co-auteur van een onderzoek naar belichting bij komkommer, niet als bedrijf of praktijkvoorbeeld[1].\n\nBelangrijkste bevindingen uit de zoekresultaten:\n\n- In een onderzoek naar belichting bij komkommer wordt \"Berkhout\" genoemd als co-auteur (Janse, Van Paassen en Berkhout, 2004), maar dit betreft een persoon, niet het bedrijf Berkhout Plants[1].\n- Er zijn uitgebreide rapporten over de effecten van onbelichte teelt versus belichte teelt op productie en energieverbruik, maar geen specifieke casus of praktijkvoorbeeld van Berkhout Plants[1][2][3][5].\n- Er zijn geen resultaten die aangeven dat Berkhout Plants een pionier is of specifieke projecten heeft op het gebied van daglichtkassen of teelt zonder kunstlicht.\n\nAls u zoekt naar informatie over **Berkhout Plants** in relatie tot deze teeltmethoden, is er op basis van de huidige zoekresultaten geen direct bewijs van betrokkenheid of praktijkervaring. Indien u doelt op een andere \"Berkhout\" (bijvoorbeeld een onderzoeker of adviseur), dan is er wel betrokkenheid bij onderzoek naar belichting, maar niet specifiek naar onbelichte teelt of daglichtkassen als praktijktoepassing[1].\n\nMocht u meer details zoeken over algemene ervaringen met onbelichte teelt of daglichtkassen in de Nederlandse glastuinbouw, dan zijn er wel diverse onderzoeksrapporten en praktijkvoorbeelden beschikbaar, maar niet direct gekoppeld aan Berkhout Plants.",
+      "citations": [
+        "https://edepot.wur.nl/295707",
+        "https://edepot.wur.nl/278610",
+        "https://edepot.wur.nl/299465",
+        "https://www.plantlighting.nl/publicaties/",
+        "https://www.acm.nl/sites/default/files/documents/agro-nutri-monitor-2021-achtergronddocument.pdf",
+        "https://worldwidescience.org/topicpages/l/licht+begint+bij.html",
+        "https://www.1ekamer.nl/9370000/1/j4nvgs5kjg27kof_j9vvksvji1pf4wd/vly4qekx3byw",
+        "https://www.glastuinbouwnederland.nl/nieuws/met-kennis-in-je-kas-betere-lichtbenutting-in-je-kas/pagina/13/?contactPerson=29&cHash=d0edf0f8d19d59743bb8fcf6e6d2c3e5",
+        "https://www.tweedekamer.nl/downloads/document?id=2024D01294",
+        "https://edepot.wur.nl/293841",
+        "https://zoek.officielebekendmakingen.nl/blg-1033186.pdf",
+        "https://www.managerzone.com/?p=forum&sub=topic&topic_id=9141798&forum_id=250&sport=soccer&share_sport=soccer",
+        "https://orgprints.org/view/projects/nl-BKB.doclang.html",
+        "https://www.glastuinbouwnederland.nl/content/user_upload/2022_Energiezuinige_belichting_bloeiende_potplanten_zonder_remmiddelen_Plant_Lighting.pdf",
+        "https://www.youtube.com/watch?v=WxlYTXs-fcA",
+        "https://www.keyfuchs.de/news/top-10-multiplayer-games-familie"
+      ]
+    }
+  ],
+  "evidence": {
+    "positive": [],
+    "negative": [],
+    "ambiguous": [
+      {
+        "url": "https://www.berkhoutplants.com/index.php/en/berkhout-plants",
+        "snippet": "I don't have information available about whether Berkhout Plants in Kwintsheul uses assimilation lighting, grow lights, or illuminated cultivation (belichte teelt) in their operations.\n\nThe search res",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://berkhoutplants.com/index.php/en/",
+        "snippet": "I don't have information available about whether Berkhout Plants in Kwintsheul uses assimilation lighting, grow lights, or illuminated cultivation (belichte teelt) in their operations.\n\nThe search res",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://aiph.org/floraculture/news/customisation-makes-the-difference/",
+        "snippet": "I don't have information available about whether Berkhout Plants in Kwintsheul uses assimilation lighting, grow lights, or illuminated cultivation (belichte teelt) in their operations.\n\nThe search res",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/448/Berkhout-Plants",
+        "snippet": "I don't have information available about whether Berkhout Plants in Kwintsheul uses assimilation lighting, grow lights, or illuminated cultivation (belichte teelt) in their operations.\n\nThe search res",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.chrysabella.nl/index.php/en/nieuws-berkhout-4/62-berkhout-nieuws-nl-3/113-nieuws-berkhout-16",
+        "snippet": "I don't have information available about whether Berkhout Plants in Kwintsheul uses assimilation lighting, grow lights, or illuminated cultivation (belichte teelt) in their operations.\n\nThe search res",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.royalvanzanten.com/en/inspirations/meet-the-grower-berkhout/",
+        "snippet": "I don't have information available about whether Berkhout Plants in Kwintsheul uses assimilation lighting, grow lights, or illuminated cultivation (belichte teelt) in their operations.\n\nThe search res",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.royalvanzanten.com/en/inspirations/meet-the-grower-berkhout/",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgentuinbouw.nl/nieuws/keten/sweet-kiss--ride",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://berkhoutplants.com/index.php/en/",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.podoslonami.pl/przeglad-informacji/chryzantemy-swiat-odmian-o-rozmaitych-mozliwosciach/",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.jbbpackaging.nl/en/portfolio",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgenchrysant.nl/nieuws/evenement/trends-en-meer-op-relatiedag-sweet-kisses",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://companyinfo.nl/organisatieprofiel/teelt-van-potplanten-onder-glas/berkhout-plants-b-v-kwintsheul-64859681-000004432959",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgenroos.nl/nieuws/sociaal/sweet-kisses-loopt-warm-voor-het-goede-doel",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.floraldaily.com/article/9002015/netherlands-berkhout-plants-starts-supply-of-rainbow-passion/",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgenchrysant.nl/nieuws/internationaal/sweet-kisses-verkent-scandinavische-markt",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.fmgroup.fm/en/news/business/1128717543/fm-group-a-legacy-of-growth-and-innovation-in-the-flower-trade",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.goedemorgengerbera.nl/nieuws/keten/sweet-kiss--ride",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.goedemorgentuinbouw.nl/nieuws/internationaal/sweet-kisses-verkent-scandinavische-markt",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.goedemorgengerbera.nl/nieuws/sociaal/sweet-kisses-schenkt-planten-aan-ouderen",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.goedemorgentuinbouw.nl/nieuws/sociaal/1500-sweet-kisses-voor-verzorgingstehuizen-",
+        "snippet": "Berkhout Plants is a Dutch grower specializing in **potted chrysanthemums**, notably the Chrysabella line, and is active in collaborative horticultural projects. There is evidence of **association wit",
+        "source": "query_2",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://edepot.wur.nl/295707",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/278610",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/299465",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.plantlighting.nl/publicaties/",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.acm.nl/sites/default/files/documents/agro-nutri-monitor-2021-achtergronddocument.pdf",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://worldwidescience.org/topicpages/l/licht+begint+bij.html",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.1ekamer.nl/9370000/1/j4nvgs5kjg27kof_j9vvksvji1pf4wd/vly4qekx3byw",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.glastuinbouwnederland.nl/nieuws/met-kennis-in-je-kas-betere-lichtbenutting-in-je-kas/pagina/13/?contactPerson=29&cHash=d0edf0f8d19d59743bb8fcf6e6d2c3e5",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.tweedekamer.nl/downloads/document?id=2024D01294",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/293841",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://zoek.officielebekendmakingen.nl/blg-1033186.pdf",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.managerzone.com/?p=forum&sub=topic&topic_id=9141798&forum_id=250&sport=soccer&share_sport=soccer",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://orgprints.org/view/projects/nl-BKB.doclang.html",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.glastuinbouwnederland.nl/content/user_upload/2022_Energiezuinige_belichting_bloeiende_potplanten_zonder_remmiddelen_Plant_Lighting.pdf",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.youtube.com/watch?v=WxlYTXs-fcA",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.keyfuchs.de/news/top-10-multiplayer-games-familie",
+        "snippet": "Er zijn geen zoekresultaten die direct een verband leggen tussen **Berkhout Plants** en de termen **onbelichte teelt**, **daglichtkas**, of **zonder kunstlicht**. Er zijn wel enkele relevante contexte",
+        "source": "query_3",
+        "tier": "general_web"
+      }
+    ]
+  },
+  "classification_suggestion": "POSITIVE (uses growlights)",
+  "dutch_terms_found": [
+    "zonder kunstlicht",
+    "belichte teelt",
+    "kunstlicht",
+    "daglichtkas",
+    "onbelichte teelt"
+  ],
+  "confidence_score": 0.85,
+  "notes": "Expected classification from VIIRS data analysis: POSITIVE",
+  "manual_classification_date": "2025-11-11T12:43:34.818829"
+}

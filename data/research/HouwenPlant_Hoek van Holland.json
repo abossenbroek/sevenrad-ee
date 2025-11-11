@@ -1,0 +1,358 @@
+{
+  "company": "HouwenPlant",
+  "location": "Hoek van Holland",
+  "timestamp": "2025-11-11T11:54:32.402014",
+  "queries": [
+    {
+      "query": "\"HouwenPlant\" Hoek van Holland AND (assimilatiebelichting OR groeilicht OR \"belichte teelt\")",
+      "response_id": "08bfa683-b49b-4dab-994a-3d62606d22de",
+      "model": "sonar-pro",
+      "content": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichting**, **groeilicht**, of specifiek inzet op \"belichte teelt\" in hun productieproces.\n\nEssenti\u00eble context en details:\n- HouwenPlant is Europees marktleider in potanthuriums en teelt deze op meerdere locaties, waaronder Hoek van Holland, met een breed assortiment in potmaten en kwaliteitsklassen[1][3][4][6].\n- De bedrijfsinformatie en nieuwsartikelen richten zich op teeltinnovatie, duurzaamheid (zoals biologische gewasbescherming en duurzame verpakkingen), en schaalvergroting, maar vermelden geen details over assimilatiebelichting of groeilichttoepassing[1][3].\n- In een sectorbreed artikel wordt HouwenPlant genoemd in een context waar een **PAR-sensor** wordt gebruikt om groeilicht te meten, wat impliceert dat groeilicht relevant is in de sector en mogelijk bij HouwenPlant, maar er wordt niet expliciet bevestigd dat HouwenPlant zelf assimilatiebelichting toepast[2].\n- De website en bedrijfsprofielen van HouwenPlant geven geen technische details over belichtingssystemen of belichte teelt[5][6][7][8][9].\n\nAanvullende relevante informatie:\n- In de Nederlandse anthuriumteelt is assimilatiebelichting (kunstmatige belichting om groei te stimuleren) een gangbare techniek, vooral voor jaarrond productie en kwaliteitsverbetering. Het ontbreken van expliciete vermelding bij HouwenPlant betekent niet dat het niet wordt toegepast, maar het kan ook duiden op een focus op andere teeltinnovaties of dat belichting niet als onderscheidend wordt gecommuniceerd.\n- HouwenPlant is actief in duurzaamheid en innovatie, wat het gebruik van moderne teelttechnieken zoals groeilicht aannemelijk maakt, maar dit blijft een ge\u00efnformeerde aanname en geen bevestigd feit op basis van de beschikbare bronnen.\n\nSamenvattend: Er is geen expliciet bewijs dat HouwenPlant in Hoek van Holland assimilatiebelichting, groeilicht of belichte teelt toepast, maar sectorinformatie en indirecte aanwijzingen suggereren dat groeilicht relevant kan zijn in hun bedrijfsvoering[2]. Directe bevestiging ontbreekt in de gevonden bronnen.",
+      "citations": [
+        "https://www.nieuweoogst.nl/nieuws/2018/09/06/houwenplant-levert-100-000-planten-per-week",
+        "https://cdnc.heyzine.com/flip-book/pdf/3f7fee8051d64226534edd1b77ca6ca51d110400.pdf",
+        "https://www.bpnieuws.nl/article/9544501/houwenplant-groeit-door-op-eigen-kracht/",
+        "https://potterydirect.nl/houwenplant/",
+        "http://www.houwenplant.eu",
+        "https://www.floraxchange.nl/Account/Kweker/1685/Houwenplant",
+        "https://www.what-women-want.nl/onze-kwekers/houwenplant",
+        "https://bedrijvenopdekaart.nl/houwenplant-5274826.html",
+        "https://www.telefoonboek.nl/bedrijven/t4934912/hoek-van-holland/houwenplant-b.v./"
+      ]
+    },
+    {
+      "query": "\"HouwenPlant\" AND (Signify OR Hortilux OR \"Philips LED\" OR Gavita)",
+      "response_id": "a509a002-8103-43a2-86bb-e44cc2cd9508",
+      "model": "sonar-pro",
+      "content": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particularly through industry events and media coverage, but there is no direct evidence in the search results of formal partnerships or collaborations between HouwenPlant and Signify, Hortilux, Philips LED, or Gavita.\n\nKey details:\n- **HouwenPlant** is expanding its plant assortment and is involved in the production of Anthurium and other ornamental plants[2][5][6].\n- HouwenPlant has been referenced in industry news and podcasts that also feature **Signify** (Philips LED), indicating some level of sectoral overlap or shared media presence, but not a direct business relationship[2][6][12][13][14].\n- There is no mention in the search results of HouwenPlant working directly with **Hortilux** or **Gavita** on lighting installations or technology[9][8].\n- The most prominent lighting partnerships in the sector involve companies like **Hortipar** and Signify, but not HouwenPlant[1][3][7].\n\nAdditional context:\n- HouwenPlant is expanding its production capacity and has acquired facilities from D\u00fcmmen Orange, indicating growth and investment in infrastructure[5].\n- Industry events such as the Tuinbouw Footprint Event have featured representatives from HouwenPlant and Signify, suggesting both are active in sustainability and innovation discussions within Dutch horticulture[12][13][14].\n\nIn summary, while HouwenPlant is a notable grower in the Dutch horticultural sector and appears in the same industry circles as Signify, Hortilux, Philips LED, and Gavita, there is no direct evidence of formal collaboration or partnership with these lighting technology providers in the available search results.",
+      "citations": [
+        "https://www.hortidaily.com/article/9334240/we-offer-our-customers-the-full-package-for-lighting-installation/",
+        "https://www.goedemorgengerbera.nl/nieuws/houwenplant-breidt-plantenassortiment-uit",
+        "https://www.growertalks.com/Article/?articleid=25327",
+        "https://www.goedemorgenpaprika.nl/kennisdossier-groeilicht/kennis-artikelen-en-praktijk-cases/plant-empowerment-bij-basf-vegetable-seeds",
+        "https://hortnews.com/dummen-orange-sells-part-of-de-lier-facilities-to-houwenplant/",
+        "https://www.goedemorgentuinbouw.nl/nieuws/houwenplant-introduceert-nieuwe-potanthurium",
+        "https://www.verticalfarmdaily.com/article/9740474/hortipar-and-bimco-holland-enter-exclusive-partnership/",
+        "https://hortnews.com/most-sustainable-hydrangea-greenhouse-with-water-and-transport-system-by-bosman-van-zaal-opens-its-doors/",
+        "https://www.hortilux.com",
+        "https://www.dega-international.com/infodienste/all-articles/198898.html",
+        "https://www.floraldaily.com/photos/album/11442/ipm-essen-2024-floral/",
+        "https://www.hortibiz.com/newsitem/news/smart-farming/how-technology-is-revolutionizing-agriculture-in-shaanxi",
+        "https://www.goedemorgensierteelt.nl/nieuws/keten/telers-willen-impact-maken-met-colour-your-season",
+        "https://www.hortibiz.com/newsitem/news/energy/signify-boss-says-2023-is-unpredictable",
+        "https://www.goedemorgenaubergine.nl/nieuws/houwenplant-presenteert-rode-parel"
+      ]
+    },
+    {
+      "query": "\"HouwenPlant\" AND (\"onbelichte teelt\" OR \"daglichtkas\" OR \"zonder kunstlicht\")",
+      "response_id": "253f81a5-8aa7-4d18-b9fa-ce6756147f81",
+      "model": "sonar-pro",
+      "content": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzingen en context uit de beschikbare bronnen:\n\n- **HouwenPlant** is een grote, duurzame teler van potanthuriums, met meerdere gespecialiseerde locaties en een focus op energiezuinig en milieubewust telen[3][5][7][13][15][17].\n- In de beschikbare bedrijfsinformatie wordt niet expliciet vermeld dat HouwenPlant uitsluitend zonder kunstlicht teelt, noch dat zij een daglichtkas of onbelichte teelt als uniek kenmerk communiceren[3][5][7][13][15][17].\n- In een recent artikel over uitbreiding van HouwenPlant wordt gesproken over de teelt van Kalancho\u00ebs in een nieuwe kas, maar er wordt niet vermeld of deze kas zonder kunstlicht werkt of een daglichtkas betreft[1].\n- Algemeen geldt in de potanthuriumteelt dat belichting (kunstlicht) vooral in de winter wordt ingezet om de productie en bloei te waarborgen, omdat sommige rassen in de winter zonder extra licht problemen met bloei kunnen hebben[11]. Dit suggereert dat volledig onbelichte teelt in deze sector niet standaard is, maar het sluit niet uit dat sommige bedrijven (deels) zonder kunstlicht werken.\n\n**Samenvatting:**\n- Er is geen direct bewijs dat HouwenPlant uitsluitend werkt met onbelichte teelt, daglichtkassen of volledig zonder kunstlicht.\n- HouwenPlant profileert zich als duurzaam en energiezuinig, maar vermeldt geen specifieke teeltwijze met betrekking tot (geen) belichting[3][5][7][13][15][17].\n- In de potanthuriumsector is het gebruik van kunstlicht in de winter gebruikelijk, maar niet universeel noodzakelijk voor alle bedrijven of rassen[11].\n\n**Indien u specifiek wilt weten of HouwenPlant zonder kunstlicht teelt, is direct contact met het bedrijf of een recente bedrijfsreportage aan te raden, aangezien deze informatie niet expliciet in de openbare bronnen wordt genoemd.**",
+      "citations": [
+        "https://www.bpnieuws.nl/article/9544501/houwenplant-groeit-door-op-eigen-kracht/",
+        "https://edepot.wur.nl/296393",
+        "https://florabiezz.com/houwenplant/",
+        "https://edepot.wur.nl/355416",
+        "http://www.houwenplant.eu/over-ons/",
+        "https://www.glastuinbouwnederland.nl/content/user_upload/2022_Energiezuinige_belichting_bloeiende_potplanten_zonder_remmiddelen_Plant_Lighting.pdf",
+        "https://www.nieuweoogst.nl/nieuws/2018/09/06/houwenplant-levert-100-000-planten-per-week",
+        "https://libstore.ugent.be/fulltxt/RUG01/003/200/606/RUG01-003200606_2024_0001_AC.pdf",
+        "https://www.onderglas.nl/footprint-wordt-net-als-prijs-een-onderhandelingsmechanisme/",
+        "https://www.plantlighting.nl/publicaties/",
+        "https://edepot.wur.nl/300333",
+        "https://staging-kasalsenergiebron.preview2.beech.it/content/onderzoeken/2015/Eindrapport_12397.pdf",
+        "https://potterydirect.nl/houwenplant/",
+        "https://www.youtube.com/watch?v=WxlYTXs-fcA",
+        "http://www.houwenplant.eu/site/assets/files/1122/houwenplant_brochure_vs25.pdf",
+        "https://www.kasalsenergiebron.nl/content/research/Eindrapport_11292.pdf",
+        "https://fair-flora.com/houwenplant/",
+        "https://www.kasalsenergiebron.nl/content/onderzoeken/2015/00020475.pdf",
+        "http://www.houwenplant.eu",
+        "https://magewappablog.com/hash-browns"
+      ]
+    }
+  ],
+  "evidence": {
+    "positive": [],
+    "negative": [],
+    "ambiguous": [
+      {
+        "url": "https://www.nieuweoogst.nl/nieuws/2018/09/06/houwenplant-levert-100-000-planten-per-week",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://cdnc.heyzine.com/flip-book/pdf/3f7fee8051d64226534edd1b77ca6ca51d110400.pdf",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.bpnieuws.nl/article/9544501/houwenplant-groeit-door-op-eigen-kracht/",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://potterydirect.nl/houwenplant/",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "http://www.houwenplant.eu",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/1685/Houwenplant",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.what-women-want.nl/onze-kwekers/houwenplant",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://bedrijvenopdekaart.nl/houwenplant-5274826.html",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.telefoonboek.nl/bedrijven/t4934912/hoek-van-holland/houwenplant-b.v./",
+        "snippet": "HouwenPlant in Hoek van Holland is een toonaangevende kwekerij van potanthuriums, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf actief gebruikmaakt van **assimilatiebelichtin",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortidaily.com/article/9334240/we-offer-our-customers-the-full-package-for-lighting-installation/",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgengerbera.nl/nieuws/houwenplant-breidt-plantenassortiment-uit",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.growertalks.com/Article/?articleid=25327",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgenpaprika.nl/kennisdossier-groeilicht/kennis-artikelen-en-praktijk-cases/plant-empowerment-bij-basf-vegetable-seeds",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://hortnews.com/dummen-orange-sells-part-of-de-lier-facilities-to-houwenplant/",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.goedemorgentuinbouw.nl/nieuws/houwenplant-introduceert-nieuwe-potanthurium",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.verticalfarmdaily.com/article/9740474/hortipar-and-bimco-holland-enter-exclusive-partnership/",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://hortnews.com/most-sustainable-hydrangea-greenhouse-with-water-and-transport-system-by-bosman-van-zaal-opens-its-doors/",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.hortilux.com",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "supplier_case_study"
+      },
+      {
+        "url": "https://www.dega-international.com/infodienste/all-articles/198898.html",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.floraldaily.com/photos/album/11442/ipm-essen-2024-floral/",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortibiz.com/newsitem/news/smart-farming/how-technology-is-revolutionizing-agriculture-in-shaanxi",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.goedemorgensierteelt.nl/nieuws/keten/telers-willen-impact-maken-met-colour-your-season",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.hortibiz.com/newsitem/news/energy/signify-boss-says-2023-is-unpredictable",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.goedemorgenaubergine.nl/nieuws/houwenplant-presenteert-rode-parel",
+        "snippet": "HouwenPlant, a Dutch grower based in Hoek van Holland, is active in the horticultural sector and has been mentioned in connection with **Signify** (the company behind Philips LED grow lights), particu",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.bpnieuws.nl/article/9544501/houwenplant-groeit-door-op-eigen-kracht/",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://edepot.wur.nl/296393",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://florabiezz.com/houwenplant/",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/355416",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "http://www.houwenplant.eu/over-ons/",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.glastuinbouwnederland.nl/content/user_upload/2022_Energiezuinige_belichting_bloeiende_potplanten_zonder_remmiddelen_Plant_Lighting.pdf",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.nieuweoogst.nl/nieuws/2018/09/06/houwenplant-levert-100-000-planten-per-week",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://libstore.ugent.be/fulltxt/RUG01/003/200/606/RUG01-003200606_2024_0001_AC.pdf",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.onderglas.nl/footprint-wordt-net-als-prijs-een-onderhandelingsmechanisme/",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.plantlighting.nl/publicaties/",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/300333",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://staging-kasalsenergiebron.preview2.beech.it/content/onderzoeken/2015/Eindrapport_12397.pdf",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://potterydirect.nl/houwenplant/",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.youtube.com/watch?v=WxlYTXs-fcA",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "http://www.houwenplant.eu/site/assets/files/1122/houwenplant_brochure_vs25.pdf",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.kasalsenergiebron.nl/content/research/Eindrapport_11292.pdf",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://fair-flora.com/houwenplant/",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.kasalsenergiebron.nl/content/onderzoeken/2015/00020475.pdf",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "http://www.houwenplant.eu",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://magewappablog.com/hash-browns",
+        "snippet": "Er zijn geen expliciete bronnen die direct bevestigen dat **HouwenPlant** werkt met *onbelichte teelt*, een *daglichtkas* of expliciet *zonder kunstlicht* teelt. Wel zijn er enkele relevante aanwijzin",
+        "source": "query_3",
+        "tier": "general_web"
+      }
+    ]
+  },
+  "classification_suggestion": "NEGATIVE (no growlights)",
+  "dutch_terms_found": [
+    "assimilatiebelichting",
+    "zonder kunstlicht",
+    "belichte teelt",
+    "kunstlicht",
+    "daglichtkas",
+    "groeilicht",
+    "onbelichte teelt"
+  ],
+  "confidence_score": 0.75,
+  "notes": "Expected classification from VIIRS data analysis: NEGATIVE",
+  "manual_classification_date": "2025-11-11T12:43:34.827169"
+}

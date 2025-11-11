@@ -328,18 +328,20 @@
       }
     ]
   },
-  "classification_suggestion": "NEEDS_MANUAL_REVIEW",
+  "classification_suggestion": "POSITIVE (uses growlights)",
   "dutch_terms_found": [
-    "led-belichting",
-    "zonder kunstlicht",
-    "onbelichte teelt",
     "belichte teelt",
+    "daglichtkas",
+    "zonder kunstlicht",
     "kunstlicht",
+    "assimilatiebelichting",
     "groeilicht",
     "son-t",
-    "daglichtkas",
-    "assimilatiebelichting"
+    "onbelichte teelt",
+    "led-belichting"
   ],
-  "confidence_score": 0.3,
-  "notes": ""
+  "confidence_score": 0.85,
+  "notes": "Manual classification: Gerbera cultivation confirmed positive for grow lights",
+  "species_grown": "Gerbera",
+  "manual_review_date": "2025-11-11T11:27:30.667918"
 }

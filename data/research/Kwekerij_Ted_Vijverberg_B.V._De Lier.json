@@ -251,17 +251,19 @@
       }
     ]
   },
-  "classification_suggestion": "NEEDS_MANUAL_REVIEW",
+  "classification_suggestion": "NEGATIVE (no growlights)",
   "dutch_terms_found": [
-    "zonder kunstlicht",
-    "onbelichte teelt",
     "belichte teelt",
-    "groeilicht",
-    "kunstlicht",
-    "son-t",
     "daglichtkas",
-    "assimilatiebelichting"
+    "zonder kunstlicht",
+    "assimilatiebelichting",
+    "kunstlicht",
+    "groeilicht",
+    "son-t",
+    "onbelichte teelt"
   ],
-  "confidence_score": 0.3,
-  "notes": ""
+  "confidence_score": 0.7,
+  "notes": "Manual classification: Inconclusive; lower light levels, not likely to be extreme case visible on VIIRS data",
+  "species_grown": "Unknown",
+  "manual_review_date": "2025-11-11T11:27:30.671451"
 }
