@@ -40,7 +40,7 @@ from typing import Any
 
 import numpy as np
 from sklearn.metrics import f1_score
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import RepeatedStratifiedKFold, StratifiedKFold
 
 
 @dataclass
@@ -54,6 +54,8 @@ class EvaluationReport:
         fold_scores: List of F1 scores for each fold
         confidence_interval_95: Tuple of (lower, upper) bounds for 95% CI
         bootstrap_scores: Full distribution of bootstrapped F1 scores
+        n_repetitions: Number of CV repetitions (1 for single-pass, >1 for repeated)
+        repetition_scores: Mean F1 per repetition (for repeated CV analysis)
 
     """
 
@@ -62,6 +64,8 @@ class EvaluationReport:
     fold_scores: list[float]
     confidence_interval_95: tuple[float, float]
     bootstrap_scores: list[float]
+    n_repetitions: int = 1
+    repetition_scores: list[float] | None = None
 
 
 def bootstrap_f1_scores(
@@ -256,4 +260,191 @@ def evaluate_with_stratified_cv(
         fold_scores=fold_scores,
         confidence_interval_95=ci_95,
         bootstrap_scores=all_bootstrap_scores,
+        n_repetitions=1,
+        repetition_scores=None,
+    )
+
+
+def evaluate_with_repeated_stratified_cv(
+    detector: Any,
+    dataset: list[dict[str, Any]],
+    n_folds: int = 10,
+    n_repetitions: int = 3,
+    n_bootstrap: int = 1000,
+    random_state: int = 42,
+) -> EvaluationReport:
+    """
+    Evaluate detector using repeated stratified k-fold CV with bootstrap.
+
+    This function implements the Phase 2.5 variance reduction strategy by using:
+    - More folds (10 instead of 5) for larger, more stable test sets
+    - Multiple repetitions (3-5) with different shuffles for robust estimation
+    - Bootstrap confidence intervals for uncertainty quantification
+
+    Statistical Improvements over single-pass CV:
+    - Reduced sampling bias: Averages across multiple random shuffles
+    - More stable variance estimates: More folds × repetitions = more data points
+    - Better generalization assessment: Tests model on multiple train/test splits
+
+    Target: Reduce std dev from 21% to <10% for stable Phase 3 baseline.
+
+    Args:
+        detector: GreenhouseDetector instance (with CachedRetriever)
+        dataset: List of company dictionaries with:
+                 - 'company': company name
+                 - 'location': location string
+                 - 'manual_classification': bool (ground truth)
+        n_folds: Number of CV folds per repetition (default: 10)
+        n_repetitions: Number of repetitions with different shuffles (default: 3)
+        n_bootstrap: Number of bootstrap samples per fold (default: 1000)
+        random_state: Random seed for reproducibility
+
+    Returns:
+        EvaluationReport with:
+        - mean_f1: Grand mean across all folds and repetitions
+        - std_f1: Standard deviation across all folds and repetitions
+        - fold_scores: F1 scores for each fold (n_folds × n_repetitions total)
+        - repetition_scores: Mean F1 per repetition (for analysis)
+        - confidence_interval_95: 95% CI from bootstrap distribution
+        - bootstrap_scores: Full bootstrap distribution
+
+    Raises:
+        ValueError: If dataset is empty or missing required fields
+
+    Example:
+        >>> from pathlib import Path
+        >>> import dspy
+        >>> from sevenrad_ee.ai.retrievers import CachedRetriever
+        >>> from sevenrad_ee.ai.dspy_greenhouse import GreenhouseDetector
+        >>>
+        >>> # Setup
+        >>> dspy.configure(lm=dspy.LM('perplexity/sonar'))
+        >>> retriever = CachedRetriever(cache_dir=Path("data/research"))
+        >>> detector = GreenhouseDetector(retriever=retriever)
+        >>>
+        >>> # Load dataset
+        >>> dataset = [...]  # 65 companies with ground truth
+        >>>
+        >>> # Evaluate with repeated CV
+        >>> report = evaluate_with_repeated_stratified_cv(
+        ...     detector, dataset, n_folds=10, n_repetitions=3
+        ... )
+        >>> print(f"F1: {report.mean_f1:.1%} ± {report.std_f1:.1%}")
+        >>> print(f"Repetitions: {report.repetition_scores}")
+
+    """
+    if not dataset:
+        msg = "Dataset cannot be empty"
+        raise ValueError(msg)
+
+    # Validate dataset structure
+    required_fields = ["company", "location", "manual_classification"]
+    for i, company in enumerate(dataset):
+        for field in required_fields:
+            if field not in company:
+                msg = f"Company {i} missing required field: {field}"
+                raise ValueError(msg)
+
+    # Extract labels for stratification
+    labels = [company["manual_classification"] for company in dataset]
+
+    # Create repeated stratified k-fold splitter
+    rskf = RepeatedStratifiedKFold(
+        n_splits=n_folds,
+        n_repeats=n_repetitions,
+        random_state=random_state,
+    )
+
+    fold_scores = []
+    all_bootstrap_scores = []
+    repetition_scores = []
+
+    # Track which repetition we're in
+    current_repetition = 0
+    repetition_fold_scores = []
+
+    # Evaluate each fold across all repetitions
+    total_folds = n_folds * n_repetitions
+    for fold_idx, (train_idx, test_idx) in enumerate(rskf.split(dataset, labels)):
+        # Determine current repetition (folds cycle through repetitions)
+        fold_in_rep = fold_idx % n_folds
+        if fold_in_rep == 0 and fold_idx > 0:
+            # Finished a repetition - save mean for this repetition
+            repetition_scores.append(np.mean(repetition_fold_scores))
+            current_repetition += 1
+            repetition_fold_scores = []
+
+        test_companies = [dataset[i] for i in test_idx]
+        test_labels = [labels[i] for i in test_idx]
+
+        # Run predictions on test set
+        predictions = []
+        for company in test_companies:
+            try:
+                pred = detector(
+                    location_name=company["company"],
+                    location_area=company["location"],
+                )
+
+                # Extract boolean prediction (handle different output formats)
+                if hasattr(pred, "uses_growlight"):
+                    # DSPy Prediction object
+                    is_positive = pred.uses_growlight == "YES"
+                elif isinstance(pred, dict):
+                    # Dictionary format
+                    is_positive = pred.get("uses_growlight") == "YES"
+                else:
+                    # Boolean directly
+                    is_positive = bool(pred)
+
+                predictions.append(is_positive)
+
+            except Exception as e:
+                # Log error but continue with pessimistic prediction
+                print(f"Warning: Prediction failed for {company['company']}: {e}")
+                predictions.append(False)
+
+        # Calculate fold F1 score
+        fold_f1 = f1_score(test_labels, predictions, zero_division=0.0)
+        fold_scores.append(fold_f1)
+        repetition_fold_scores.append(fold_f1)
+
+        print(
+            f"Rep {current_repetition + 1}/{n_repetitions}, "
+            f"Fold {fold_in_rep + 1}/{n_folds}: F1 = {fold_f1:.1%}"
+        )
+
+        # Bootstrap within fold for CI estimation
+        boot_scores = bootstrap_f1_scores(
+            predictions, test_labels, n_bootstrap, random_state + fold_idx
+        )
+        all_bootstrap_scores.extend(boot_scores)
+
+    # Save final repetition mean
+    if repetition_fold_scores:
+        repetition_scores.append(np.mean(repetition_fold_scores))
+
+    # Aggregate results across all folds and repetitions
+    mean_f1 = np.mean(fold_scores)
+    std_f1 = np.std(fold_scores, ddof=1)  # Use sample std dev
+
+    # 95% confidence interval from bootstrap distribution
+    ci_95 = (
+        np.percentile(all_bootstrap_scores, 2.5),
+        np.percentile(all_bootstrap_scores, 97.5),
+    )
+
+    print(f"\n[Repeated CV Summary]")
+    print(f"Grand Mean F1: {mean_f1:.1%} ± {std_f1:.1%}")
+    print(f"Repetition Means: {[f'{s:.1%}' for s in repetition_scores]}")
+    print(f"Total Folds Evaluated: {total_folds}")
+
+    return EvaluationReport(
+        mean_f1=mean_f1,
+        std_f1=std_f1,
+        fold_scores=fold_scores,
+        confidence_interval_95=ci_95,
+        bootstrap_scores=all_bootstrap_scores,
+        n_repetitions=n_repetitions,
+        repetition_scores=repetition_scores,
     )

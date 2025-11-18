@@ -738,6 +738,80 @@ def optimize_greenhouse_detector():
 - Optimization report generated
 - Budget approved for generalization testing
 
+#### Implementation Status
+
+**Status**: ✅ **IMPLEMENTED** (2025-11-18)
+
+**Files Created**:
+- ✅ `scripts/dry_run_cost_estimate.py` (~400 lines)
+  - Cost estimation before full run
+  - Tracks teacher model API calls and tokens
+  - Provides budget recommendations
+  - Supports custom dry run parameters
+
+- ✅ `notebooks/optimize_with_cached_data.py` (~550 lines)
+  - Full GEPA optimization implementation
+  - Configurable student/teacher models
+  - 70/30 train/val split (expert recommendation)
+  - Reduced demos (2+6) for budget control
+  - Deterministic (seed=42, temperature=0)
+  - Automatic report generation
+  - Progress tracking with Rich console
+
+- ✅ `results/cached_optimization/README.md`
+  - Complete workflow documentation
+  - Troubleshooting guide
+  - Success criteria checklist
+
+**Key Implementation Decisions** (based on Gemini 2.5 Pro consultation):
+
+1. **Train/Val Split**: Changed from 80/20 to **70/30**
+   - Validation set: ~20 examples (vs 13) - reduces noise
+   - Training set: ~45 examples - still sufficient for GEPA
+
+2. **Demo Reduction**: Reduced from (4+8) to **(2+6)**
+   - max_bootstrapped_demos: 2 (was 4)
+   - max_labeled_demos: 6 (was 8)
+   - Directly controls teacher model costs
+   - Maintains optimization quality with smaller dataset
+
+3. **Metric Function**: Uses existing `dutch_aware_hierarchical_f1`
+   - Already implemented in `dspy_evaluation.py:322`
+   - Returns (score, feedback) tuples for GEPA reflection
+   - Weighted: 70% classification + 15% Dutch terms + 15% evidence
+
+4. **Determinism**: Full reproducibility
+   - All random seeds set to 42
+   - Teacher model temperature=0
+   - Stratified splits with random_state=42
+   - Same seed + same data → same results
+
+5. **Budget Monitoring**: Two-stage approach
+   - **Dry run first**: Estimate costs with small subset
+   - **Full run**: Only if within $25 budget
+   - CostTracker wraps teacher LM to monitor spending
+
+**Usage**:
+
+```bash
+# Step 1: Dry run cost estimate (required first)
+uv run python scripts/dry_run_cost_estimate.py \
+  --cache-dir data/research \
+  --output results/cached_optimization/dry_run_report.json
+
+# Step 2: Full optimization (8-10 hours, run in tmux)
+tmux new -s gepa-optimization
+uv run python notebooks/optimize_with_cached_data.py \
+  --cache-dir data/research \
+  --output-dir results/cached_optimization \
+  --student-model perplexity/sonar-reasoning-pro \
+  --teacher-model gemini/gemini-2.5-pro \
+  --baseline-f1 0.634 \
+  > results/cached_optimization/run.log 2>&1
+```
+
+**Next Action**: Run dry run to estimate costs before committing to full optimization.
+
 ---
 
 ### Phase 4: Generalization Spot Check (2-4 hours, $5-10)
@@ -995,28 +1069,54 @@ Selected for Phase 3: perplexity/sonar-reasoning-pro
 
 ### Phase 3: GEPA Optimization (Week 2-3)
 
-**Files to Create**:
-- [ ] `notebooks/optimize_with_cached_data.py` (~150 lines)
-  - [ ] Dataset loading
-  - [ ] GEPA configuration
-  - [ ] Optimization execution
-  - [ ] Report generation
+**Status**: ✅ **IMPLEMENTED** (2025-11-18)
 
-**Execute**:
+**Files Created**:
+- [x] `scripts/dry_run_cost_estimate.py` (~400 lines) - **NEW**
+  - [x] Cost estimation before full run
+  - [x] Teacher model API call tracking
+  - [x] Budget recommendations
+- [x] `notebooks/optimize_with_cached_data.py` (~550 lines)
+  - [x] Dataset loading with validation
+  - [x] GEPA configuration (expert-validated parameters)
+  - [x] Optimization execution with progress tracking
+  - [x] Automatic markdown report generation
+  - [x] 70/30 train/val split (expert recommendation)
+  - [x] Deterministic execution (seed=42)
+- [x] `results/cached_optimization/README.md` - **NEW**
+  - [x] Complete workflow documentation
+  - [x] Troubleshooting guide
+
+**Execute** (Two-step process):
+
 ```bash
-# Run GEPA optimization (8-10 hours)
+# Step 1: Dry run cost estimate (REQUIRED FIRST)
+uv run python scripts/dry_run_cost_estimate.py \
+  --cache-dir data/research \
+  --output results/cached_optimization/dry_run_report.json
+
+# Step 2: Full GEPA optimization (8-10 hours, run in tmux)
+tmux new -s gepa-optimization
 uv run python notebooks/optimize_with_cached_data.py \
   --cache-dir data/research \
   --output-dir results/cached_optimization \
   --student-model perplexity/sonar-reasoning-pro \
   --teacher-model gemini/gemini-2.5-pro \
-  --budget medium
+  --baseline-f1 0.634 \
+  > results/cached_optimization/run.log 2>&1
 ```
 
+**Key Parameters** (based on expert consultation):
+- max_bootstrapped_demos: 2 (reduced from 4 for budget control)
+- max_labeled_demos: 6 (reduced from 8 for budget control)
+- train_split: 0.7 (70/30 instead of 80/20 for stable validation)
+- random_seed: 42 (full reproducibility)
+- teacher_temperature: 0 (deterministic)
+
 **Monitoring**:
-- Check progress every 2 hours
-- Monitor API costs
-- Verify no Perplexity calls (should use cache)
+- Check `run.log` every 2 hours for progress
+- Dry run provides cost estimate before committing
+- No Perplexity calls during optimization (uses cache)
 
 **Expected Duration**: 8-10 hours
 

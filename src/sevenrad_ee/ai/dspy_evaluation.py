@@ -18,8 +18,6 @@ except ImportError as e:
     msg = "dspy-ai package is required. Install with: uv pip install -e '.[dev]'"
     raise ImportError(msg) from e
 
-from sevenrad_ee.ai.dspy_greenhouse import GrowlightUsage
-
 logger = logging.getLogger(__name__)
 
 # Phase 3: Dutch terminology reference for scoring
@@ -127,14 +125,9 @@ def growlight_accuracy_metric(
     if not (true_is_greenhouse and pred_is_greenhouse):
         return 1.0
 
-    # Extract predicted growlight usage
+    # Extract predicted growlight usage (now a Literal["YES", "NO", "UNKNOWN", "NOT_APPLICABLE"])
     if hasattr(prediction, "uses_growlight"):
-        pred_growlight = prediction.uses_growlight
-        # Normalize to string
-        if isinstance(pred_growlight, GrowlightUsage):
-            pred_growlight_str = pred_growlight.value
-        else:
-            pred_growlight_str = str(pred_growlight).strip().upper()
+        pred_growlight_str = str(prediction.uses_growlight).strip().upper()
     else:
         logger.warning("Prediction missing uses_growlight field")
         return 0.0
@@ -596,8 +589,7 @@ def dutch_aware_f1_score_only(
     that returns only the score component, dropping the feedback text.
 
     Use this metric with optimizers that expect a single float return value
-    (BootstrapFewShot, MIPROv2). Use dutch_aware_hierarchical_f1 directly
-    for GEPA optimizer which requires (score, feedback) tuples.
+    (BootstrapFewShot, MIPROv2). Use gepa_compatible_metric for GEPA optimizer.
 
     Args:
         example: Ground truth example
@@ -616,3 +608,41 @@ def dutch_aware_f1_score_only(
     """
     score, _ = dutch_aware_hierarchical_f1(example, prediction)
     return score
+
+
+def gepa_compatible_metric(
+    gold: dspy.Example,
+    pred: Any,  # noqa: ANN401
+    trace: Any | None = None,  # noqa: ANN401
+    pred_name: str | None = None,
+    pred_trace: Any | None = None,  # noqa: ANN401
+) -> tuple[float, str]:
+    """
+    GEPA-compatible wrapper for dutch_aware_hierarchical_f1 metric.
+
+    GEPA requires metrics to accept 5 arguments: (gold, pred, trace, pred_name, pred_trace).
+    This wrapper adapts our 3-argument metric to the GEPA interface.
+
+    Args:
+        gold: Ground truth example
+        pred: Model prediction
+        trace: Optional execution trace (unused)
+        pred_name: Name of the predictor being evaluated (unused)
+        pred_trace: Trace of the predictor execution (unused)
+
+    Returns:
+        Tuple of (score, feedback) for GEPA's reflection mechanism
+
+    Example:
+        >>> from dspy.teleprompt import GEPA
+        >>> optimizer = GEPA(
+        ...     metric=gepa_compatible_metric,
+        ...     auto='medium',
+        ...     reflection_lm=teacher_lm,
+        ...     seed=42
+        ... )
+
+    """
+    # Call our existing metric (ignores extra GEPA-specific arguments)
+    score, feedback = dutch_aware_hierarchical_f1(gold, pred, trace)
+    return score, feedback
