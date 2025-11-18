@@ -10,7 +10,7 @@ research as an authoritative tie-breaker for uncertain classifications.
 
 import logging
 from enum import Enum
-from typing import Optional
+from typing import TYPE_CHECKING, Literal, Optional
 
 try:
     import dspy
@@ -22,9 +22,10 @@ except ImportError as e:
     )
     raise ImportError(msg) from e
 
-from typing import Literal
-
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
+
+if TYPE_CHECKING:
+    from sevenrad_ee.ai.retrievers import Retriever
 
 logger = logging.getLogger(__name__)
 
@@ -533,10 +534,117 @@ class GreenhouseClassification(Signature):  # type: ignore[misc]
     )
 
 
+# Phase 1: Context-aware signature for dependency injection
+
+
+class GreenhouseClassificationWithContext(Signature):  # type: ignore[misc]
+    """
+    DSPy Signature for greenhouse detection using pre-retrieved evidence.
+
+    This signature enables dependency injection by accepting evidence as a
+    context string rather than performing its own web search. Critical for
+    deterministic optimization on cached data (Phase 1 architecture).
+
+    The signature implements the same hierarchical classification workflow as
+    GreenhouseDetectionSignature but operates on provided evidence:
+    1. Determine if location is an actual greenhouse
+    2. Search provided evidence for direct indicators of growlights
+    3. If unclear, look for WUR research in evidence
+    4. Cross-validate with species patterns
+
+    This decouples retrieval from classification, enabling both:
+    - Training: CachedRetriever provides frozen evidence (deterministic)
+    - Production: PerplexityRetriever provides live search results
+    """
+
+    # Input fields
+    location_name: str = dspy.InputField(desc="Company or facility name to classify")
+    location_area: str = dspy.InputField(
+        desc="City or region (e.g., 'waddinxveen, Netherlands')"
+    )
+    evidence_context: str = dspy.InputField(
+        desc=(
+            "Pre-retrieved search results and evidence regarding the location. "
+            "Analyze this provided evidence rather than performing your own search. "
+            "The evidence includes search queries, responses, and source citations."
+        )
+    )
+
+    # Output fields (hierarchical) - identical to GreenhouseDetectionSignature
+    is_greenhouse: bool = dspy.OutputField(
+        desc=(
+            "Is this an actual greenhouse facility? "
+            "False for auction houses (bloemenveiling), seed companies, "
+            "transport companies, caravan storage, etc."
+        )
+    )
+    uses_growlight: str = dspy.OutputField(
+        desc=(
+            "'YES' if uses artificial growlights, "
+            "'NO' if natural light only, "
+            "'UNKNOWN' if evidence is inconclusive. "
+            "Return empty string if is_greenhouse=False. "
+            "\n\nCLASSIFICATION WORKFLOW:\n"
+            "1. Analyze provided evidence for DIRECT facility indicators\n"
+            "2. If unclear, check for WUR research in evidence\n"
+            "   - Look for wur.nl URLs or WUR publications\n"
+            "   - Check for 'assimilatieverlichting voor {species}'\n"
+            "3. Cross-validate with species:\n"
+            "   - Roses/Gerberas/Lilies/Chrysanthemums → almost always YES\n"
+            "   - Tomatoes/Peppers → check WUR for Dutch climate\n"
+            "4. If still unclear → UNKNOWN"
+        )
+    )
+    species_grown: str = dspy.OutputField(
+        desc=(
+            "Comma-separated species/crops grown. "
+            "Examples: 'roses', 'gerberas', 'tomatoes', 'peppers', "
+            "'lilies', 'chrysanthemums', 'cucumbers'. "
+            "Return empty string if is_greenhouse=False or unknown."
+        )
+    )
+    confidence: float = dspy.OutputField(
+        desc=(
+            "Classification confidence (0.0-1.0). "
+            "Direct facility evidence = highest confidence. "
+            "WUR research support = medium-high confidence. "
+            "No evidence = low confidence."
+        )
+    )
+    reasoning: str = dspy.OutputField(
+        desc=(
+            "Step-by-step reasoning with citations:\n"
+            "1. Direct facility evidence from provided context\n"
+            "2. WUR research if found in evidence (CITE wur.nl URLs)\n"
+            "3. Species validation\n"
+            "4. Final decision\n"
+            "\nCITE ALL URLS from the provided evidence."
+        )
+    )
+    lighting_type: str = dspy.OutputField(
+        desc=(
+            "Type of lighting if uses_growlight=YES: "
+            "'LED', 'SON-T', 'HPS', 'Mixed', or 'Unknown'. "
+            "Return 'None' if uses_growlight=NO or UNKNOWN."
+        )
+    )
+    sources: str = dspy.OutputField(
+        desc=(
+            "Source URLs separated by '|||'. "
+            "\n\nSOURCE PRIORITY:\n"
+            "1. Direct facility evidence (company website, YouTube)\n"
+            "2. WUR academic research (wur.nl, edepot.wur.nl)\n"
+            "3. Dutch agricultural sources (kasmagazine.nl, onderglas.nl)\n"
+            "4. General sources\n"
+            "\nExtract URLs from the provided evidence."
+        )
+    )
+
+
 # DSPy Module
 
 
-class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
+class GreenhouseDetectorLegacy(dspy.Module):  # type: ignore[misc]
     """
     DSPy Module for detecting greenhouse artificial lighting usage.
 
@@ -687,6 +795,126 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
         )
 
 
+class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
+    """
+    DSPy Module for greenhouse detection with dependency injection.
+
+    This module decouples retrieval from classification by accepting a Retriever
+    via dependency injection. This enables:
+    - Deterministic optimization on cached data (CachedRetriever)
+    - Production use with live search (PerplexityRetriever)
+
+    The two-stage architecture (retrieve → classify) prevents temporal overfitting
+    and enables reproducible DSPy optimization on frozen evidence.
+
+    Example:
+        >>> from sevenrad_ee.ai.retrievers import CachedRetriever
+        >>> import dspy
+        >>>
+        >>> # Configure LM
+        >>> dspy.configure(lm=dspy.LM('perplexity/sonar'))
+        >>>
+        >>> # Create detector with cached retriever
+        >>> cache_dir = Path("data/research")
+        >>> cached_retriever = CachedRetriever(cache_dir=cache_dir)
+        >>> detector = GreenhouseDetector(retriever=cached_retriever)
+        >>>
+        >>> # Classify using cached evidence
+        >>> result = detector(
+        ...     location_name="Royal Van Zanten",
+        ...     location_area="Rijsenhout"
+        ... )
+        >>> print(result.uses_growlight)
+
+    """
+
+    def __init__(self, retriever: "Retriever") -> None:  # noqa: F821
+        """
+        Initialize greenhouse detector with injected retriever.
+
+        Args:
+            retriever: Any object conforming to Retriever protocol
+                      (must implement forward(company_name, location) -> str)
+
+        """
+        super().__init__()
+        self.retriever = retriever
+        # Use new context-aware signature
+        self.predictor = dspy.ChainOfThought(GreenhouseClassificationWithContext)
+
+    def forward(
+        self,
+        location_name: str,
+        location_area: str,
+    ) -> dspy.Prediction:
+        """
+        Analyze a location using two-stage architecture.
+
+        Stage 1: Retrieve evidence using injected retriever
+        Stage 2: Classify based on retrieved evidence
+
+        Args:
+            location_name: Name of the facility/company
+            location_area: City or region (e.g., 'waddinxveen, Netherlands')
+
+        Returns:
+            dspy.Prediction with fields matching GreenhouseClassificationWithContext
+
+        """
+        logger.info("Retrieving evidence for %s in %s", location_name, location_area)
+
+        # Stage 1: Retrieve evidence
+        evidence_context = self.retriever.forward(
+            company_name=location_name,
+            location=location_area,
+        )
+
+        logger.info(
+            "Classifying %s in %s with %d chars of evidence",
+            location_name,
+            location_area,
+            len(evidence_context),
+        )
+
+        # Stage 2: Classify using retrieved evidence
+        prediction = self.predictor(
+            location_name=location_name,
+            location_area=location_area,
+            evidence_context=evidence_context,
+        )
+
+        logger.info(
+            "Classification: is_greenhouse=%s, uses_growlight=%s, confidence=%.2f",
+            prediction.is_greenhouse,
+            prediction.uses_growlight,
+            prediction.confidence,
+        )
+
+        return prediction
+
+    def to_pydantic(self, prediction: dspy.Prediction) -> GreenhouseLightingAnalysis:
+        """
+        Convert DSPy Prediction to Pydantic model for validation.
+
+        Delegates to the same conversion logic as GreenhouseDetectorLegacy
+        for consistency.
+
+        Args:
+            prediction: DSPy Prediction from forward()
+
+        Returns:
+            GreenhouseLightingAnalysis validated Pydantic model
+
+        Raises:
+            ValueError: If prediction violates hierarchical logic
+
+        """
+        # Use same conversion logic as legacy detector
+        # (Create temporary legacy instance for conversion)
+        legacy_detector = GreenhouseDetectorLegacy()
+        return legacy_detector.to_pydantic(prediction)
+
+
 # Helper function for convenience
 
 
@@ -698,8 +926,12 @@ def analyze_greenhouse(
     """
     Analyze a location for greenhouse and artificial lighting usage.
 
-    Convenience function that creates a detector, runs prediction with
-    WUR tie-breaker strategy, and returns a validated Pydantic model.
+    Convenience function that creates a detector with live Perplexity retrieval,
+    runs prediction, and returns a validated Pydantic model. This is the primary
+    entry point for production use with live web search.
+
+    For cached/deterministic evaluation, use GreenhouseDetector directly with
+    a CachedRetriever instance.
 
     Args:
         location_name: Name of the facility/company
@@ -728,13 +960,19 @@ def analyze_greenhouse(
         >>> print(f"Confidence: {result.confidence:.2%}")
 
     """
+    # Import here to avoid circular dependency
+    from sevenrad_ee.ai.retrievers import PerplexityRetriever
+
+    # Create live retriever for production use
+    live_retriever = PerplexityRetriever()
+
     if lm:
         with dspy.context(lm=lm):
-            detector = GreenhouseDetector()
+            detector = GreenhouseDetector(retriever=live_retriever)
             prediction = detector(location_name, location_area)
             return detector.to_pydantic(prediction)
 
     # Use default LM from dspy.settings
-    detector = GreenhouseDetector()
+    detector = GreenhouseDetector(retriever=live_retriever)
     prediction = detector(location_name, location_area)
     return detector.to_pydantic(prediction)
