@@ -1,0 +1,211 @@
+{
+  "company": "Kwekerij Lindenberg",
+  "location": "'s-Gravenzande",
+  "timestamp": "2025-11-11T11:59:12.905013",
+  "queries": [
+    {
+      "query": "\"Kwekerij Lindenberg\" 's-Gravenzande AND (assimilatiebelichting OR groeilicht OR \"belichte teelt\")",
+      "response_id": "a1650f90-55aa-4c3b-a3bf-563994ebeeee",
+      "model": "sonar-pro",
+      "content": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5]. De kwekerij staat bekend om de teelt van lelies, tuinplanten en perkgoed, en biedt jaarrond witte, roze en regenbooglelies aan[1][5].\n\n**Essenti\u00eble context:**\n- Assimilatiebelichting (groeilicht, belichte teelt) wordt in de glastuinbouw breed toegepast om jaarrond productie mogelijk te maken, vooral bij vruchtgroenten zoals tomaat, paprika, komkommer en aubergine[4][6]. Het gebruik van assimilatiebelichting verhoogt de productie, verbetert de kwaliteit en verkort de teeltduur, maar het effect verschilt per gewas en situatie[2][4].\n- Voor lelieteelt, zoals bij Kwekerij Lindenberg, is assimilatiebelichting technisch mogelijk en wordt in sommige gevallen toegepast om jaarrond bloemen te kunnen leveren, vooral bij dubbelbloemige cultivars[2]. Echter, er is geen expliciet bewijs dat Lindenberg deze techniek gebruikt.\n\n**Extra relevante informatie:**\n- De jaarrond beschikbaarheid van lelies bij Lindenberg kan wijzen op het gebruik van technieken zoals belichte teelt, maar dit wordt niet bevestigd in de openbare bedrijfsinformatie[1][5].\n- In de regio Westland zijn diverse bedrijven en specialisten actief op het gebied van assimilatiebelichting, wat de toegang tot deze technologie vergemakkelijkt voor kwekerijen in de omgeving[9][10].\n\n**Conclusie:**  \nOp basis van de beschikbare informatie is het niet vast te stellen of Kwekerij Lindenberg daadwerkelijk assimilatiebelichting, groeilicht of belichte teelt toepast. Er zijn geen expliciete vermeldingen of technische details hierover in de openbare bronnen.",
+      "citations": [
+        "https://www.floraxchange.nl/Account/Kweker/10570/Kwekerij-Lindenberg",
+        "https://edepot.wur.nl/391976",
+        "https://www.youtube.com/channel/UC_hlpTZe_cMO_wuXwJ6QAZA/about",
+        "https://royalbrinkman.nl/elektrotechniek/verlichting/assimilatie-verlichting/",
+        "https://www.fairsy.nl/westland/lindenberg-kwekerij",
+        "https://www.onderglas.nl/gaat-om-balans-meerproductie-en-vruchtgewicht/",
+        "https://edepot.wur.nl/274228",
+        "https://www.westlandwerk.nl/bedrijf/techniek-installatie-gebr-geers-bv-s-gravenzande-westland/179",
+        "https://www.geersbv.nl/nl/",
+        "https://www.westlandwerk.nl/vacature/bouw-kassenbouw-zzpers-in-assimilatiebelichting-gebr-geers-bv-s-gravenzande-westland/2694",
+        "https://edepot.wur.nl/459859",
+        "https://libstore.ugent.be/fulltxt/RUG01/003/200/606/RUG01-003200606_2024_0001_AC.pdf",
+        "https://edepot.wur.nl/391989"
+      ]
+    },
+    {
+      "query": "\"Kwekerij Lindenberg\" AND (Signify OR Hortilux OR \"Philips LED\" OR Gavita)",
+      "response_id": "d7aff3f3-48b2-45ba-9b77-e83b76910588",
+      "model": "sonar-pro",
+      "content": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant context about both Kwekerij Lindenberg and the lighting companies mentioned:\n\n- **Kwekerij Lindenberg** is a nursery in 's-Gravenzande, specializing in lilies, garden plants, and bedding plants[7].\n- **Hortilux** is a major supplier of LED and HPS grow light solutions for the horticultural sector, with a strong presence in the Netherlands and internationally[3][4][5][6][8]. They have case studies with other growers (such as Jan Lindberg in Finland), but there is no mention of Kwekerij Lindenberg in their published projects[1].\n- **Philips LED** (Signify) distributes its products through a network of certified partners, but there is no listing or case study directly connecting them to Kwekerij Lindenberg in the available results[2].\n- There is no information in the results about **Gavita** in relation to Kwekerij Lindenberg.\n\n**Summary of findings:**\n- No direct project, partnership, or installation involving Kwekerij Lindenberg and Signify, Hortilux, Philips LED, or Gavita is documented in the search results.\n- Kwekerij Lindenberg is an active nursery in the Westland region, which is a hub for horticultural lighting innovation, so collaboration is possible but not confirmed in these sources[7].\n\nIf you require confirmation of a specific project or partnership, direct contact with Kwekerij Lindenberg or the lighting companies would be necessary, as this information is not publicly documented in the search results provided.",
+      "citations": [
+        "https://www.hortilux.com/nl/project/dertig-procent-meer-komkommers-bij-gelijkblijvend-energieverbruik/",
+        "https://www.lighting.philips.nl/toepassingsgebieden/specialist-applications/led-groeilampen/partners",
+        "https://www.hortilux.com/nl/about-us/",
+        "https://www.hortilux.com/about-us/",
+        "https://www.hortilux.com/nl/",
+        "https://www.hortilux.com/led-hps-hybrid-grow-light-products/",
+        "https://www.floraxchange.nl/Account/Kweker/10570/Kwekerij-Lindenberg",
+        "https://www.hortilux.com/grow-light-solutions/",
+        "https://www.groentennieuws.nl/photos/album/12290/horticontact-2020/"
+      ]
+    },
+    {
+      "query": "\"Kwekerij Lindenberg\" AND (\"onbelichte teelt\" OR \"daglichtkas\" OR \"zonder kunstlicht\")",
+      "response_id": "f17ab8cf-f6d0-4f77-ad91-f915dc8b72f9",
+      "model": "sonar-pro",
+      "content": "Kwekerij Lindenberg is a nursery located in 's-Gravenzande, specializing in **lilies, garden plants, and bedding plants**[1]. \n\nThe available search result does **not provide information** about whether Kwekerij Lindenberg uses **onbelichte teelt** (unlit cultivation), a **daglichtkas** (daylight greenhouse), or grows **zonder kunstlicht** (without artificial lighting)[1]. There is no mention of their lighting practices or greenhouse technology in the provided source.\n\nIf you need specific details about their use of artificial lighting or daylight-only cultivation methods, direct contact with the nursery or additional sources would be necessary.",
+      "citations": [
+        "https://www.floraxchange.nl/Account/Kweker/10570/Kwekerij-Lindenberg"
+      ]
+    }
+  ],
+  "evidence": {
+    "positive": [],
+    "negative": [],
+    "ambiguous": [
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/10570/Kwekerij-Lindenberg",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/391976",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.youtube.com/channel/UC_hlpTZe_cMO_wuXwJ6QAZA/about",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://royalbrinkman.nl/elektrotechniek/verlichting/assimilatie-verlichting/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.fairsy.nl/westland/lindenberg-kwekerij",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.onderglas.nl/gaat-om-balans-meerproductie-en-vruchtgewicht/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/274228",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.westlandwerk.nl/bedrijf/techniek-installatie-gebr-geers-bv-s-gravenzande-westland/179",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.geersbv.nl/nl/",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.westlandwerk.nl/vacature/bouw-kassenbouw-zzpers-in-assimilatiebelichting-gebr-geers-bv-s-gravenzande-westland/2694",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/459859",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://libstore.ugent.be/fulltxt/RUG01/003/200/606/RUG01-003200606_2024_0001_AC.pdf",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://edepot.wur.nl/391989",
+        "snippet": "Er zijn geen directe aanwijzingen in de beschikbare zoekresultaten dat **Kwekerij Lindenberg** in 's-Gravenzande assimilatiebelichting, groeilicht of belichte teelt toepast in hun bedrijfsvoering[1][5",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/nl/project/dertig-procent-meer-komkommers-bij-gelijkblijvend-energieverbruik/",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.lighting.philips.nl/toepassingsgebieden/specialist-applications/led-groeilampen/partners",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/nl/about-us/",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/about-us/",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/nl/",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/led-hps-hybrid-grow-light-products/",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/10570/Kwekerij-Lindenberg",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/grow-light-solutions/",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.groentennieuws.nl/photos/album/12290/horticontact-2020/",
+        "snippet": "There is no direct evidence in the search results that **Kwekerij Lindenberg** has a partnership or project with **Signify**, **Hortilux**, **Philips LED**, or **Gavita**. However, there is relevant c",
+        "source": "query_2",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/10570/Kwekerij-Lindenberg",
+        "snippet": "Kwekerij Lindenberg is a nursery located in 's-Gravenzande, specializing in **lilies, garden plants, and bedding plants**[1]. \n\nThe available search result does **not provide information** about wheth",
+        "source": "query_3",
+        "tier": "company_website"
+      }
+    ]
+  },
+  "classification_suggestion": "NEGATIVE (no growlights)",
+  "dutch_terms_found": [
+    "assimilatiebelichting",
+    "zonder kunstlicht",
+    "belichte teelt",
+    "kunstlicht",
+    "daglichtkas",
+    "groeilicht",
+    "onbelichte teelt"
+  ],
+  "confidence_score": 0.75,
+  "notes": "Expected classification from VIIRS data analysis: NEGATIVE",
+  "manual_classification_date": "2025-11-11T12:43:34.816000"
+}

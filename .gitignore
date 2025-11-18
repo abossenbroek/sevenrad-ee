@@ -182,9 +182,9 @@ cython_debug/
 .abstra/
 
 # Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore
 #  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#  and can be added to the global gitignore or merged into this file. However, if you prefer,
 #  you could uncomment the following to ignore the entire vscode folder
 # .vscode/
 
@@ -205,3 +205,65 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project and system files
+.DS_Store
+*~
+*.swp
+*.swo
+
+# Output and temp directories
+output/
+temp/
+
+# Private/WIP code (Arkalos structure)
+_private/
+
+# GEE data and outputs
+*.tif
+*.tiff
+*.geotiff
+*.jp2
+*.hdf
+*.nc
+*.h5
+
+# Common image formats
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+
+# Google Earth Engine credentials
+.ee-credentials
+*.json.key
+service-account*.json
+
+# JavaScript configuration files (user-specific)
+# These contain region definitions and should not be versioned
+extract_geotiffs.js
+wavelength_palette_1025.js
+*_config.js
+
+# Cache directory for API responses
+cache/
+
+# Test output files
+*.geojson
+*_test.yml
+*_output.yml
+test_*.yml
+demo_*.yml
+zen_generated.code
+*.log
+
+# Region-specific test outputs (e.g., moerkapelle_*.yml)
+# These are generated when running the CLI on test regions
+moerkapelle*.yml
+*_top*.yml
+*_fixed.yml
+*_clean.yml
+*_with_*.yml
+*_businesses.yml
+*_results.yml

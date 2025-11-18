@@ -1,0 +1,344 @@
+{
+  "company": "Kwekerij Altijd Blij",
+  "location": "Maasdijk",
+  "timestamp": "2025-11-11T12:11:09.629854",
+  "queries": [
+    {
+      "query": "\"Kwekerij Altijd Blij\" Maasdijk AND (assimilatiebelichting OR groeilicht OR \"belichte teelt\")",
+      "response_id": "e469e73c-9db7-48a3-8f4f-01905eaf0d99",
+      "model": "sonar-pro",
+      "content": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plants under glass, with a focus on bulb flowers including Agapanthus, Zantedeschia, and other bulb varieties.[3][9]\n\nHowever, the search results do not contain specific information about whether Kwekerij Altijd Blij uses assimilatiebelichting (growth lighting or supplemental lighting) in their operations. While the search results provide detailed information about assimilatiebelichting regulations and applications in Dutch greenhouse horticulture, they do not specifically document this nursery's use of such lighting systems.\n\nTo obtain information about whether this particular nursery employs assimilatiebelichting or other supplemental lighting technologies, you would need to contact them directly at +31 651935992 or altijdbl@kabelfoon.nl.",
+      "citations": [
+        "https://www.odwh.nl/themas/licht/assimilatiebelichting/",
+        "https://edepot.wur.nl/391976",
+        "https://floraxchange.nl/Account/Kweker/11218/Kwekerij-Altijd-Blij",
+        "https://edepot.wur.nl/274228",
+        "https://omgevingsdiensthaaglanden.nl/themas/licht/assimilatiebelichting/",
+        "https://royalbrinkman.nl/elektrotechniek/verlichting/assimilatie-verlichting/",
+        "https://www.telefoonboek.nl/bedrijven/t8563837/maasdijk/kwekerij-altijd-blij/",
+        "https://www.onderglas.nl/gaat-om-balans-meerproductie-en-vruchtgewicht/",
+        "https://www.transfirm.nl/nl/organisatie/83823980-000049973541-kwekerij-altijd-blij",
+        "https://edepot.wur.nl/355948",
+        "https://inspct.nl/projects/inspectie-chrysanten-kwekerij/",
+        "https://edepot.wur.nl/459859",
+        "https://indebuurt.nl/westland/gids/kwekerij-altijd-blij/",
+        "https://www.bpnieuws.nl/article/9697429/aardappelen-de-grond-in-bij-kwekerij-altijd-blij/",
+        "https://www.iperen.com/kennis-nieuws/tuinbouw/bloemen-kweken-is-iedere-dag-topsport/",
+        "https://nl.wikipedia.org/wiki/Assimilatieverlichting",
+        "https://edepot.wur.nl/355941",
+        "https://www.kasalsenergiebron.nl/content/onderzoeken/2021/20092_Eindrapport_Freesiateelt_toekomst-proof.pdf"
+      ]
+    },
+    {
+      "query": "\"Kwekerij Altijd Blij\" AND (Signify OR Hortilux OR \"Philips LED\" OR Gavita)",
+      "response_id": "ea1fbd25-f1b7-46d7-a6bc-406452afbb5f",
+      "model": "sonar-pro",
+      "content": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is een kweker van Agapanthus, Zantedeschia en andere bolbloemen uit Maasdijk, Nederland, maar er zijn geen openbare vermeldingen van samenwerkingen, projecten of installaties met bovengenoemde leveranciers van tuinbouwbelichting[1]. De beschikbare informatie over Kwekerij Altijd Blij betreft vooral contactgegevens en teeltinformatie, zonder verwijzing naar specifieke groeilichtsystemen of leveranciers[1].\n\nDe genoemde leveranciers (Signify/Philips LED, Hortilux, Gavita) zijn wel actief in de tuinbouwsector en leveren groeilichtoplossingen aan diverse kwekerijen, maar er zijn geen bronnen die een directe relatie met Kwekerij Altijd Blij bevestigen[2][3][7][9]. \n\nIndien u zoekt naar een samenwerking of installatie van deze merken bij Kwekerij Altijd Blij, is er op basis van de huidige openbare bronnen geen bevestiging of bewijs hiervan gevonden.",
+      "citations": [
+        "https://floraxchange.nl/Account/Kweker/11218/Kwekerij-Altijd-Blij",
+        "https://www.hortilux.com/nl/about-us/",
+        "https://www.signify.com/nl-nl/our-company/news/press-releases/2018/20181206-signify-teams-up-with-worlds-largest-gerbera-grower-holstein-flowers",
+        "https://solarmagazine.nl/nieuws-zonne-energie/i23468/Enphase21022024a",
+        "https://www.bpnieuws.nl/article/9555743/led-helpt-deense-rozenteler-energiekosten-te-verlagen-en-kwaliteit-te-verbeteren/",
+        "https://www.hortilux.com/nl/bericht/hortiled-helpt-deense-rozenteler-de-energiekosten-te-verlagen-en-de-kwaliteit-te-verbeteren/",
+        "https://www.hortilux.com/nl/",
+        "https://www.groentennieuws.nl/photos/album/9925/tuinbouw-op-fruit-logistica-2022-berlijn-duitsland/",
+        "https://www.lighting.philips.nl/toepassingsgebieden/specialist-applications/led-groeilampen/persberichten",
+        "https://www.hortilux.com/nl/groeilichtoplossingen/"
+      ]
+    },
+    {
+      "query": "\"Kwekerij Altijd Blij\" AND (\"onbelichte teelt\" OR \"daglichtkas\" OR \"zonder kunstlicht\")",
+      "response_id": "1fb1cba5-e08e-4917-92ac-26161ebca31e",
+      "model": "sonar-pro",
+      "content": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is van het weer: “Ik teel weersafhankelijk” en “het is drie graden in de kas. Dan groeit er niets.” Dit wijst erop dat er geen gebruik wordt gemaakt van assimilatiebelichting of andere vormen van kunstlicht, en dat de teelt volledig op daglicht is gebaseerd[1].\n\nEr is geen directe vermelding dat Kwekerij Altijd Blij een **daglichtkas** (zoals het innovatieve kasconcept met lenzen en warmtecollectoren) gebruikt; de beschrijving wijst juist op een traditionele, eenvoudige kas zonder extra technologie voor licht- of warmtevoorziening[1]. De focus ligt op het telen van onder andere aardappelen, selderij en snijbloemen (zoals Calla’s) in het voorjaar, wanneer het natuurlijke licht toeneemt[1][5].\n\nSamengevat:\n- **Kwekerij Altijd Blij werkt zonder kunstlicht (onbelichte teelt)**[1].\n- De kas is een eenvoudige, koude kas en geen geavanceerde daglichtkas[1].\n- De teelt is volledig afhankelijk van daglicht en weersomstandigheden[1].\n\nEr zijn geen aanwijzingen in de gevonden bronnen dat Kwekerij Altijd Blij experimenteert met of investeert in daglichtkassen of andere innovatieve kasconcepten zoals beschreven bij andere bedrijven[2][4][6].",
+      "citations": [
+        "https://www.bpnieuws.nl/article/9697429/aardappelen-de-grond-in-bij-kwekerij-altijd-blij/",
+        "https://www.glastuinbouwnederland.nl/nieuws/de-nieuwe-daglichtkas-komt-goed-uit-de-startblokken/pagina/9/?contactPerson=18&cHash=16e704ccc0c9929113da29b5c03a57ba",
+        "https://www.onderglas.nl/tomatenteler-roy-steegh-teelt-schoon-eindigen-is-enorm-belangrijk/",
+        "https://technokas.nl/nieuwe-daglichtkas-ter-laak-orchids-schiet-hoogte-in/",
+        "https://floraxchange.nl/Account/Kweker/11218/Kwekerij-Altijd-Blij",
+        "https://www.horticontact.nl/products/de-daglichtkas/",
+        "https://www.groentennieuws.nl/article/161557/wat-we-hier-hebben-gedaan-is-gewoon-topsport/",
+        "https://www.wur.nl/upload_mm/d/3/5/8b5f5909-8769-44c2-93cf-8e74399db4b5_EINDRAPPORT%20INES-GELDERLAND%20GTB-1233-juli2013.pdf",
+        "https://www.goedemorgenzomerbloem.nl/nieuws/meest-effectieve-combinatie-tegen-meeldauw/",
+        "https://www.enzazaden.com/nl/-/media/Files/enza-zaden/newsletters/peppernews_juni_2017.pdf",
+        "https://www.gfactueel.nl/tomatengewas-heeft-behoorlijk-schraal-gestaan/",
+        "https://www.nieuweoogst.nl/nieuws/2023/08/18/fusie-heeft-geholpen-om-grotere-stappen-in-verduurzaming-te-zetten",
+        "https://www.onderglas.nl/vier-westlandse-glasgroentebedrijven-samen-verder-als-acres/",
+        "https://www.glastuinbouwwaterproof.nl/substraat/teelt-en-bemesting/nieuws/paul-zantman-nieuwbouw-biedt-kans-om-watermanagement-goed-aan-te-pakken/pagina/17/"
+      ]
+    }
+  ],
+  "evidence": {
+    "positive": [],
+    "negative": [
+      {
+        "url": "https://www.bpnieuws.nl/article/9697429/aardappelen-de-grond-in-bij-kwekerij-altijd-blij/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.glastuinbouwnederland.nl/nieuws/de-nieuwe-daglichtkas-komt-goed-uit-de-startblokken/pagina/9/?contactPerson=18&cHash=16e704ccc0c9929113da29b5c03a57ba",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.onderglas.nl/tomatenteler-roy-steegh-teelt-schoon-eindigen-is-enorm-belangrijk/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://technokas.nl/nieuwe-daglichtkas-ter-laak-orchids-schiet-hoogte-in/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://floraxchange.nl/Account/Kweker/11218/Kwekerij-Altijd-Blij",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.horticontact.nl/products/de-daglichtkas/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.groentennieuws.nl/article/161557/wat-we-hier-hebben-gedaan-is-gewoon-topsport/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.wur.nl/upload_mm/d/3/5/8b5f5909-8769-44c2-93cf-8e74399db4b5_EINDRAPPORT%20INES-GELDERLAND%20GTB-1233-juli2013.pdf",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgenzomerbloem.nl/nieuws/meest-effectieve-combinatie-tegen-meeldauw/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.enzazaden.com/nl/-/media/Files/enza-zaden/newsletters/peppernews_juni_2017.pdf",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.gfactueel.nl/tomatengewas-heeft-behoorlijk-schraal-gestaan/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.nieuweoogst.nl/nieuws/2023/08/18/fusie-heeft-geholpen-om-grotere-stappen-in-verduurzaming-te-zetten",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.onderglas.nl/vier-westlandse-glasgroentebedrijven-samen-verder-als-acres/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.glastuinbouwwaterproof.nl/substraat/teelt-en-bemesting/nieuws/paul-zantman-nieuwbouw-biedt-kans-om-watermanagement-goed-aan-te-pakken/pagina/17/",
+        "snippet": "Kwekerij Altijd Blij teelt zijn gewassen in een **koude kas zonder kunstlicht**, oftewel een onbelichte teelt. Eigenaar Martin Prins geeft aan dat hij geen gas meer gebruikt en volledig afhankelijk is",
+        "source": "query_3",
+        "tier": "general_web"
+      }
+    ],
+    "ambiguous": [
+      {
+        "url": "https://www.odwh.nl/themas/licht/assimilatiebelichting/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/391976",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://floraxchange.nl/Account/Kweker/11218/Kwekerij-Altijd-Blij",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/274228",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://omgevingsdiensthaaglanden.nl/themas/licht/assimilatiebelichting/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://royalbrinkman.nl/elektrotechniek/verlichting/assimilatie-verlichting/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.telefoonboek.nl/bedrijven/t8563837/maasdijk/kwekerij-altijd-blij/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.onderglas.nl/gaat-om-balans-meerproductie-en-vruchtgewicht/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.transfirm.nl/nl/organisatie/83823980-000049973541-kwekerij-altijd-blij",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/355948",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://inspct.nl/projects/inspectie-chrysanten-kwekerij/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/459859",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://indebuurt.nl/westland/gids/kwekerij-altijd-blij/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.bpnieuws.nl/article/9697429/aardappelen-de-grond-in-bij-kwekerij-altijd-blij/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.iperen.com/kennis-nieuws/tuinbouw/bloemen-kweken-is-iedere-dag-topsport/",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://nl.wikipedia.org/wiki/Assimilatieverlichting",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://edepot.wur.nl/355941",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.kasalsenergiebron.nl/content/onderzoeken/2021/20092_Eindrapport_Freesiateelt_toekomst-proof.pdf",
+        "snippet": "Based on the search results, **Kwekerij Altijd Blij** is a flower nursery located in Maasdijk, Netherlands, at Kaapsebos 14, 2676 BX. The nursery specializes in growing cut flowers and ornamental plan",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://floraxchange.nl/Account/Kweker/11218/Kwekerij-Altijd-Blij",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/nl/about-us/",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.signify.com/nl-nl/our-company/news/press-releases/2018/20181206-signify-teams-up-with-worlds-largest-gerbera-grower-holstein-flowers",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "supplier_case_study"
+      },
+      {
+        "url": "https://solarmagazine.nl/nieuws-zonne-energie/i23468/Enphase21022024a",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.bpnieuws.nl/article/9555743/led-helpt-deense-rozenteler-energiekosten-te-verlagen-en-kwaliteit-te-verbeteren/",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.hortilux.com/nl/bericht/hortiled-helpt-deense-rozenteler-de-energiekosten-te-verlagen-en-de-kwaliteit-te-verbeteren/",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/nl/",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.groentennieuws.nl/photos/album/9925/tuinbouw-op-fruit-logistica-2022-berlijn-duitsland/",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.lighting.philips.nl/toepassingsgebieden/specialist-applications/led-groeilampen/persberichten",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortilux.com/nl/groeilichtoplossingen/",
+        "snippet": "Er is geen bewijs gevonden dat **Kwekerij Altijd Blij** samenwerkt met of gebruikmaakt van groeilichtoplossingen van **Signify**, **Hortilux**, **Philips LED**, of **Gavita**.\n\nKwekerij Altijd Blij is",
+        "source": "query_2",
+        "tier": "company_website"
+      }
+    ]
+  },
+  "classification_suggestion": "NEGATIVE (no growlights)",
+  "dutch_terms_found": [
+    "assimilatiebelichting",
+    "zonder kunstlicht",
+    "belichte teelt",
+    "kunstlicht",
+    "daglichtkas",
+    "groeilicht",
+    "onbelichte teelt"
+  ],
+  "confidence_score": 1.0,
+  "notes": ""
+}

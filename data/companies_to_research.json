@@ -1,0 +1,278 @@
+[
+  {
+    "company": "L. Noordam Holding B.V.",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Fachjan B.V. Nieuwelaan",
+    "location": "'s-gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "HouwenPlant",
+    "location": "Hoek van Holland",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Van den Bos Premium Ardisia's",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Beekenkamp Plants",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Nunhems Netherlands BV",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Kwekerij Lindenberg",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Flip Vreugdenhil B.V.",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "OK plant",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "J.H.A. Stolk Kwekerij",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Firma J. Boon",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "WPK - Westlandse Plantenkwekerij",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Kwekerij Jongland B.V.",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "J. van Baalen Kwekerij",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Vreugdenhil Bulbs & Plants",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data (different from existing Naaldwijk location)"
+  },
+  {
+    "company": "N.L. van Geest bv",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Arjan de Hoog",
+    "location": "Bleiswijk",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Andelsfiore",
+    "location": "Andel",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Kwekerij Altijd Blij",
+    "location": "Maasdijk",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Alex Warmerdam",
+    "location": "Noordwijkerhout",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Ad de Koning",
+    "location": "Maasdijk",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Kwekerij Alb. Maarse",
+    "location": "Aalsmeer",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Amaranthos Flowers",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Amortensia",
+    "location": "'s-Gravenzande",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Ammerlaan-Sosef",
+    "location": "Honselersdijk",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Anthogether Evanty",
+    "location": "Moerkapelle",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Balk-v.d. Gracht",
+    "location": "Westwoud",
+    "expected_classification": "NEGATIVE",
+    "notes": "Negative case or very unlikely to be extreme case visible in VIIRS data"
+  },
+  {
+    "company": "Vereijken Beek en Donk",
+    "location": "Beek en Donk",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "4Evergeen Hoek van Holland - Kwekerij Grootscholte BV",
+    "location": "Hoek van Holland",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "J. van Daalen Orchideeën B.V.",
+    "location": "'s-Gravenzande",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting - Orchids"
+  },
+  {
+    "company": "Vereijken 's-Gravenzande B.V.",
+    "location": "'s-Gravenzande",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Kwekerij Oriënt BV",
+    "location": "'s-Gravenzande",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Apollo Orchids",
+    "location": "De Kwakel",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting - Orchids"
+  },
+  {
+    "company": "Anjers de Nijs",
+    "location": "Erpe, Belgium",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting - Carnations"
+  },
+  {
+    "company": "Aad Meewisse Exclusive",
+    "location": "Bergschenhoek",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Alain Poot Orchideeen",
+    "location": "Delfgauw",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting - Orchids"
+  },
+  {
+    "company": "Akina",
+    "location": "Aalsmeer",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "AH van Staalduinen & Zn",
+    "location": "'s-Gravenzande",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Alisha",
+    "location": "Aalsmeer",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Avance Roses",
+    "location": "Maasland",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting - Roses"
+  },
+  {
+    "company": "Firma Baars",
+    "location": "Roelofarendsveen",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Bac Orchids",
+    "location": "Moerkapelle",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting - Orchids"
+  },
+  {
+    "company": "Bakkeren J.A. & R.J.",
+    "location": "Zevenhuizen",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Ben Slagter Flowers",
+    "location": "Lutjebroek",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Berkhout Plants",
+    "location": "Kwintsheul",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  },
+  {
+    "company": "Bernhard Optimum",
+    "location": "Luttelgeest",
+    "expected_classification": "POSITIVE",
+    "notes": "Confirmed positive for high-intensity lighting"
+  }
+]
