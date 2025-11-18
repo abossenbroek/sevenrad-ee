@@ -9,8 +9,7 @@ research as an authoritative tie-breaker for uncertain classifications.
 """
 
 import logging
-from enum import Enum
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal
 
 try:
     import dspy
@@ -34,126 +33,67 @@ logger = logging.getLogger(__name__)
 HIGH_CONFIDENCE_THRESHOLD = 0.8  # Min confidence for tier-2 + Dutch terms
 
 
-# Enums for structured outputs
-
-
-class GrowlightUsage(str, Enum):
-    """
-    Explicit uncertainty modeling for growlight classification.
-
-    This enum forces the model to explicitly indicate when evidence is
-    inconclusive rather than providing a low-confidence boolean answer.
-    """
-
-    YES = "YES"
-    NO = "NO"
-    UNKNOWN = "UNKNOWN"
-
-
 # Pydantic models for structured output
+# Phase 2.5: Simplified model to avoid DSPy schema rendering issues
 
 
-class GreenhouseLightingAnalysis(BaseModel):
+class SimplifiedGreenhouseAnalysis(BaseModel):
     """
-    Hierarchical greenhouse classification with explicit uncertainty.
+    Simplified greenhouse classification optimized for DSPy + Perplexity.
 
-    This model enforces a logical classification hierarchy:
-    1. is_greenhouse (primary gate)
-    2. uses_growlight (only if is_greenhouse=True)
-    3. species_grown (only if is_greenhouse=True)
+    This model uses flat, primitive types to avoid DSPy's "messy and verbose"
+    JSON schema rendering issues with complex nested Pydantic models.
 
-    The model uses TriState (YES/NO/UNKNOWN) for growlight classification
-    to explicitly model uncertainty when evidence is inconclusive.
+    Key simplifications from GreenhouseLightingAnalysis:
+    - Removed Optional/Enum complexity (uses_growlight is always required)
+    - Removed list types (sources embedded in reasoning)
+    - Removed validators (validation moved to application code)
+    - Removed nice-to-have fields (species_grown, lighting_type)
+
+    Design Philosophy:
+    - Pure data transfer object (DTO) for LLM generation
+    - Business logic validation happens after parsing
+    - Optimized for reliable JSON schema generation
     """
 
     is_greenhouse: bool = Field(
         ...,
         description=(
             "Is this location an actual greenhouse facility? "
+            "Must be true or false. "
             "False for auction houses, seed companies, transport, storage."
         ),
     )
-    uses_growlight: Optional[GrowlightUsage] = Field(
-        None,
+
+    uses_growlight: Literal["YES", "NO", "UNKNOWN", "NOT_APPLICABLE"] = Field(
+        ...,
         description=(
-            "Does the greenhouse use artificial growlights? "
-            "'UNKNOWN' if evidence is inconclusive. "
-            "Null if is_greenhouse=False."
+            "Classification of growlight usage. Must be one of: "
+            "'YES' (confirmed artificial lighting), "
+            "'NO' (confirmed no artificial lighting), "
+            "'UNKNOWN' (evidence is inconclusive), or "
+            "'NOT_APPLICABLE' (if is_greenhouse is false)."
         ),
     )
-    species_grown: Optional[list[str]] = Field(
-        None,
-        description=(
-            "Species/crops grown (e.g., ['roses', 'gerberas', 'tomatoes']). "
-            "Null if is_greenhouse=False."
-        ),
-    )
+
     confidence: float = Field(
         ...,
-        ge=0.0,
-        le=1.0,
-        description="Overall confidence score (0.0-1.0) for the classification",
+        description=(
+            "Overall confidence score for the is_greenhouse classification, "
+            "from 0.0 (no confidence) to 1.0 (complete confidence)."
+        ),
     )
+
     reasoning: str = Field(
         ...,
         description=(
-            "Step-by-step reasoning: "
-            "(1) Direct facility evidence, "
-            "(2) WUR research if used, "
-            "(3) Species validation, "
-            "(4) Final decision. "
-            "CITE ALL URLs."
+            "Step-by-step reasoning for the classification. "
+            "Include: (1) Direct facility evidence, "
+            "(2) WUR research if consulted, "
+            "(3) Final decision with justification. "
+            "IMPORTANT: Include all source URLs directly in this text."
         ),
     )
-    lighting_type: Optional[str] = Field(
-        None,
-        description=(
-            "Type of artificial lighting detected "
-            "(e.g., 'LED', 'SON-T', 'HPS', 'Mixed'). "
-            "Only if uses_growlight=YES."
-        ),
-    )
-    sources: list[str] = Field(
-        default_factory=list,
-        description=(
-            "URLs of sources used for analysis. "
-            "Include WUR publications if consulted."
-        ),
-    )
-
-    @field_validator("confidence")
-    @classmethod
-    def validate_confidence(cls, v: float) -> float:
-        """Ensure confidence is within valid range."""
-        if not 0.0 <= v <= 1.0:
-            msg = "Confidence must be between 0.0 and 1.0"
-            raise ValueError(msg)
-        return v
-
-    @model_validator(mode="after")
-    def validate_hierarchy(self) -> "GreenhouseLightingAnalysis":
-        """
-        Validate hierarchical classification logic.
-
-        If not a greenhouse, downstream fields must be None.
-        If is a greenhouse, growlight status must be determined.
-        """
-        if not self.is_greenhouse:
-            # Not a greenhouse → all downstream fields must be None
-            if self.uses_growlight is not None or self.species_grown is not None:
-                msg = (
-                    "If is_greenhouse=False, uses_growlight and "
-                    "species_grown must be None"
-                )
-                raise ValueError(msg)
-        # Is a greenhouse → growlight status must be determined (even if UNKNOWN)
-        elif self.uses_growlight is None:
-            msg = (
-                "If is_greenhouse=True, uses_growlight must be "
-                "YES, NO, or UNKNOWN (not None)"
-            )
-            raise ValueError(msg)
-        return self
 
 
 # Phase 2: Enhanced Pydantic models for hierarchical classification with Dutch guidance
@@ -570,20 +510,22 @@ class GreenhouseClassificationWithContext(Signature):  # type: ignore[misc]
         )
     )
 
-    # Output fields (hierarchical) - identical to GreenhouseDetectionSignature
+    # Output fields (simplified structure for reliable schema generation)
     is_greenhouse: bool = dspy.OutputField(
         desc=(
             "Is this an actual greenhouse facility? "
+            "Must be true or false. "
             "False for auction houses (bloemenveiling), seed companies, "
             "transport companies, caravan storage, etc."
         )
     )
     uses_growlight: str = dspy.OutputField(
         desc=(
-            "'YES' if uses artificial growlights, "
-            "'NO' if natural light only, "
-            "'UNKNOWN' if evidence is inconclusive. "
-            "Return empty string if is_greenhouse=False. "
+            "Classification of growlight usage. Must be one of: "
+            "'YES' (confirmed artificial lighting), "
+            "'NO' (confirmed no artificial lighting), "
+            "'UNKNOWN' (evidence is inconclusive), or "
+            "'NOT_APPLICABLE' (if is_greenhouse is false)."
             "\n\nCLASSIFICATION WORKFLOW:\n"
             "1. Analyze provided evidence for DIRECT facility indicators\n"
             "2. If unclear, check for WUR research in evidence\n"
@@ -595,17 +537,10 @@ class GreenhouseClassificationWithContext(Signature):  # type: ignore[misc]
             "4. If still unclear → UNKNOWN"
         )
     )
-    species_grown: str = dspy.OutputField(
-        desc=(
-            "Comma-separated species/crops grown. "
-            "Examples: 'roses', 'gerberas', 'tomatoes', 'peppers', "
-            "'lilies', 'chrysanthemums', 'cucumbers'. "
-            "Return empty string if is_greenhouse=False or unknown."
-        )
-    )
     confidence: float = dspy.OutputField(
         desc=(
-            "Classification confidence (0.0-1.0). "
+            "Overall confidence score for the is_greenhouse classification, "
+            "from 0.0 (no confidence) to 1.0 (complete confidence). "
             "Direct facility evidence = highest confidence. "
             "WUR research support = medium-high confidence. "
             "No evidence = low confidence."
@@ -613,186 +548,18 @@ class GreenhouseClassificationWithContext(Signature):  # type: ignore[misc]
     )
     reasoning: str = dspy.OutputField(
         desc=(
-            "Step-by-step reasoning with citations:\n"
+            "Step-by-step reasoning for the classification. Include:\n"
             "1. Direct facility evidence from provided context\n"
             "2. WUR research if found in evidence (CITE wur.nl URLs)\n"
-            "3. Species validation\n"
-            "4. Final decision\n"
-            "\nCITE ALL URLS from the provided evidence."
-        )
-    )
-    lighting_type: str = dspy.OutputField(
-        desc=(
-            "Type of lighting if uses_growlight=YES: "
-            "'LED', 'SON-T', 'HPS', 'Mixed', or 'Unknown'. "
-            "Return 'None' if uses_growlight=NO or UNKNOWN."
-        )
-    )
-    sources: str = dspy.OutputField(
-        desc=(
-            "Source URLs separated by '|||'. "
-            "\n\nSOURCE PRIORITY:\n"
-            "1. Direct facility evidence (company website, YouTube)\n"
-            "2. WUR academic research (wur.nl, edepot.wur.nl)\n"
-            "3. Dutch agricultural sources (kasmagazine.nl, onderglas.nl)\n"
-            "4. General sources\n"
-            "\nExtract URLs from the provided evidence."
+            "3. Species validation if relevant\n"
+            "4. Final decision with justification\n"
+            "\nIMPORTANT: Include all source URLs directly in this text. "
+            "CITE ALL URLS from the provided evidence."
         )
     )
 
 
 # DSPy Module
-
-
-class GreenhouseDetectorLegacy(dspy.Module):  # type: ignore[misc]
-    """
-    DSPy Module for detecting greenhouse artificial lighting usage.
-
-    This module uses Chain-of-Thought reasoning with Perplexity's search
-    capabilities to determine if a greenhouse uses artificial lighting.
-    It can be optimized using DSPy's teleprompters.
-
-    Example:
-        >>> import dspy
-        >>> from dspy.adapters import Perplexity
-        >>>
-        >>> # Configure Perplexity as the LM
-        >>> perplexity_lm = dspy.LM(
-        ...     'perplexity/sonar',
-        ...     api_key='your-api-key',
-        ...     api_base='https://api.perplexity.ai'
-        ... )
-        >>> dspy.configure(lm=perplexity_lm)
-        >>>
-        >>> # Create detector
-        >>> detector = GreenhouseDetector()
-        >>>
-        >>> # Analyze a company
-        >>> result = detector(
-        ...     company_name="Royal Van Zanten",
-        ...     location="Rijsenhout, Nederland"
-        ... )
-        >>> print(result.uses_artificial_lighting)
-        True
-
-    """
-
-    def __init__(self) -> None:
-        """Initialize the greenhouse detector with CoT predictor."""
-        super().__init__()
-        # Use ChainOfThought for reasoning before output
-        self.predictor = dspy.ChainOfThought(GreenhouseDetectionSignature)
-
-    def forward(
-        self,
-        location_name: str,
-        location_area: str,
-    ) -> dspy.Prediction:
-        """
-        Analyze a location to detect greenhouse and artificial lighting usage.
-
-        This method implements the hierarchical classification workflow with
-        WUR academic tie-breaker strategy.
-
-        Args:
-            location_name: Name of the facility/company
-            location_area: City or region (e.g., 'waddinxveen, Netherlands')
-
-        Returns:
-            dspy.Prediction with fields matching GreenhouseDetectionSignature
-
-        """
-        logger.info("Analyzing %s in %s", location_name, location_area)
-
-        # Run prediction
-        prediction = self.predictor(
-            location_name=location_name,
-            location_area=location_area,
-        )
-
-        logger.info(
-            "Classification: is_greenhouse=%s, uses_growlight=%s, confidence=%.2f",
-            prediction.is_greenhouse,
-            prediction.uses_growlight,
-            prediction.confidence,
-        )
-
-        return prediction
-
-    def to_pydantic(self, prediction: dspy.Prediction) -> GreenhouseLightingAnalysis:
-        """
-        Convert DSPy Prediction to Pydantic model for validation.
-
-        This method handles the hierarchical structure and converts
-        string outputs to appropriate types (enums, lists, etc.).
-
-        Args:
-            prediction: DSPy Prediction from forward()
-
-        Returns:
-            GreenhouseLightingAnalysis validated Pydantic model
-
-        Raises:
-            ValueError: If prediction violates hierarchical logic
-
-        """
-        # Parse is_greenhouse
-        is_greenhouse = bool(prediction.is_greenhouse)
-
-        # Parse uses_growlight (TriState enum)
-        uses_growlight_str = prediction.uses_growlight.strip().upper()
-        if is_greenhouse:
-            # Must be YES/NO/UNKNOWN
-            if uses_growlight_str in ("YES", "NO", "UNKNOWN"):
-                uses_growlight = GrowlightUsage(uses_growlight_str)
-            else:
-                # Default to UNKNOWN if unclear
-                logger.warning(
-                    "Invalid uses_growlight value '%s', defaulting to UNKNOWN",
-                    prediction.uses_growlight,
-                )
-                uses_growlight = GrowlightUsage.UNKNOWN
-        else:
-            # Not a greenhouse → must be None
-            uses_growlight = None
-
-        # Parse species_grown
-        if is_greenhouse and prediction.species_grown:
-            species_list = [
-                s.strip() for s in prediction.species_grown.split(",") if s.strip()
-            ]
-        else:
-            species_list = None
-
-        # Parse sources
-        sources_list = (
-            [s.strip() for s in prediction.sources.split("|||") if s.strip()]
-            if prediction.sources
-            else []
-        )
-
-        # Parse lighting_type
-        lighting_type = (
-            prediction.lighting_type
-            if (
-                is_greenhouse
-                and uses_growlight == GrowlightUsage.YES
-                and prediction.lighting_type
-                and prediction.lighting_type.lower() != "none"
-            )
-            else None
-        )
-
-        # Build Pydantic model (will validate hierarchy)
-        return GreenhouseLightingAnalysis(
-            is_greenhouse=is_greenhouse,
-            uses_growlight=uses_growlight,
-            species_grown=species_list,
-            confidence=float(prediction.confidence),
-            reasoning=prediction.reasoning,
-            lighting_type=lighting_type,
-            sources=sources_list,
-        )
 
 
 class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
@@ -864,7 +631,7 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
         logger.info("Retrieving evidence for %s in %s", location_name, location_area)
 
         # Stage 1: Retrieve evidence
-        evidence_context = self.retriever.forward(
+        evidence_context = self.retriever(
             company_name=location_name,
             location=location_area,
         )
@@ -892,27 +659,36 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
 
         return prediction
 
-    def to_pydantic(self, prediction: dspy.Prediction) -> GreenhouseLightingAnalysis:
+    def to_pydantic(self, prediction: dspy.Prediction) -> SimplifiedGreenhouseAnalysis:
         """
         Convert DSPy Prediction to Pydantic model for validation.
-
-        Delegates to the same conversion logic as GreenhouseDetectorLegacy
-        for consistency.
 
         Args:
             prediction: DSPy Prediction from forward()
 
         Returns:
-            GreenhouseLightingAnalysis validated Pydantic model
+            SimplifiedGreenhouseAnalysis validated Pydantic model
 
         Raises:
-            ValueError: If prediction violates hierarchical logic
+            ValueError: If prediction violates Pydantic validation
 
         """
-        # Use same conversion logic as legacy detector
-        # (Create temporary legacy instance for conversion)
-        legacy_detector = GreenhouseDetectorLegacy()
-        return legacy_detector.to_pydantic(prediction)
+        # Parse uses_growlight - ensure it's a valid Literal value
+        uses_growlight_str = prediction.uses_growlight.strip().upper()
+        if uses_growlight_str not in ("YES", "NO", "UNKNOWN", "NOT_APPLICABLE"):
+            logger.warning(
+                "Invalid uses_growlight value '%s', defaulting to UNKNOWN",
+                prediction.uses_growlight,
+            )
+            uses_growlight_str = "UNKNOWN"
+
+        # Build simplified Pydantic model
+        return SimplifiedGreenhouseAnalysis(
+            is_greenhouse=bool(prediction.is_greenhouse),
+            uses_growlight=uses_growlight_str,
+            confidence=float(prediction.confidence),
+            reasoning=prediction.reasoning,
+        )
 
 
 # Helper function for convenience
@@ -921,8 +697,8 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
 def analyze_greenhouse(
     location_name: str,
     location_area: str,
-    lm: Optional[dspy.LM] = None,
-) -> GreenhouseLightingAnalysis:
+    lm: dspy.LM | None = None,
+) -> SimplifiedGreenhouseAnalysis:
     """
     Analyze a location for greenhouse and artificial lighting usage.
 
@@ -939,11 +715,11 @@ def analyze_greenhouse(
         lm: Optional DSPy LM instance. If None, uses dspy.settings.lm
 
     Returns:
-        GreenhouseLightingAnalysis with hierarchical classification
+        SimplifiedGreenhouseAnalysis with hierarchical classification
 
     Raises:
         ValueError: If no LM is configured and none provided, or if
-                    hierarchical validation fails
+                    Pydantic validation fails
 
     Example:
         >>> import dspy
@@ -956,7 +732,6 @@ def analyze_greenhouse(
         ... )
         >>> print(f"Is greenhouse: {result.is_greenhouse}")
         >>> print(f"Uses growlight: {result.uses_growlight}")
-        >>> print(f"Species: {result.species_grown}")
         >>> print(f"Confidence: {result.confidence:.2%}")
 
     """

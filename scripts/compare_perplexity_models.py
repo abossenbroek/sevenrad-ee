@@ -50,7 +50,11 @@ except ImportError as e:
     )
     raise ImportError(msg) from e
 
-from scripts.evaluate_with_cv import EvaluationReport, evaluate_with_stratified_cv
+from scripts.evaluate_with_cv import (
+    EvaluationReport,
+    evaluate_with_repeated_stratified_cv,
+    evaluate_with_stratified_cv,
+)
 from sevenrad_ee.ai.data_utils import load_cached_companies
 from sevenrad_ee.ai.dspy_greenhouse import GreenhouseDetector
 from sevenrad_ee.ai.retrievers import CachedRetriever
@@ -64,7 +68,9 @@ MODELS_TO_COMPARE = {
 }
 CHEAPER_MODEL_KEY = "Sonar"
 RANDOM_STATE = 42
-N_FOLDS = 5
+# Phase 2.5: Repeated CV for variance reduction (21% → <10% std dev target)
+N_FOLDS = 10  # Increased from 5 for more stable estimates
+N_REPETITIONS = 3  # Multiple shuffles for robust estimation
 N_BOOTSTRAP = 1000
 
 console = Console()
@@ -117,6 +123,15 @@ Statistical Method:
         action="store_true",
         help="Test with first 10 companies only (for validation).",
     )
+    parser.add_argument(
+        "--n-repetitions",
+        type=int,
+        default=N_REPETITIONS,
+        choices=range(1, 11),
+        metavar="[1-10]",
+        help=f"Number of CV repetitions (default: {N_REPETITIONS}). "
+        "More repetitions = more stable variance estimates but longer runtime.",
+    )
 
     return parser.parse_args()
 
@@ -126,6 +141,7 @@ def run_evaluation(
     model_id: str,
     detector: GreenhouseDetector,
     companies: list[dict[str, str | bool]],
+    n_repetitions: int,
     dry_run: bool = False,
 ) -> EvaluationReport:
     """
@@ -136,6 +152,7 @@ def run_evaluation(
         model_id: DSPy model identifier (e.g., "perplexity/sonar-pro")
         detector: GreenhouseDetector instance with CachedRetriever
         companies: List of company dictionaries with ground truth labels
+        n_repetitions: Number of CV repetitions (1 for single-pass, >1 for repeated)
         dry_run: If True, use only first 10 companies for testing
 
     Returns:
@@ -167,13 +184,30 @@ def run_evaluation(
     if dry_run:
         console.print(f"[yellow]Dry run: Using first {len(eval_companies)} companies[/yellow]")
 
-    return evaluate_with_stratified_cv(
-        detector,
-        eval_companies,
-        n_folds=N_FOLDS,
-        n_bootstrap=N_BOOTSTRAP,
-        random_state=RANDOM_STATE,
-    )
+    # Use repeated CV for variance reduction (Phase 2.5)
+    if n_repetitions > 1:
+        console.print(
+            f"[cyan]Running {N_FOLDS}-fold CV × {n_repetitions} repetitions "
+            f"(total: {N_FOLDS * n_repetitions} folds)[/cyan]"
+        )
+        return evaluate_with_repeated_stratified_cv(
+            detector,
+            eval_companies,
+            n_folds=N_FOLDS,
+            n_repetitions=n_repetitions,
+            n_bootstrap=N_BOOTSTRAP,
+            random_state=RANDOM_STATE,
+        )
+    else:
+        # Single-pass CV (backward compatibility)
+        console.print(f"[cyan]Running {N_FOLDS}-fold CV (single pass)[/cyan]")
+        return evaluate_with_stratified_cv(
+            detector,
+            eval_companies,
+            n_folds=N_FOLDS,
+            n_bootstrap=N_BOOTSTRAP,
+            random_state=RANDOM_STATE,
+        )
 
 
 def create_report(
@@ -197,10 +231,20 @@ def create_report(
     baseline_f1 = float(stats["baseline_f1"])
     recommendation = str(stats["recommendation"])
     selected_model = str(stats["selected_model"])
+    # Determine if repeated CV was used
+    n_reps = results['Sonar'].n_repetitions
+    cv_method = (
+        f"Stratified {N_FOLDS}-fold × {n_reps} repetitions"
+        if n_reps > 1
+        else f"Stratified {N_FOLDS}-fold"
+    )
+    total_folds = N_FOLDS * n_reps
+
     report_content = f"""# Phase 2: Perplexity Model Comparison Report
 
 **Date**: {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 **Purpose**: Establish baseline F1 score and select student model for Phase 3 GEPA optimization
+**Phase**: {f"2.5 (Repeated CV for Variance Reduction)" if n_reps > 1 else "2 (Baseline & Model Selection)"}
 
 ---
 
@@ -208,6 +252,8 @@ def create_report(
 
 This report details the comparison between Perplexity Sonar and Sonar Reasoning Pro
 to establish a baseline F1 score and select a student model for Phase 3 GEPA optimization.
+
+{f"**Variance Reduction**: Using repeated CV to reduce std dev from 21% to <10% target" if n_reps > 1 else ""}
 
 **Recommendation**: {recommendation}
 **Selected Model for Phase 3**: `{selected_model}`
@@ -230,7 +276,8 @@ to establish a baseline F1 score and select a student model for Phase 3 GEPA opt
 
 ### Method
 
-- **Evaluation**: Stratified 5-fold cross-validation with bootstrap resampling
+- **Evaluation**: {cv_method} with bootstrap resampling
+- **Total Folds**: {total_folds} ({N_FOLDS} folds × {n_reps} repetitions)
 - **Test**: Wilcoxon signed-rank test (paired, non-parametric)
 - **Hypothesis**: Sonar Pro F1 > Sonar F1 (one-sided test)
 - **Bootstrap**: 1000 samples per fold for confidence interval estimation
@@ -255,6 +302,35 @@ to establish a baseline F1 score and select a student model for Phase 3 GEPA opt
     ):
         diff = pro_f1 - sonar_f1
         report_content += f"| {i}    | {sonar_f1:.2%}    | {pro_f1:.2%}      | {diff:+.2%}     |\n"
+
+    # Add repetition-by-repetition breakdown if repeated CV was used
+    if n_reps > 1 and results["Sonar"].repetition_scores:
+        report_content += f"""
+
+### Repetition-by-Repetition Breakdown
+
+Showing mean F1 per repetition (each repetition uses a different random shuffle):
+
+| Repetition | Sonar Mean F1 | Sonar Pro Mean F1 | Difference |
+|------------|---------------|-------------------|------------|
+"""
+        for i, (sonar_rep_f1, pro_rep_f1) in enumerate(
+            zip(results["Sonar"].repetition_scores, results["Sonar Reasoning Pro"].repetition_scores), 1
+        ):
+            diff_rep = pro_rep_f1 - sonar_rep_f1
+            report_content += f"| {i}          | {sonar_rep_f1:.2%}         | {pro_rep_f1:.2%}           | {diff_rep:+.2%}      |\n"
+
+        sonar_rep_std = np.std(results["Sonar"].repetition_scores, ddof=1) if len(results["Sonar"].repetition_scores) > 1 else 0.0
+        pro_rep_std = np.std(results["Sonar Reasoning Pro"].repetition_scores, ddof=1) if len(results["Sonar Reasoning Pro"].repetition_scores) > 1 else 0.0
+
+        report_content += f"""
+
+**Repetition Variance Analysis:**
+- Sonar std dev across repetitions: {sonar_rep_std:.2%}
+- Sonar Pro std dev across repetitions: {pro_rep_std:.2%}
+
+This shows the stability of each model across different data shuffles.
+"""
 
     report_content += f"""
 ---
@@ -368,7 +444,12 @@ def main(args: argparse.Namespace) -> int:
         return 1
 
     # Step 3: Evaluate each model
-    console.print("\n[bold]Running stratified 5-fold cross-validation...[/bold]")
+    cv_desc = (
+        f"{N_FOLDS}-fold × {args.n_repetitions} repetitions"
+        if args.n_repetitions > 1
+        else f"{N_FOLDS}-fold"
+    )
+    console.print(f"\n[bold]Running stratified {cv_desc} cross-validation...[/bold]")
     results: dict[str, EvaluationReport] = {}
 
     try:
@@ -378,6 +459,7 @@ def main(args: argparse.Namespace) -> int:
                 model_id,
                 detector,
                 companies,
+                n_repetitions=args.n_repetitions,
                 dry_run=args.dry_run,
             )
     except (RuntimeError, Exception) as e:
