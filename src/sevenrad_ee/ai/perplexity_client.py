@@ -6,14 +6,16 @@ This module provides a production-ready client for the Perplexity Sonar API with
 - Rate limiting with configurable delays
 - Structured error handling
 - Rich console output for progress tracking
+- Native structured output support via response_format parameter (Pydantic)
 """
 
 import os
 import time
-from typing import Any
+from typing import Any, TypeVar, overload
 
 import requests
 from dotenv import load_dotenv
+from pydantic import BaseModel
 from rich.console import Console
 
 from sevenrad_ee.ai.perplexity_cache import (
@@ -22,6 +24,9 @@ from sevenrad_ee.ai.perplexity_cache import (
     PerplexityAPIConfig,
     PerplexityResponse,
 )
+
+# Generic type for Pydantic models
+T = TypeVar("T", bound=BaseModel)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -67,32 +72,74 @@ class PerplexityClient:
         self.rate_limit_delay = rate_limit_delay
         self.api_url = "https://api.perplexity.ai/chat/completions"
 
+    @overload
     def query(
         self,
         query: str,
         config: PerplexityAPIConfig | None = None,
         force_refresh: bool = False,
-    ) -> PerplexityResponse:
+        response_model: None = None,
+    ) -> PerplexityResponse: ...
+
+    @overload
+    def query(
+        self,
+        query: str,
+        config: PerplexityAPIConfig | None = None,
+        force_refresh: bool = False,
+        *,
+        response_model: type[T],
+    ) -> T: ...
+
+    def query(
+        self,
+        query: str,
+        config: PerplexityAPIConfig | None = None,
+        force_refresh: bool = False,
+        response_model: type[T] | None = None,
+    ) -> PerplexityResponse | T:
         """
-        Execute Perplexity query with automatic caching.
+        Execute Perplexity query with automatic caching and optional structured output.
 
         Args:
             query: Search query string
             config: API configuration (uses defaults if None)
             force_refresh: If True, bypass cache and fetch new response
+            response_model: Optional Pydantic model class for structured output.
+                          When provided, uses Perplexity's native response_format
+                          parameter to enforce the schema and returns an instance
+                          of the model. When None, returns PerplexityResponse.
 
         Returns:
-            Perplexity API response with citations
+            If response_model provided: Instance of the Pydantic model
+            If response_model is None: PerplexityResponse with citations
 
         Raises:
             PerplexityAPIError: If API request fails
+
+        Example:
+            >>> from pydantic import BaseModel
+            >>> class Analysis(BaseModel):
+            ...     is_greenhouse: bool
+            ...     confidence: float
+            >>> client = PerplexityClient()
+            >>> result = client.query(
+            ...     "Is Marjoland a greenhouse?",
+            ...     response_model=Analysis
+            ... )
+            >>> print(result.is_greenhouse)  # Typed access!
 
         """
         if config is None:
             config = PerplexityAPIConfig()
 
-        # Generate cache key
+        # Generate cache key (include schema hash if using structured output)
         config_dict = config.model_dump()
+        if response_model is not None:
+            # Add schema to cache key to ensure different schemas get different caches
+            schema = response_model.model_json_schema()
+            config_dict["__schema_hash__"] = str(hash(str(schema)))
+
         cache_key = self.cache_manager.generate_cache_key(query, config_dict)
 
         # Check cache unless force refresh
@@ -103,6 +150,9 @@ class PerplexityClient:
                     f"  [dim][CACHE HIT][/dim] {query[:60]}...",
                     style="cyan",
                 )
+                # If using structured output, parse cached response into model
+                if response_model is not None:
+                    return self._parse_structured_response(cached.content, response_model)
                 return cached
 
         # Execute API call
@@ -112,8 +162,13 @@ class PerplexityClient:
         )
 
         try:
-            response = self._execute_request(query, config_dict)
-            self.cache_manager.save_response(cache_key, response)
+            response = self._execute_request(query, config_dict, response_model)
+
+            # Cache the raw response (always PerplexityResponse)
+            if isinstance(response, PerplexityResponse):
+                self.cache_manager.save_response(cache_key, response)
+            # If structured, response is already typed - cache the raw content
+            # (This branch handles future enhancements)
 
             # Rate limiting courtesy delay
             time.sleep(self.rate_limit_delay)
@@ -127,16 +182,18 @@ class PerplexityClient:
         self,
         query: str,
         config_dict: dict[str, Any],
-    ) -> PerplexityResponse:
+        response_model: type[T] | None = None,
+    ) -> PerplexityResponse | T:
         """
         Execute API request and parse response.
 
         Args:
             query: Search query
             config_dict: Configuration dictionary
+            response_model: Optional Pydantic model for structured output
 
         Returns:
-            Parsed PerplexityResponse
+            Parsed PerplexityResponse or typed Pydantic model instance
 
         Raises:
             PerplexityAPIError: If request fails or response is invalid
@@ -147,10 +204,14 @@ class PerplexityClient:
             "Content-Type": "application/json",
         }
 
-        # Filter out None values from config
-        filtered_config = {k: v for k, v in config_dict.items() if v is not None}
+        # Filter out None values and internal keys from config
+        filtered_config = {
+            k: v
+            for k, v in config_dict.items()
+            if v is not None and not k.startswith("__")
+        }
 
-        payload = {
+        payload: dict[str, Any] = {
             **filtered_config,
             "messages": [
                 {
@@ -160,19 +221,38 @@ class PerplexityClient:
             ],
         }
 
+        # Add response_format if using structured output
+        if response_model is not None:
+            schema = response_model.model_json_schema()
+            payload["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": response_model.__name__,
+                    "schema": schema,
+                },
+            }
+
         response = requests.post(
             self.api_url,
             json=payload,
             headers=headers,
-            timeout=30,
+            timeout=60,  # Increased timeout for first schema compilation (10-30s)
         )
 
         response.raise_for_status()
         data = response.json()
 
-        # Parse response into Pydantic model
+        # Parse response based on mode
         try:
-            return self._parse_response(data)
+            if response_model is not None:
+                # Structured output: parse into Pydantic model
+                return self._parse_structured_response(
+                    data["choices"][0]["message"]["content"],
+                    response_model,
+                )
+            else:
+                # Standard mode: return PerplexityResponse
+                return self._parse_response(data)
         except (KeyError, ValueError) as e:
             raise PerplexityAPIError(f"Failed to parse API response: {e}") from e
 
@@ -207,6 +287,42 @@ class PerplexityClient:
             citations=citations,
             usage=data.get("usage", {}),
         )
+
+    def _parse_structured_response(
+        self,
+        content: str,
+        response_model: type[T],
+    ) -> T:
+        """
+        Parse structured JSON response into Pydantic model.
+
+        Args:
+            content: JSON string from API response
+            response_model: Pydantic model class to parse into
+
+        Returns:
+            Instance of response_model
+
+        Raises:
+            PerplexityAPIError: If JSON parsing or Pydantic validation fails
+
+        """
+        import json
+
+        try:
+            # Parse JSON string
+            data = json.loads(content)
+            # Validate and construct Pydantic model
+            return response_model(**data)
+        except json.JSONDecodeError as e:
+            raise PerplexityAPIError(
+                f"Failed to decode JSON from structured output: {e}\n"
+                f"Content: {content[:200]}..."
+            ) from e
+        except Exception as e:
+            raise PerplexityAPIError(
+                f"Failed to validate structured output against {response_model.__name__}: {e}"
+            ) from e
 
     def query_batch(
         self,
