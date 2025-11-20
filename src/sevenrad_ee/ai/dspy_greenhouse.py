@@ -510,12 +510,13 @@ class GreenhouseClassificationWithContext(Signature):  # type: ignore[misc]
         )
     )
 
-    # Output fields (simplified structure for reliable schema generation)
-    is_greenhouse: bool = dspy.OutputField(
+    # Output fields (using str types to disable DSPy's automatic JSON schema mode)
+    # This prevents JSONAdapter from sending response_format that Perplexity rejects
+    is_greenhouse: str = dspy.OutputField(
         desc=(
             "Is this an actual greenhouse facility? "
-            "Must be true or false. "
-            "False for auction houses (bloemenveiling), seed companies, "
+            "Must be 'true' or 'false' (as a string). "
+            "Use 'false' for auction houses (bloemenveiling), seed companies, "
             "transport companies, caravan storage, etc."
         )
     )
@@ -537,10 +538,10 @@ class GreenhouseClassificationWithContext(Signature):  # type: ignore[misc]
             "4. If still unclear → UNKNOWN"
         )
     )
-    confidence: float = dspy.OutputField(
+    confidence: str = dspy.OutputField(
         desc=(
             "Overall confidence score for the is_greenhouse classification, "
-            "from 0.0 (no confidence) to 1.0 (complete confidence). "
+            "as a decimal string from 0.0 to 1.0 (e.g., '0.85'). "
             "Direct facility evidence = highest confidence. "
             "WUR research support = medium-high confidence. "
             "No evidence = low confidence."
@@ -576,10 +577,12 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
 
     Example:
         >>> from sevenrad_ee.ai.retrievers import CachedRetriever
+        >>> from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
         >>> import dspy
         >>>
-        >>> # Configure LM
-        >>> dspy.configure(lm=dspy.LM('perplexity/sonar'))
+        >>> # Configure LM (use PerplexityLM for native structured outputs)
+        >>> lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online")
+        >>> dspy.configure(lm=lm)
         >>>
         >>> # Create detector with cached retriever
         >>> cache_dir = Path("data/research")
@@ -606,7 +609,8 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
         """
         super().__init__()
         self.retriever = retriever
-        # Use new context-aware signature
+        # Use ChainOfThought - DSPy 3.x will use JSON adapter for structured output
+        # The signature has proper type hints which triggers JSON mode automatically
         self.predictor = dspy.ChainOfThought(GreenhouseClassificationWithContext)
 
     def forward(
@@ -723,7 +727,10 @@ def analyze_greenhouse(
 
     Example:
         >>> import dspy
-        >>> lm = dspy.LM('perplexity/sonar', api_key='...')
+        >>> from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
+        >>>
+        >>> # Use PerplexityLM for native structured outputs (bypasses LiteLLM)
+        >>> lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online")
         >>> dspy.configure(lm=lm)
         >>>
         >>> result = analyze_greenhouse(

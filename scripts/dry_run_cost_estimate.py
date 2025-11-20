@@ -62,6 +62,10 @@ class CostTracker:
         self.total_output_tokens = 0
         self.call_log: list[dict[str, Any]] = []
 
+    def __getattr__(self, name: str) -> Any:  # noqa: ANN401
+        """Delegate attribute access to underlying LM."""
+        return getattr(self.lm, name)
+
     def __call__(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """
         Execute LM call and track costs.
@@ -191,8 +195,6 @@ def load_greenhouse_data(cache_dir: Path) -> list[dspy.Example]:
 
 def run_dry_run(
     cache_dir: Path,
-    dry_run_generations: int = 2,
-    dry_run_population: int = 2,
     dry_run_samples: int = 10,
 ) -> dict[str, Any]:
     """
@@ -200,8 +202,6 @@ def run_dry_run(
 
     Args:
         cache_dir: Directory with cached research data
-        dry_run_generations: Number of generations for dry run
-        dry_run_population: Population size for dry run
         dry_run_samples: Number of training samples to use
 
     Returns:
@@ -239,7 +239,14 @@ def run_dry_run(
     cached_retriever = CachedRetriever(cache_dir=cache_dir)
     detector = GreenhouseDetector(retriever=cached_retriever)
 
-    # Configure teacher model with cost tracking
+    # Configure student model (Perplexity Sonar) for predictions
+    student_lm = dspy.LM(
+        "perplexity/llama-3.1-sonar-large-128k-chat",
+        temperature=0,
+    )
+    dspy.configure(lm=student_lm)
+
+    # Configure teacher model with cost tracking for GEPA feedback
     teacher_lm = dspy.LM("gemini/gemini-2.5-pro", temperature=0)
     cost_tracker = CostTracker(teacher_lm)
 
@@ -248,7 +255,7 @@ def run_dry_run(
 
     optimizer = GEPA(
         metric=gepa_compatible_metric,
-        auto='light',  # Lightest preset for dry run
+        auto="light",  # Use 'light' preset for fast, minimal dry run
         reflection_lm=cost_tracker,  # Teacher model for feedback-based optimization
         seed=SEED,
     )
@@ -264,34 +271,36 @@ def run_dry_run(
         logger.warning(f"Dry run failed: {e}")
         console.print(f"[red]Dry run failed: {e}[/red]")
 
-    # Calculate cost estimates
+    # --- Cost Extrapolation ---
     dry_run_cost = cost_tracker.estimate_cost()
 
-    # Extrapolate to full run
-    # auto='light' -> auto='medium' is roughly 3-4x more exploration
-    # small dataset (10) -> full dataset (65) is 6.5x more examples
+    # The full run will use 'auto=medium', which is 2x the work of 'auto=light'.
+    WORK_SCALE_FACTOR = 2.0
+
+    # The full run uses the entire dataset, so costs scale with data size.
     full_dataset_size = len(all_data)
-    dataset_scale = full_dataset_size / dry_run_samples
+    if dry_run_samples > 0:
+        DATA_SCALE_FACTOR = full_dataset_size / dry_run_samples
+    else:
+        DATA_SCALE_FACTOR = 1.0
 
-    # auto='medium' does roughly 3x more work than auto='light'
-    auto_scale = 3.0
-
-    # Conservative estimate (assumes linear scaling)
-    estimated_full_cost = dry_run_cost * dataset_scale * auto_scale
-
-    # Non-linear adjustment (optimization becomes more efficient over time)
-    # Reduce estimate by 30% to account for caching and convergence
-    adjusted_estimate = estimated_full_cost * 0.7
+    # Estimate full cost based on scaling factors.
+    # Note: This only tracks reflection_lm costs. The true cost, including
+    # evaluation calls, will be higher. This is a lower-bound estimate.
+    estimated_full_cost = dry_run_cost * WORK_SCALE_FACTOR * DATA_SCALE_FACTOR
+    estimated_calls = int(
+        cost_tracker.api_calls * WORK_SCALE_FACTOR * DATA_SCALE_FACTOR
+    )
 
     return {
         "dry_run_cost": dry_run_cost,
         "dry_run_calls": cost_tracker.api_calls,
         "dry_run_input_tokens": cost_tracker.total_input_tokens,
         "dry_run_output_tokens": cost_tracker.total_output_tokens,
-        "estimated_full_cost": adjusted_estimate,
-        "estimated_calls": int(cost_tracker.api_calls * dataset_scale * auto_scale * 0.7),
+        "estimated_full_cost": estimated_full_cost,
+        "estimated_calls": estimated_calls,
         "budget_target": 25.0,
-        "within_budget": adjusted_estimate <= 25.0,
+        "within_budget": estimated_full_cost <= 25.0,
         "call_log": cost_tracker.call_log,
     }
 
@@ -317,7 +326,7 @@ def display_results(results: dict[str, Any]) -> None:
     console.print(table)
 
     # Full run estimate table
-    table2 = Table(title="Full Run Estimate", show_header=True, header_style="bold cyan")
+    table2 = Table(title="Full Run Estimate (Lower Bound)", show_header=True, header_style="bold cyan")
     table2.add_column("Metric", style="cyan")
     table2.add_column("Value", justify="right")
 
@@ -330,20 +339,22 @@ def display_results(results: dict[str, Any]) -> None:
     table2.add_row("Status", f"[{status_color}]{status}[/{status_color}]")
 
     console.print(table2)
+    console.print("[italic yellow]Note: Cost estimate is a lower bound as it only tracks the reflection LM.[/italic yellow]")
+
 
     # Recommendations
     if not results["within_budget"]:
         console.print(
             "\n[yellow]⚠️  Estimated cost exceeds budget![/yellow]\n"
             "[bold]Recommended adjustments:[/bold]\n"
-            "1. Use auto='light' instead of auto='medium'\n"
-            "2. Set max_metric_calls to limit total evaluations\n"
-            "3. Consider using a cheaper reflection_lm model\n"
+            "1. For the full run, consider staying with auto='light'.\n"
+            "2. Explicitly set max_metric_calls to a lower value to cap evaluations.\n"
+            "3. Consider using a cheaper reflection_lm model.\n"
         )
     else:
         console.print(
             "\n[green]✓ Estimated cost is within budget![/green]\n"
-            "[bold]Proceed with full optimization run.[/bold]"
+            "[bold]Proceed with full optimization run using auto='medium'.[/bold]"
         )
 
 
@@ -363,12 +374,10 @@ Examples:
   # Run dry run with defaults
   uv run python scripts/dry_run_cost_estimate.py --cache-dir data/research
 
-  # Run with custom parameters
+  # Run with a larger sample size for a more accurate estimate
   uv run python scripts/dry_run_cost_estimate.py \\
     --cache-dir data/research \\
-    --generations 3 \\
-    --population 3 \\
-    --samples 15 \\
+    --samples 20 \\
     --output results/dry_run_report.json
         """,
     )
@@ -381,24 +390,10 @@ Examples:
     )
 
     parser.add_argument(
-        "--generations",
-        type=int,
-        default=2,
-        help="Number of generations for dry run (default: 2)",
-    )
-
-    parser.add_argument(
-        "--population",
-        type=int,
-        default=2,
-        help="Population size for dry run (default: 2)",
-    )
-
-    parser.add_argument(
         "--samples",
         type=int,
         default=10,
-        help="Number of training samples to use (default: 10)",
+        help="Number of training samples to use for the dry run (default: 10)",
     )
 
     parser.add_argument(
@@ -445,8 +440,6 @@ def main() -> int:
     try:
         results = run_dry_run(
             cache_dir=args.cache_dir,
-            dry_run_generations=args.generations,
-            dry_run_population=args.population,
             dry_run_samples=args.samples,
         )
     except Exception as e:

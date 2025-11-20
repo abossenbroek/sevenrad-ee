@@ -324,6 +324,100 @@ class PerplexityClient:
                 f"Failed to validate structured output against {response_model.__name__}: {e}"
             ) from e
 
+    def chat_completion(
+        self,
+        query: str | None = None,
+        messages: list[dict[str, str]] | None = None,
+        model: str | None = None,
+        response_format: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """
+        Perform chat completion with Perplexity API (DSPy-compatible).
+
+        This is a lower-level method intended for DSPy integration. Unlike `query()`,
+        it does NOT use caching and returns the raw API response dictionary.
+
+        Args:
+            query: Single query string (for backward compatibility)
+            messages: OpenAI-compatible messages list (preferred for DSPy)
+            model: Model name override (defaults to config default)
+            response_format: Structured output schema (Perplexity native format)
+            **kwargs: Additional API parameters (temperature, max_tokens, etc.)
+
+        Returns:
+            Raw API response dictionary with structure:
+            {
+                "id": "...",
+                "model": "...",
+                "choices": [{"message": {"content": "..."}}],
+                "usage": {...},
+                "citations": [...]
+            }
+
+        Raises:
+            ValueError: If both query and messages provided, or neither
+            PerplexityAPIError: If API request fails
+
+        Example:
+            >>> client = PerplexityClient()
+            >>> # Using query parameter
+            >>> response = client.chat_completion(query="What is Python?")
+            >>> print(response["choices"][0]["message"]["content"])
+            >>>
+            >>> # Using messages parameter (DSPy style)
+            >>> messages = [{"role": "user", "content": "What is Python?"}]
+            >>> response = client.chat_completion(messages=messages)
+            >>>
+            >>> # With structured output
+            >>> schema = {"type": "object", "properties": {"answer": {"type": "string"}}}
+            >>> response = client.chat_completion(
+            ...     query="What is Python?",
+            ...     response_format={"type": "json_schema", "json_schema": {"schema": schema}}
+            ... )
+
+        """
+        # Validation: ensure exactly one of query or messages is provided
+        if query is not None and messages is not None:
+            raise ValueError("Provide either 'query' or 'messages', not both")
+        if query is None and messages is None:
+            raise ValueError("Must provide either 'query' or 'messages'")
+
+        # Convert query to messages format if needed
+        if query is not None:
+            messages = [{"role": "user", "content": query}]
+
+        # Build request payload
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        payload: dict[str, Any] = {
+            "model": model or "llama-3.1-sonar-large-128k-online",
+            "messages": messages,
+            **kwargs,  # Include any additional parameters
+        }
+
+        # Add response_format if provided
+        if response_format is not None:
+            payload["response_format"] = response_format
+
+        # Execute API request
+        try:
+            response = requests.post(
+                self.api_url,
+                json=payload,
+                headers=headers,
+                timeout=60,
+            )
+            response.raise_for_status()
+            data: dict[str, Any] = response.json()
+            return data
+
+        except requests.exceptions.RequestException as e:
+            raise PerplexityAPIError(f"API request failed: {e}") from e
+
     def query_batch(
         self,
         queries: list[str],

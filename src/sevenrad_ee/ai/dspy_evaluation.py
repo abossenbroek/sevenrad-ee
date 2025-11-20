@@ -353,6 +353,16 @@ def dutch_aware_hierarchical_f1(  # noqa: C901, PLR0912, PLR0915
     """
     del trace  # Unused parameter
 
+    # Defensive check: Verify prediction has required fields
+    if not hasattr(prediction, "is_greenhouse") or not hasattr(prediction, "uses_growlight"):
+        error_msg = (
+            "FATAL: Prediction object missing required fields "
+            f"(has is_greenhouse: {hasattr(prediction, 'is_greenhouse')}, "
+            f"has uses_growlight: {hasattr(prediction, 'uses_growlight')})"
+        )
+        logger.error(error_msg)
+        return 0.0, error_msg
+
     feedback_parts = []
 
     # Component 1: Hierarchical Classification (70% weight)
@@ -372,7 +382,22 @@ def dutch_aware_hierarchical_f1(  # noqa: C901, PLR0912, PLR0915
         return 0.0, "FATAL: Prediction missing uses_growlight field"
 
     # Extract ground truth (normalize to uppercase strings)
-    true_is_greenhouse = str(example.is_greenhouse).strip().upper()
+    # Note: is_greenhouse can be boolean (True/False) or string ("true"/"false")
+    true_is_greenhouse_raw = str(example.is_greenhouse).strip().upper()
+    # Normalize TRUE/FALSE to consistent format
+    if true_is_greenhouse_raw in ("TRUE", "YES", "1"):
+        true_is_greenhouse = "TRUE"
+    elif true_is_greenhouse_raw in ("FALSE", "NO", "0"):
+        true_is_greenhouse = "FALSE"
+    else:
+        true_is_greenhouse = true_is_greenhouse_raw
+
+    # Normalize prediction similarly
+    if pred_is_greenhouse in ("TRUE", "YES", "1"):
+        pred_is_greenhouse = "TRUE"
+    elif pred_is_greenhouse in ("FALSE", "NO", "0"):
+        pred_is_greenhouse = "FALSE"
+
     true_uses_growlight = str(example.uses_growlight).strip().upper()
 
     # Greenhouse classification
@@ -385,8 +410,8 @@ def dutch_aware_hierarchical_f1(  # noqa: C901, PLR0912, PLR0915
             f"expected {true_is_greenhouse}"
         )
 
-    # Growlight classification (only if greenhouse=YES in ground truth)
-    if true_is_greenhouse == "YES":
+    # Growlight classification (only if greenhouse=TRUE in ground truth)
+    if true_is_greenhouse == "TRUE":
         gl_correct = pred_uses_growlight == true_uses_growlight
         gl_score = 1.0 if gl_correct else 0.0
 
