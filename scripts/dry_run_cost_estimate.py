@@ -1,8 +1,11 @@
 """
-Dry run cost estimation for GEPA optimization.
+Dry run cost estimation for GEPA optimization with PerplexityLM.
 
 This script runs a minimal GEPA optimization to estimate the total cost
 of the full Phase 3 optimization run before committing resources.
+
+Uses PerplexityLM for student model (native structured outputs) and
+Gemini for teacher model (GEPA reflection).
 
 Documentation Type: Script (Code to Run)
 Part of: Phase 3 - GEPA Optimization Strategy
@@ -32,6 +35,7 @@ from sklearn.model_selection import train_test_split
 
 from sevenrad_ee.ai.dspy_evaluation import gepa_compatible_metric
 from sevenrad_ee.ai.dspy_greenhouse import GreenhouseDetector
+from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
 from sevenrad_ee.ai.retrievers import CachedRetriever
 
 console = Console()
@@ -132,9 +136,12 @@ class CostTracker:
         """
         Estimate total cost based on token counts.
 
-        Default pricing is for Gemini 2.5 Pro:
+        Default pricing is for Gemini 2.5 Pro (teacher/reflection model):
         - Input: $0.0025 per 1K tokens
         - Output: $0.01 per 1K tokens
+
+        Note: This only tracks the teacher model (reflection_lm) costs.
+        Student model (PerplexityLM) costs are not included.
 
         Args:
             input_price_per_1k: Price per 1000 input tokens
@@ -240,8 +247,9 @@ def run_dry_run(
     detector = GreenhouseDetector(retriever=cached_retriever)
 
     # Configure student model (Perplexity Sonar) for predictions
-    student_lm = dspy.LM(
-        "perplexity/llama-3.1-sonar-large-128k-chat",
+    # Using PerplexityLM for native structured outputs (bypasses LiteLLM)
+    student_lm = PerplexityLM(
+        model="llama-3.1-sonar-large-128k-chat",
         temperature=0,
     )
     dspy.configure(lm=student_lm)
@@ -339,7 +347,12 @@ def display_results(results: dict[str, Any]) -> None:
     table2.add_row("Status", f"[{status_color}]{status}[/{status_color}]")
 
     console.print(table2)
-    console.print("[italic yellow]Note: Cost estimate is a lower bound as it only tracks the reflection LM.[/italic yellow]")
+    console.print(
+        "\n[italic yellow]Note: Cost estimate is a lower bound as it only tracks "
+        "the teacher model (Gemini).[/italic yellow]\n"
+        "[italic yellow]Student model (PerplexityLM) costs are not included "
+        "in this estimate.[/italic yellow]"
+    )
 
 
     # Recommendations
@@ -417,7 +430,8 @@ def main() -> int:
     console.print(
         Panel.fit(
             "[bold cyan]GEPA Optimization - Dry Run Cost Estimation[/bold cyan]\n"
-            "Estimate costs before running full Phase 3 optimization",
+            "Estimate costs before running full Phase 3 optimization\n"
+            "[dim]Student: PerplexityLM | Teacher: Gemini 2.5 Pro[/dim]",
             border_style="cyan",
         )
     )
