@@ -78,7 +78,8 @@ class PerplexityLM(dspy.LM):  # type: ignore[misc]
         Args:
             model: Perplexity model name (default: llama-3.1-sonar-large-128k-online)
             api_key: API key (reads from PERPLEXITY_API_KEY env var if not provided)
-            **kwargs: Additional parameters passed to PerplexityClient
+            **kwargs: Additional model parameters (temperature, max_tokens, etc.)
+                     stored and passed to API calls
 
         Raises:
             ValueError: If API key not found in environment
@@ -86,7 +87,9 @@ class PerplexityLM(dspy.LM):  # type: ignore[misc]
         """
         super().__init__(model=model)
         self.model_name = model
-        self.client = PerplexityClient(api_key=api_key, **kwargs)
+        self.client = PerplexityClient(api_key=api_key)
+        # Store model parameters to pass during API calls
+        self.default_kwargs = kwargs
 
     def __call__(
         self,
@@ -132,12 +135,15 @@ class PerplexityLM(dspy.LM):  # type: ignore[misc]
             # Convert prompt to messages format (backward compat / direct usage)
             messages = self._prompt_to_messages(prompt)  # type: ignore[arg-type]
 
+        # Merge default kwargs with call-time kwargs (call-time takes precedence)
+        api_kwargs = {**self.default_kwargs, **kwargs}
+
         # Call Perplexity API with native structured outputs
         response = self.client.chat_completion(
             messages=messages,
             model=self.model_name,
             response_format=response_format,
-            **kwargs,
+            **api_kwargs,
         )
 
         # Convert to DSPy format
