@@ -441,7 +441,7 @@ class PerplexityClient:
         # Build request payload
         assert self.api_key is not None, "API key should be validated in __init__"
         headers = {
-            "Authorization": f"Bearer {self.api_key[:10]}...[REDACTED]",
+            "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
 
