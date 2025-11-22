@@ -9,6 +9,9 @@ This module provides a production-ready client for the Perplexity Sonar API with
 - Native structured output support via response_format parameter (Pydantic)
 """
 
+import contextvars
+import json
+import logging
 import os
 import time
 from typing import Any, TypeVar, overload
@@ -32,12 +35,41 @@ T = TypeVar("T", bound=BaseModel)
 load_dotenv()
 
 console = Console()
+logger = logging.getLogger(__name__)
+
+# Context variables for request tracking (defined in logging_setup)
+request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
+    "request_id", default="N/A"
+)
+phase_var: contextvars.ContextVar[str] = contextvars.ContextVar(
+    "phase", default="setup"
+)
 
 
 class PerplexityAPIError(Exception):
-    """Exception raised for Perplexity API errors."""
+    """Exception raised for Perplexity API errors with context."""
 
-    pass
+    def __init__(
+        self,
+        message: str,
+        request_payload: dict[str, Any] | None = None,
+        response_body: str | None = None,
+        status_code: int | None = None,
+    ) -> None:
+        """
+        Initialize API error with context.
+
+        Args:
+            message: Error message
+            request_payload: Request payload sent to API
+            response_body: Response body from API
+            status_code: HTTP status code
+
+        """
+        super().__init__(message)
+        self.request_payload = request_payload
+        self.response_body = response_body
+        self.status_code = status_code
 
 
 class PerplexityClient:
@@ -152,7 +184,9 @@ class PerplexityClient:
                 )
                 # If using structured output, parse cached response into model
                 if response_model is not None:
-                    return self._parse_structured_response(cached.content, response_model)
+                    return self._parse_structured_response(
+                        cached.content, response_model
+                    )
                 return cached
 
         # Execute API call
@@ -377,19 +411,37 @@ class PerplexityClient:
             ... )
 
         """
+        request_id = request_id_var.get()
+
+        logger.debug(
+            f"chat_completion() called with query={query is not None}, "
+            f"messages={messages is not None}, "
+            f"response_format={response_format is not None}"
+        )
+
         # Validation: ensure exactly one of query or messages is provided
         if query is not None and messages is not None:
+            logger.error("Both query and messages provided")
             raise ValueError("Provide either 'query' or 'messages', not both")
         if query is None and messages is None:
+            logger.error("Neither query nor messages provided")
             raise ValueError("Must provide either 'query' or 'messages'")
 
         # Convert query to messages format if needed
         if query is not None:
+            logger.debug(
+                f"Converting query to messages (query length: {len(query)} chars)"
+            )
             messages = [{"role": "user", "content": query}]
 
+        # Type narrowing: messages is guaranteed to be non-None here
+        assert messages is not None, "messages should be set by now"
+        logger.debug(f"Messages to API: {len(messages)} message(s)")
+
         # Build request payload
+        assert self.api_key is not None, "API key should be validated in __init__"
         headers = {
-            "Authorization": f"Bearer {self.api_key}",
+            "Authorization": f"Bearer {self.api_key[:10]}...[REDACTED]",
             "Content-Type": "application/json",
         }
 
@@ -399,11 +451,34 @@ class PerplexityClient:
             **kwargs,  # Include any additional parameters
         }
 
+        logger.debug(f"Payload parameters: {list(payload.keys())}")
+
         # Add response_format if provided
         if response_format is not None:
+            logger.debug("response_format provided:")
+            logger.debug(f"  Type: {response_format.get('type', 'N/A')}")
+
+            if "json_schema" in response_format:
+                schema = response_format["json_schema"].get("schema", {})
+                logger.debug(
+                    f"  Schema name: {response_format['json_schema'].get('name', 'N/A')}"
+                )
+                logger.debug(
+                    f"  Schema properties: {list(schema.get('properties', {}).keys())}"
+                )
+                logger.debug(f"  Schema required: {schema.get('required', [])}")
+
             payload["response_format"] = response_format
 
+        # Log the complete final payload
+        payload_json = json.dumps(payload, indent=2)
+        logger.debug(f"FINAL API REQUEST PAYLOAD ({len(payload_json)} bytes):")
+        logger.debug(payload_json)
+
         # Execute API request
+        logger.info(f"Making API request to {self.api_url}")
+        start_time = time.time()
+
         try:
             response = requests.post(
                 self.api_url,
@@ -411,11 +486,63 @@ class PerplexityClient:
                 headers=headers,
                 timeout=60,
             )
+
+            duration = time.time() - start_time
+
+            logger.info(
+                f"Response received in {duration:.2f}s (status: {response.status_code})"
+            )
+
             response.raise_for_status()
+
             data: dict[str, Any] = response.json()
+            logger.debug(f"Response keys: {list(data.keys())}")
+
+            if "usage" in data:
+                usage = data["usage"]
+                logger.debug(
+                    f"Token usage: "
+                    f"prompt={usage.get('prompt_tokens', 'N/A')}, "
+                    f"completion={usage.get('completion_tokens', 'N/A')}, "
+                    f"total={usage.get('total_tokens', 'N/A')}"
+                )
+
+            logger.info("API request successful")
             return data
 
+        except requests.exceptions.HTTPError as e:
+            duration = time.time() - start_time
+
+            logger.error(
+                f"API REQUEST FAILED (HTTP {e.response.status_code}) after {duration:.2f}s"
+            )
+
+            error_body = e.response.text
+            logger.error(f"Response body (raw): {error_body}")
+
+            # Try to parse as JSON for readability
+            try:
+                error_json = json.loads(error_body)
+                logger.error(
+                    f"Response body (parsed): {json.dumps(error_json, indent=2)}"
+                )
+            except json.JSONDecodeError:
+                pass
+
+            logger.error(f"Response headers: {dict(e.response.headers)}")
+
+            raise PerplexityAPIError(
+                f"API request failed: {e}",
+                request_payload=payload,
+                response_body=error_body,
+                status_code=e.response.status_code,
+            ) from e
+
         except requests.exceptions.RequestException as e:
+            duration = time.time() - start_time
+            logger.error(f"REQUEST EXCEPTION after {duration:.2f}s: {type(e).__name__}")
+            logger.exception("Network error details:")
+
             raise PerplexityAPIError(f"API request failed: {e}") from e
 
     def query_batch(

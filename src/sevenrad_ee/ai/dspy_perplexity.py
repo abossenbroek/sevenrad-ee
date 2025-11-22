@@ -18,11 +18,24 @@ Key Design Principles:
     - No LiteLLM dependency for structured outputs
 """
 
+import contextvars
+import json
+import logging
 from typing import Any
 
 import dspy
 
 from sevenrad_ee.ai.perplexity_client import PerplexityClient
+
+logger = logging.getLogger(__name__)
+
+# Context variables for request tracking
+request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
+    "request_id", default="N/A"
+)
+phase_var: contextvars.ContextVar[str] = contextvars.ContextVar(
+    "phase", default="setup"
+)
 
 
 class PerplexityLM(dspy.LM):  # type: ignore[misc]
@@ -127,27 +140,66 @@ class PerplexityLM(dspy.LM):  # type: ignore[misc]
             ValueError: If neither prompt nor messages provided
 
         """
+        request_id = request_id_var.get()
+
+        logger.debug("PerplexityLM.__call__() invoked")
+        logger.debug(
+            f"Input: prompt={'present' if prompt is not None else 'None'}, "
+            f"messages={'present' if messages is not None else 'None'}"
+        )
+
         # Handle both calling patterns
         if messages is None and prompt is None:
+            logger.error("Neither prompt nor messages provided")
             raise ValueError("Must provide either prompt or messages")
 
         if messages is None:
             # Convert prompt to messages format (backward compat / direct usage)
+            logger.debug(
+                f"Converting prompt to messages (prompt length: {len(prompt) if prompt else 0} chars)"
+            )
             messages = self._prompt_to_messages(prompt)  # type: ignore[arg-type]
+            logger.debug(f"Converted to {len(messages)} message(s)")
 
         # Merge default kwargs with call-time kwargs (call-time takes precedence)
         api_kwargs = {**self.default_kwargs, **kwargs}
+        logger.debug(f"API kwargs keys: {list(api_kwargs.keys())}")
+
+        # Log response_format if provided
+        if response_format is not None:
+            logger.debug("response_format provided:")
+            response_format_preview = json.dumps(response_format, indent=2)[:500]
+            logger.debug(f"  Preview: {response_format_preview}")
+            if "json_schema" in response_format:
+                schema = response_format["json_schema"].get("schema", {})
+                logger.debug(
+                    f"  Schema properties: {list(schema.get('properties', {}).keys())}"
+                )
+                logger.debug(f"  Schema required fields: {schema.get('required', [])}")
 
         # Call Perplexity API with native structured outputs
-        response = self.client.chat_completion(
-            messages=messages,
-            model=self.model_name,
-            response_format=response_format,
-            **api_kwargs,
-        )
+        logger.info("Calling PerplexityClient.chat_completion()...")
+        try:
+            response = self.client.chat_completion(
+                messages=messages,
+                model=self.model_name,
+                response_format=response_format,
+                **api_kwargs,
+            )
+            logger.info("PerplexityClient.chat_completion() successful")
+            logger.debug(f"Response keys: {list(response.keys())}")
+        except Exception as e:
+            logger.error("PerplexityClient.chat_completion() FAILED")
+            logger.error(f"Error type: {type(e).__name__}")
+            logger.exception("Exception details:")
+            raise
 
         # Convert to DSPy format
-        return self._format_response(response)
+        logger.debug("Converting response to DSPy format")
+        dspy_response = self._format_response(response)
+        logger.debug(f"DSPy response: {len(dspy_response)} item(s)")
+
+        return dspy_response
 
     def _prompt_to_messages(self, prompt: str) -> list[dict[str, str]]:
         """

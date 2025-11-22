@@ -8,6 +8,7 @@ terminology for enhanced accuracy, and uses WUR (Wageningen University)
 research as an authoritative tie-breaker for uncertain classifications.
 """
 
+import contextvars
 import logging
 from typing import TYPE_CHECKING, Literal
 
@@ -28,6 +29,13 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# Context variables for request tracking (defined in logging_setup)
+request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
+    "request_id", default="N/A"
+)
+phase_var: contextvars.ContextVar[str] = contextvars.ContextVar(
+    "phase", default="setup"
+)
 
 # Constants for Phase 2 validation
 HIGH_CONFIDENCE_THRESHOLD = 0.8  # Min confidence for tier-2 + Dutch terms
@@ -598,7 +606,7 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
 
     """
 
-    def __init__(self, retriever: "Retriever") -> None:  # noqa: F821
+    def __init__(self, retriever: "Retriever") -> None:
         """
         Initialize greenhouse detector with injected retriever.
 
@@ -632,34 +640,75 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
             dspy.Prediction with fields matching GreenhouseClassificationWithContext
 
         """
-        logger.info("Retrieving evidence for %s in %s", location_name, location_area)
+        request_id = request_id_var.get()
 
-        # Stage 1: Retrieve evidence
-        evidence_context = self.retriever(
-            company_name=location_name,
-            location=location_area,
+        logger.info("=" * 60)
+        logger.info("GreenhouseDetector.forward() called")
+        logger.info(f"  Location: '{location_name}' in '{location_area}'")
+        logger.debug(
+            f"  location_name type: {type(location_name)}, length: {len(location_name)}"
+        )
+        logger.debug(
+            f"  location_area type: {type(location_area)}, length: {len(location_area)}"
         )
 
-        logger.info(
-            "Classifying %s in %s with %d chars of evidence",
-            location_name,
-            location_area,
-            len(evidence_context),
+        # ===== STAGE 1: RETRIEVE EVIDENCE =====
+        logger.info("STAGE 1: Retrieving evidence...")
+        try:
+            evidence_context = self.retriever(  # type: ignore[operator]
+                company_name=location_name,
+                location=location_area,
+            )
+            logger.info(
+                f"Evidence retrieval successful ({len(evidence_context)} chars)"
+            )
+            logger.debug(
+                f"Evidence preview (first 300 chars): {evidence_context[:300]}"
+            )
+        except Exception as e:
+            logger.error("STAGE 1 FAILED: Evidence retrieval failed")
+            logger.error(f"Error type: {type(e).__name__}")
+            logger.exception("Retrieval error details:")
+            raise
+
+        # ===== STAGE 2: CLASSIFY WITH EVIDENCE =====
+        logger.info("STAGE 2: Classifying with retrieved evidence...")
+        logger.debug(
+            f"Calling predictor with {len(evidence_context)} chars of evidence"
         )
 
-        # Stage 2: Classify using retrieved evidence
-        prediction = self.predictor(
-            location_name=location_name,
-            location_area=location_area,
-            evidence_context=evidence_context,
-        )
+        try:
+            prediction = self.predictor(
+                location_name=location_name,
+                location_area=location_area,
+                evidence_context=evidence_context,
+            )
+            logger.info("Classification successful")
+            logger.info(
+                f"  Result: is_greenhouse={prediction.is_greenhouse}, "
+                f"uses_growlight={prediction.uses_growlight}, "
+                f"confidence={prediction.confidence}"
+            )
+            logger.debug(f"  Prediction type: {type(prediction)}")
+            logger.debug(f"  Prediction fields: {list(prediction.__dict__.keys())}")
 
-        logger.info(
-            "Classification: is_greenhouse=%s, uses_growlight=%s, confidence=%.2f",
-            prediction.is_greenhouse,
-            prediction.uses_growlight,
-            prediction.confidence,
-        )
+            # Log reasoning preview
+            if hasattr(prediction, "reasoning"):
+                reasoning_preview = (
+                    prediction.reasoning[:200]
+                    if len(prediction.reasoning) > 200
+                    else prediction.reasoning
+                )
+                logger.debug(f"  Reasoning preview: {reasoning_preview}")
+
+        except Exception as e:
+            logger.error("STAGE 2 FAILED: Classification failed")
+            logger.error(f"Error type: {type(e).__name__}")
+            logger.exception("Classification error details:")
+            raise
+
+        logger.info("GreenhouseDetector.forward() completed successfully")
+        logger.info("=" * 60)
 
         return prediction
 
