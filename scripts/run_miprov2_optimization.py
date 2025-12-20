@@ -242,6 +242,7 @@ def run_optimization(
 
     optimizer = MIPROv2(
         metric=gepa_compatible_metric,
+        auto=None,  # Disable auto to use custom num_candidates
         num_candidates=num_candidates,
         init_temperature=init_temperature,
     )
@@ -255,10 +256,16 @@ def run_optimization(
         task = progress.add_task("Optimizing with MIPROv2...", total=None)
 
         try:
+            # num_trials ~ 2x num_candidates recommended by MIPROv2
+            num_trials = num_candidates * 2
+            # minibatch_size must be <= valset size
+            minibatch_size = min(10, len(val_data))
             optimized_detector = optimizer.compile(
                 detector,
                 trainset=train_data,
                 valset=val_data,
+                num_trials=num_trials,
+                minibatch_size=minibatch_size,
             )
             progress.update(task, completed=True)
             console.print("[green]✓[/green] Optimization completed successfully")

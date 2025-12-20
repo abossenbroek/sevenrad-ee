@@ -10,7 +10,17 @@ research as an authoritative tie-breaker for uncertain classifications.
 
 import contextvars
 import logging
+from enum import Enum
 from typing import TYPE_CHECKING, Literal
+
+
+class GrowlightUsage(str, Enum):
+    """Classification of growlight usage in greenhouses."""
+
+    YES = "YES"
+    NO = "NO"
+    UNKNOWN = "UNKNOWN"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
 
 try:
     import dspy
