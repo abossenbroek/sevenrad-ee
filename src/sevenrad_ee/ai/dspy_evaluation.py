@@ -14,6 +14,7 @@ from typing import Any
 
 try:
     import dspy
+    from dspy.teleprompt.gepa.gepa_utils import ScoreWithFeedback
 except ImportError as e:
     msg = "dspy-ai package is required. Install with: uv pip install -e '.[dev]'"
     raise ImportError(msg) from e
@@ -354,7 +355,9 @@ def dutch_aware_hierarchical_f1(  # noqa: C901, PLR0912, PLR0915
     del trace  # Unused parameter
 
     # Defensive check: Verify prediction has required fields
-    if not hasattr(prediction, "is_greenhouse") or not hasattr(prediction, "uses_growlight"):
+    if not hasattr(prediction, "is_greenhouse") or not hasattr(
+        prediction, "uses_growlight"
+    ):
         error_msg = (
             "FATAL: Prediction object missing required fields "
             f"(has is_greenhouse: {hasattr(prediction, 'is_greenhouse')}, "
@@ -584,21 +587,33 @@ def dutch_aware_hierarchical_f1(  # noqa: C901, PLR0912, PLR0915
     # Add confidence check
     pred_confidence = getattr(prediction, "confidence", None)
     if pred_confidence is not None:
-        tier2_count = sum(
-            1
-            for source in pred_evidence_sources
-            if (
-                source.get("tier")
-                if isinstance(source, dict)
-                else getattr(source, "tier", None)
-            )
-            in ["company_website", "supplier_case_study", "job_posting"]
-        )
+        # Convert confidence to float if it's a string
+        if isinstance(pred_confidence, str):
+            try:
+                pred_confidence = float(pred_confidence)
+            except (ValueError, TypeError):
+                # If conversion fails, skip confidence check
+                pred_confidence = None
 
-        if pred_confidence > HIGH_CONFIDENCE_THRESHOLD_FOR_WARNING and tier2_count == 0:
-            feedback += (
-                " | WARNING: High confidence without tier-2 evidence is unreliable"
+        if pred_confidence is not None:
+            tier2_count = sum(
+                1
+                for source in pred_evidence_sources
+                if (
+                    source.get("tier")
+                    if isinstance(source, dict)
+                    else getattr(source, "tier", None)
+                )
+                in ["company_website", "supplier_case_study", "job_posting"]
             )
+
+            if (
+                pred_confidence > HIGH_CONFIDENCE_THRESHOLD_FOR_WARNING
+                and tier2_count == 0
+            ):
+                feedback += (
+                    " | WARNING: High confidence without tier-2 evidence is unreliable"
+                )
 
     return total_score, feedback
 
@@ -641,12 +656,14 @@ def gepa_compatible_metric(
     trace: Any | None = None,  # noqa: ANN401
     pred_name: str | None = None,
     pred_trace: Any | None = None,  # noqa: ANN401
-) -> tuple[float, str]:
+) -> ScoreWithFeedback:
     """
     GEPA-compatible wrapper for dutch_aware_hierarchical_f1 metric.
 
-    GEPA requires metrics to accept 5 arguments: (gold, pred, trace, pred_name, pred_trace).
-    This wrapper adapts our 3-argument metric to the GEPA interface.
+    GEPA requires metrics to accept 5 arguments: (gold, pred, trace, pred_name, pred_trace)
+    and return either a float or ScoreWithFeedback object. This wrapper adapts our metric
+    to return ScoreWithFeedback for proper integration with GEPA's evaluation and reflection
+    mechanisms.
 
     Args:
         gold: Ground truth example
@@ -656,7 +673,7 @@ def gepa_compatible_metric(
         pred_trace: Trace of the predictor execution (unused)
 
     Returns:
-        Tuple of (score, feedback) for GEPA's reflection mechanism
+        ScoreWithFeedback object with score and feedback for GEPA's reflection mechanism
 
     Example:
         >>> from dspy.teleprompt import GEPA
@@ -670,4 +687,7 @@ def gepa_compatible_metric(
     """
     # Call our existing metric (ignores extra GEPA-specific arguments)
     score, feedback = dutch_aware_hierarchical_f1(gold, pred, trace)
-    return score, feedback
+
+    # Return ScoreWithFeedback object for GEPA compatibility
+    # This prevents TypeError when GEPA's parallelizer tries to sum scores
+    return ScoreWithFeedback(score=score, feedback=feedback)

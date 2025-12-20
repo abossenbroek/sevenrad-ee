@@ -546,10 +546,10 @@ class GreenhouseClassificationWithContext(Signature):  # type: ignore[misc]
             "4. If still unclear → UNKNOWN"
         )
     )
-    confidence: str = dspy.OutputField(
+    confidence: float = dspy.OutputField(
         desc=(
             "Overall confidence score for the is_greenhouse classification, "
-            "as a decimal string from 0.0 to 1.0 (e.g., '0.85'). "
+            "from 0.0 to 1.0 (e.g., 0.85). "
             "Direct facility evidence = highest confidence. "
             "WUR research support = medium-high confidence. "
             "No evidence = low confidence."
@@ -589,7 +589,7 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
         >>> import dspy
         >>>
         >>> # Configure LM (use PerplexityLM for native structured outputs)
-        >>> lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online")
+        >>> lm = PerplexityLM(model="sonar-pro")
         >>> dspy.configure(lm=lm)
         >>>
         >>> # Create detector with cached retriever
@@ -779,7 +779,7 @@ def analyze_greenhouse(
         >>> from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
         >>>
         >>> # Use PerplexityLM for native structured outputs (bypasses LiteLLM)
-        >>> lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online")
+        >>> lm = PerplexityLM(model="sonar-pro")
         >>> dspy.configure(lm=lm)
         >>>
         >>> result = analyze_greenhouse(

@@ -100,6 +100,18 @@ class PerplexityClient:
                 "Set it with: export PERPLEXITY_API_KEY='your-key'"
             )
 
+        # Log API key format for debugging (redacted)
+        key_prefix = self.api_key[:5] if len(self.api_key) >= 5 else "***"
+        key_suffix = self.api_key[-4:] if len(self.api_key) >= 4 else "***"
+        logger.debug(f"API key loaded: {key_prefix}...{key_suffix} (length: {len(self.api_key)})")
+
+        # Verify API key starts with expected prefix
+        if not self.api_key.startswith("pplx-"):
+            logger.warning(
+                f"API key does not start with 'pplx-' (starts with '{self.api_key[:5]}'). "
+                "This may indicate an invalid key format."
+            )
+
         self.cache_manager = cache_manager or CacheManager()
         self.rate_limit_delay = rate_limit_delay
         self.api_url = "https://api.perplexity.ai/chat/completions"
@@ -446,7 +458,7 @@ class PerplexityClient:
         }
 
         payload: dict[str, Any] = {
-            "model": model or "llama-3.1-sonar-large-128k-online",
+            "model": model or "sonar-pro",
             "messages": messages,
             **kwargs,  # Include any additional parameters
         }

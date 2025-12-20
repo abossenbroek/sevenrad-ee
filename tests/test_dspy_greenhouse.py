@@ -307,7 +307,7 @@ class TestPerplexityIntegration:
 
         # Configure Perplexity LM
         lm = dspy.LM(
-            "perplexity/llama-3.1-sonar-small-128k-online",
+            "perplexity/sonar-pro",
             api_key=perplexity_api_key,
         )
         dspy.configure(lm=lm)
@@ -349,7 +349,7 @@ class TestPerplexityIntegration:
         import dspy
 
         lm = dspy.LM(
-            "perplexity/llama-3.1-sonar-small-128k-online",
+            "perplexity/sonar-pro",
             api_key=perplexity_api_key,
         )
         dspy.configure(lm=lm)
@@ -381,7 +381,7 @@ class TestPerplexityIntegration:
         import dspy
 
         lm = dspy.LM(
-            "perplexity/llama-3.1-sonar-small-128k-online",
+            "perplexity/sonar-pro",
             api_key=perplexity_api_key,
         )
         dspy.configure(lm=lm)

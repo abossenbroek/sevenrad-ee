@@ -14,15 +14,23 @@ Part of: Phase 3 - GEPA Optimization Strategy
 import argparse
 import json
 import logging
+import os
 import random
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+from dotenv import load_dotenv
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from sklearn.model_selection import train_test_split
+
+from sevenrad_ee.ai.dspy_evaluation import gepa_compatible_metric
+from sevenrad_ee.ai.dspy_greenhouse import GreenhouseDetector
+from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
+from sevenrad_ee.ai.retrievers import CachedRetriever
 
 try:
     import dspy
@@ -31,12 +39,8 @@ except ImportError as e:
     msg = "dspy-ai package is required. Install with: uv pip install -e '.[dev]'"
     raise ImportError(msg) from e
 
-from sklearn.model_selection import train_test_split
-
-from sevenrad_ee.ai.dspy_evaluation import gepa_compatible_metric
-from sevenrad_ee.ai.dspy_greenhouse import GreenhouseDetector
-from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
-from sevenrad_ee.ai.retrievers import CachedRetriever
+# Load environment variables from .env file
+load_dotenv()
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -179,8 +183,23 @@ def load_greenhouse_data(cache_dir: Path) -> list[dspy.Example]:
             # Extract fields from JSON
             company_name = data.get("company", "")
             location = data.get("location", "")
-            is_greenhouse = data.get("is_greenhouse", False)
-            uses_growlight = data.get("uses_growlight", "UNKNOWN")
+
+            # Require ground truth labels (fail fast if missing)
+            if "is_greenhouse" not in data:
+                msg = (
+                    f"Missing 'is_greenhouse' label in {json_file.name}. "
+                    "Run scripts/label_training_data.py to add labels."
+                )
+                raise ValueError(msg)
+            if "uses_growlight" not in data:
+                msg = (
+                    f"Missing 'uses_growlight' label in {json_file.name}. "
+                    "Run scripts/label_training_data.py to add labels."
+                )
+                raise ValueError(msg)
+
+            is_greenhouse = data["is_greenhouse"]
+            uses_growlight = data["uses_growlight"]
 
             # Create dspy.Example (using parameter names that match GreenhouseDetector.forward())
             example = dspy.Example(
@@ -249,7 +268,7 @@ def run_dry_run(
     # Configure student model (Perplexity Sonar) for predictions
     # Using PerplexityLM for native structured outputs (bypasses LiteLLM)
     student_lm = PerplexityLM(
-        model="llama-3.1-sonar-large-128k-chat",
+        model="sonar-pro",
         temperature=0,
     )
     dspy.configure(lm=student_lm)
@@ -322,7 +341,9 @@ def display_results(results: dict[str, Any]) -> None:
 
     """
     # Dry run stats table
-    table = Table(title="Dry Run Statistics", show_header=True, header_style="bold cyan")
+    table = Table(
+        title="Dry Run Statistics", show_header=True, header_style="bold cyan"
+    )
     table.add_column("Metric", style="cyan")
     table.add_column("Value", justify="right")
 
@@ -334,7 +355,11 @@ def display_results(results: dict[str, Any]) -> None:
     console.print(table)
 
     # Full run estimate table
-    table2 = Table(title="Full Run Estimate (Lower Bound)", show_header=True, header_style="bold cyan")
+    table2 = Table(
+        title="Full Run Estimate (Lower Bound)",
+        show_header=True,
+        header_style="bold cyan",
+    )
     table2.add_column("Metric", style="cyan")
     table2.add_column("Value", justify="right")
 
@@ -353,7 +378,6 @@ def display_results(results: dict[str, Any]) -> None:
         "[italic yellow]Student model (PerplexityLM) costs are not included "
         "in this estimate.[/italic yellow]"
     )
-
 
     # Recommendations
     if not results["within_budget"]:

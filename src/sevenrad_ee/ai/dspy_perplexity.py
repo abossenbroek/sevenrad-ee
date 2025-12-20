@@ -54,7 +54,7 @@ class PerplexityLM(dspy.LM):  # type: ignore[misc]
         >>> import dspy
         >>>
         >>> # Initialize LM
-        >>> lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online")
+        >>> lm = PerplexityLM(model="sonar-pro")
         >>> dspy.configure(lm=lm)
         >>>
         >>> # Use with DSPy predictor
@@ -81,7 +81,7 @@ class PerplexityLM(dspy.LM):  # type: ignore[misc]
 
     def __init__(
         self,
-        model: str = "llama-3.1-sonar-large-128k-online",
+        model: str = "sonar-pro",
         api_key: str | None = None,
         **kwargs: Any,
     ):
@@ -89,7 +89,7 @@ class PerplexityLM(dspy.LM):  # type: ignore[misc]
         Initialize Perplexity LM for DSPy.
 
         Args:
-            model: Perplexity model name (default: llama-3.1-sonar-large-128k-online)
+            model: Perplexity model name (default: sonar-pro)
             api_key: API key (reads from PERPLEXITY_API_KEY env var if not provided)
             **kwargs: Additional model parameters (temperature, max_tokens, etc.)
                      stored and passed to API calls

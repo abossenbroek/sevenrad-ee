@@ -25,7 +25,7 @@ class TestPerplexityLMIntegration:
         # DSPy's JSONAdapter expects JSON string for structured output
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [{"message": {"content": '{"answer": "Paris"}'}}],
             "usage": {"total_tokens": 20},
             "citations": [],
@@ -33,7 +33,7 @@ class TestPerplexityLMIntegration:
         mock_post.return_value = mock_response
 
         # Create LM and configure DSPy
-        lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online", api_key="test-key")
+        lm = PerplexityLM(model="sonar-pro", api_key="test-key")
         dspy.configure(lm=lm)
 
         # Define simple signature
@@ -61,7 +61,7 @@ class TestPerplexityLMIntegration:
         # DSPy's JSONAdapter expects JSON string with all output fields
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [
                 {
                     "message": {
@@ -76,7 +76,7 @@ class TestPerplexityLMIntegration:
         mock_post.return_value = mock_response
 
         # Create LM and configure DSPy
-        lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online", api_key="test-key")
+        lm = PerplexityLM(model="sonar-pro", api_key="test-key")
         dspy.configure(lm=lm)
 
         # Define signature
@@ -102,7 +102,7 @@ class TestPerplexityLMIntegration:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [{"message": {"content": "Test response"}}],
             "usage": {"total_tokens": 10},
             "citations": [],
@@ -110,7 +110,7 @@ class TestPerplexityLMIntegration:
         mock_post.return_value = mock_response
 
         # Create LM and test direct call
-        lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online", api_key="test-key")
+        lm = PerplexityLM(model="sonar-pro", api_key="test-key")
         result = lm(prompt="What is 2+2?")
 
         # Verify result format
@@ -134,7 +134,7 @@ class TestPerplexityLMIntegration:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [
                 {"message": {"content": '{"answer": "Paris", "confidence": 0.95}'}}
             ],
@@ -144,7 +144,7 @@ class TestPerplexityLMIntegration:
         mock_post.return_value = mock_response
 
         # Create LM and test with response_format
-        lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online", api_key="test-key")
+        lm = PerplexityLM(model="sonar-pro", api_key="test-key")
         schema = {
             "type": "object",
             "properties": {
@@ -180,7 +180,7 @@ class TestPerplexityLMIntegration:
         # DSPy's JSONAdapter expects JSON string for structured output
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [{"message": {"content": '{"answer": "Test response"}'}}],
             "usage": {"total_tokens": 10},
             "citations": [],
@@ -188,7 +188,7 @@ class TestPerplexityLMIntegration:
         mock_post.return_value = mock_response
 
         # Create LM
-        lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online", api_key="test-key")
+        lm = PerplexityLM(model="sonar-pro", api_key="test-key")
         dspy.configure(lm=lm)
 
         # Define signature
@@ -219,7 +219,7 @@ class TestPerplexityLMIntegration:
         mock_post.side_effect = Exception("API Error")
 
         # Create LM and test
-        lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online", api_key="test-key")
+        lm = PerplexityLM(model="sonar-pro", api_key="test-key")
 
         # Verify exception is raised
         with pytest.raises(Exception, match="API Error"):
@@ -232,7 +232,7 @@ class TestPerplexityLMIntegration:
 
         # Mock environment variable
         with patch.dict(os.environ, {"PERPLEXITY_API_KEY": "env-key"}):
-            lm = PerplexityLM(model="llama-3.1-sonar-large-128k-online")
+            lm = PerplexityLM(model="sonar-pro")
             assert lm.client.api_key == "env-key"
 
     def test_api_key_required(self) -> None:
@@ -243,4 +243,4 @@ class TestPerplexityLMIntegration:
         # Mock empty environment
         with patch.dict(os.environ, {}, clear=True):
             with pytest.raises(ValueError, match="PERPLEXITY_API_KEY"):
-                PerplexityLM(model="llama-3.1-sonar-large-128k-online")
+                PerplexityLM(model="sonar-pro")

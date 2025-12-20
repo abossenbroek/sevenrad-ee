@@ -1,16 +1,15 @@
 """
-Run full Phase 3 GEPA optimization with PerplexityLM.
+Run full MIPROv2 optimization with PerplexityLM.
 
-This script runs the complete GEPA optimization using:
+This script runs the complete MIPROv2 optimization using:
 - Student Model: PerplexityLM (sonar-pro) with native structured outputs
-- Teacher Model: Gemini 2.5 Pro for reflection and feedback
-- Optimization: GEPA with auto='medium' for comprehensive optimization
+- Optimization: MIPROv2 with Bayesian optimization (no teacher model needed)
 
 Expected runtime: 1-3 hours depending on dataset size
-Expected cost: Based on dry run estimate (see dry_run_cost_estimate.py)
+Expected cost: Lower than GEPA as no teacher model is required
 
 Documentation Type: Script (Code to Run)
-Part of: Phase 3 - GEPA Optimization Strategy
+Part of: Phase 3 - MIPROv2 Optimization Strategy
 """
 
 import argparse
@@ -31,8 +30,6 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
-from sklearn.model_selection import train_test_split
-
 from sevenrad_ee.ai.dspy_evaluation import gepa_compatible_metric
 from sevenrad_ee.ai.dspy_greenhouse import GreenhouseDetector
 from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
@@ -43,10 +40,11 @@ from sevenrad_ee.ai.utils.logging_setup import (
     request_id_var,
     setup_logging,
 )
+from sklearn.model_selection import train_test_split
 
 try:
     import dspy
-    from dspy.teleprompt import GEPA
+    from dspy.teleprompt import MIPROv2
 except ImportError as e:
     msg = "dspy-ai package is required. Install with: uv pip install -e '.[dev]'"
     raise ImportError(msg) from e
@@ -55,7 +53,7 @@ except ImportError as e:
 load_dotenv()
 
 # Initialize logging FIRST (before creating any loggers)
-setup_logging(log_file="gepa_optimization_debug.log")
+setup_logging(log_file="miprov2_optimization_debug.log")
 
 console = Console()
 logger = get_logger(__name__)
@@ -145,15 +143,19 @@ def run_optimization(
     output_dir: Path,
     test_size: float = 0.2,
     val_size: float = 0.2,
+    num_candidates: int = 10,
+    init_temperature: float = 1.0,
 ) -> dict[str, Any]:
     """
-    Run full GEPA optimization with PerplexityLM.
+    Run full MIPROv2 optimization with PerplexityLM.
 
     Args:
         cache_dir: Directory with cached research data
         output_dir: Directory to save optimization results
         test_size: Proportion of data to use for final testing
         val_size: Proportion of training data to use for validation
+        num_candidates: Number of prompt candidates to generate per iteration
+        init_temperature: Initial temperature for Bayesian optimization
 
     Returns:
         Dictionary with optimization results and metrics
@@ -218,7 +220,7 @@ def run_optimization(
     detector = GreenhouseDetector(retriever=cached_retriever)
 
     # Configure student model (PerplexityLM) for predictions
-    console.print("\n[yellow]Configuring models...[/yellow]")
+    console.print("\n[yellow]Configuring model...[/yellow]")
     student_lm = PerplexityLM(
         model="sonar-pro",
         temperature=0,
@@ -226,27 +228,22 @@ def run_optimization(
     dspy.configure(lm=student_lm)
     console.print("[green]✓[/green] Student model: PerplexityLM (sonar-pro)")
 
-    # Configure teacher model (Gemini) for GEPA feedback
-    teacher_lm = dspy.LM("gemini/gemini-2.5-pro", temperature=0)
-    console.print("[green]✓[/green] Teacher model: Gemini 2.5 Pro")
-
     # ===== PHASE 1: OPTIMIZATION =====
     logger.info("=" * 80)
-    logger.info("STARTING PHASE 1: GEPA OPTIMIZATION")
+    logger.info("STARTING PHASE 1: MIPROv2 OPTIMIZATION")
     logger.info("=" * 80)
     phase_var.set("optimization")
     metrics["optimization"]["start_time"] = time.time()
 
-    # Configure GEPA
+    # Configure MIPROv2
     console.print(
-        "\n[yellow]Starting GEPA optimization (this may take 1-3 hours)...[/yellow]"
+        "\n[yellow]Starting MIPROv2 optimization (this may take 1-3 hours)...[/yellow]"
     )
 
-    optimizer = GEPA(
+    optimizer = MIPROv2(
         metric=gepa_compatible_metric,
-        auto="medium",  # Use 'medium' preset for production run
-        reflection_lm=teacher_lm,
-        seed=SEED,
+        num_candidates=num_candidates,
+        init_temperature=init_temperature,
     )
 
     # Run optimization
@@ -255,7 +252,7 @@ def run_optimization(
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
-        task = progress.add_task("Optimizing with GEPA...", total=None)
+        task = progress.add_task("Optimizing with MIPROv2...", total=None)
 
         try:
             optimized_detector = optimizer.compile(
@@ -449,6 +446,9 @@ def run_optimization(
         "num_train": len(train_data),
         "num_val": len(val_data),
         "num_test": len(test_data),
+        "optimizer": "MIPROv2",
+        "num_candidates": num_candidates,
+        "init_temperature": init_temperature,
     }
 
     return results
@@ -463,7 +463,7 @@ def display_results(results: dict[str, Any]) -> None:
 
     """
     table = Table(
-        title="Phase 3 GEPA Optimization Results",
+        title="MIPROv2 Optimization Results",
         show_header=True,
         header_style="bold cyan",
     )
@@ -474,6 +474,10 @@ def display_results(results: dict[str, Any]) -> None:
     table.add_row("Validation Examples", f"{results['num_val']:,}")
     table.add_row("Test Examples", f"{results['num_test']:,}")
     table.add_row("", "")  # Separator
+    table.add_row("Optimizer", results["optimizer"])
+    table.add_row("Num Candidates", str(results["num_candidates"]))
+    table.add_row("Init Temperature", str(results["init_temperature"]))
+    table.add_row("", "")  # Separator
     table.add_row("Test Score (avg)", f"{results['avg_test_score']:.3f}")
     table.add_row("Test Score (std)", f"{results['std_test_score']:.3f}")
     table.add_row("", "")  # Separator
@@ -482,7 +486,7 @@ def display_results(results: dict[str, Any]) -> None:
 
     console.print("\n")
     console.print(table)
-    console.print("\n[green]✓ Phase 3 optimization completed successfully![/green]")
+    console.print("\n[green]✓ MIPROv2 optimization completed successfully![/green]")
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -494,21 +498,23 @@ def parse_arguments() -> argparse.Namespace:
 
     """
     parser = argparse.ArgumentParser(
-        description="Run full Phase 3 GEPA optimization with PerplexityLM",
+        description="Run full MIPROv2 optimization with PerplexityLM",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Run with default settings
-  uv run python scripts/run_phase3_gepa_optimization.py \\
+  uv run python scripts/run_miprov2_optimization.py \\
     --cache-dir data/research \\
-    --output-dir results/phase3_optimization
+    --output-dir results/miprov2_optimization
 
-  # Custom train/test split
-  uv run python scripts/run_phase3_gepa_optimization.py \\
+  # Custom train/test split and MIPROv2 parameters
+  uv run python scripts/run_miprov2_optimization.py \\
     --cache-dir data/research \\
-    --output-dir results/phase3_optimization \\
+    --output-dir results/miprov2_optimization \\
     --test-size 0.3 \\
-    --val-size 0.25
+    --val-size 0.25 \\
+    --num-candidates 15 \\
+    --init-temperature 1.5
         """,
     )
 
@@ -540,12 +546,26 @@ Examples:
         help="Proportion of training data for validation (default: 0.2)",
     )
 
+    parser.add_argument(
+        "--num-candidates",
+        type=int,
+        default=10,
+        help="Number of prompt candidates per iteration (default: 10)",
+    )
+
+    parser.add_argument(
+        "--init-temperature",
+        type=float,
+        default=1.0,
+        help="Initial temperature for Bayesian optimization (default: 1.0)",
+    )
+
     return parser.parse_args()
 
 
 def main() -> int:
     """
-    Run Phase 3 GEPA optimization.
+    Run MIPROv2 optimization.
 
     Returns:
         Exit code (0 for success, 1 for failure)
@@ -554,9 +574,9 @@ def main() -> int:
     # Display header
     console.print(
         Panel.fit(
-            "[bold cyan]Phase 3 GEPA Optimization with PerplexityLM[/bold cyan]\n"
-            "Full optimization run using GEPA with auto='medium'\n"
-            "[dim]Student: PerplexityLM | Teacher: Gemini 2.5 Pro[/dim]",
+            "[bold cyan]MIPROv2 Optimization with PerplexityLM[/bold cyan]\n"
+            "Bayesian optimization using MIPROv2\n"
+            "[dim]Student: PerplexityLM (no teacher model required)[/dim]",
             border_style="cyan",
         )
     )
@@ -578,6 +598,8 @@ def main() -> int:
             output_dir=args.output_dir,
             test_size=args.test_size,
             val_size=args.val_size,
+            num_candidates=args.num_candidates,
+            init_temperature=args.init_temperature,
         )
     except Exception as e:
         console.print(f"[red]✗[/red] Optimization failed: {e}", style="bold red")

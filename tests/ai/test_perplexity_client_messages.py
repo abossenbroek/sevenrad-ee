@@ -26,7 +26,7 @@ class TestChatCompletionMessages:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [{"message": {"content": "Test response"}}],
             "usage": {"total_tokens": 10},
             "citations": [],
@@ -41,7 +41,7 @@ class TestChatCompletionMessages:
 
         # Verify result
         assert result["choices"][0]["message"]["content"] == "Test response"
-        assert result["model"] == "llama-3.1-sonar-large-128k-online"
+        assert result["model"] == "sonar-pro"
 
         # Verify API was called with messages
         call_args = mock_post.call_args
@@ -59,7 +59,7 @@ class TestChatCompletionMessages:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [{"message": {"content": "Test response"}}],
             "usage": {"total_tokens": 10},
             "citations": [],
@@ -105,7 +105,7 @@ class TestChatCompletionMessages:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [{"message": {"content": '{"answer": "Test"}'}}],
             "usage": {"total_tokens": 10},
             "citations": [],
@@ -143,7 +143,7 @@ class TestChatCompletionMessages:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "sonar-pro",
             "choices": [{"message": {"content": "Test"}}],
             "usage": {"total_tokens": 10},
             "citations": [],
@@ -189,7 +189,7 @@ class TestChatCompletionMessages:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "id": "test-id",
-            "model": "llama-3.1-sonar-small-128k-online",
+            "model": "sonar-pro",
             "choices": [{"message": {"content": "Test"}}],
             "usage": {"total_tokens": 10},
             "citations": [],
@@ -199,11 +199,11 @@ class TestChatCompletionMessages:
         # Create client and call with model override
         client = PerplexityClient(api_key="test-key")
         result = client.chat_completion(
-            query="Test", model="llama-3.1-sonar-small-128k-online"
+            query="Test", model="sonar-pro"
         )
 
         # Verify model was passed
         call_args = mock_post.call_args
         assert call_args is not None
         payload = call_args[1]["json"]
-        assert payload["model"] == "llama-3.1-sonar-small-128k-online"
+        assert payload["model"] == "sonar-pro"
