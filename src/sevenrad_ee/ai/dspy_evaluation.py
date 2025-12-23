@@ -6,9 +6,12 @@ the performance of the greenhouse detection system.
 
 Phase 3: Dutch-aware hierarchical F1 metric with feedback generation
 for GEPA optimizer reflection mechanism.
+
+Updated: Added NaN guard to prevent optimization failures from parse errors.
 """
 
 import logging
+import math
 from collections.abc import Callable
 from typing import Any
 
@@ -126,7 +129,7 @@ def growlight_accuracy_metric(
     if not (true_is_greenhouse and pred_is_greenhouse):
         return 1.0
 
-    # Extract predicted growlight usage (now a Literal["YES", "NO", "UNKNOWN", "NOT_APPLICABLE"])
+    # Extract predicted growlight usage (Literal type)
     if hasattr(prediction, "uses_growlight"):
         pred_growlight_str = str(prediction.uses_growlight).strip().upper()
     else:
@@ -572,6 +575,14 @@ def dutch_aware_hierarchical_f1(  # noqa: C901, PLR0912, PLR0915
         classification_score * 0.70 + dutch_score * 0.15 + evidence_score * 0.15
     )
 
+    # NaN Guard - prevent optimization failures from parse errors
+    # -----------------------------------------------------------
+    if math.isnan(total_score):
+        location_name = getattr(example, "location_name", "unknown")
+        error_msg = f"NaN score for example '{location_name}' - likely parse error"
+        logger.error(error_msg)
+        return 0.0, error_msg
+
     # Final Feedback Assembly
     # -----------------------
 
@@ -654,16 +665,17 @@ def gepa_compatible_metric(
     gold: dspy.Example,
     pred: Any,  # noqa: ANN401
     trace: Any | None = None,  # noqa: ANN401
-    pred_name: str | None = None,
-    pred_trace: Any | None = None,  # noqa: ANN401
+    pred_name: str | None = None,  # noqa: ARG001
+    pred_trace: Any | None = None,  # noqa: ANN401, ARG001
 ) -> ScoreWithFeedback:
     """
     GEPA-compatible wrapper for dutch_aware_hierarchical_f1 metric.
 
-    GEPA requires metrics to accept 5 arguments: (gold, pred, trace, pred_name, pred_trace)
-    and return either a float or ScoreWithFeedback object. This wrapper adapts our metric
-    to return ScoreWithFeedback for proper integration with GEPA's evaluation and reflection
-    mechanisms.
+    GEPA requires metrics to accept 5 arguments:
+    (gold, pred, trace, pred_name, pred_trace) and return either a float
+    or ScoreWithFeedback object. This wrapper adapts our metric to return
+    ScoreWithFeedback for proper integration with GEPA's evaluation and
+    reflection mechanisms.
 
     Args:
         gold: Ground truth example
@@ -690,4 +702,318 @@ def gepa_compatible_metric(
 
     # Return ScoreWithFeedback object for GEPA compatibility
     # This prevents TypeError when GEPA's parallelizer tries to sum scores
+    return ScoreWithFeedback(score=score, feedback=feedback)
+
+
+# ============================================================================
+# Phase 4: Dutch-aware metrics for PerplexityKasClassificatie
+# ============================================================================
+#
+# These metrics handle Dutch field names and values:
+# - is_kas (true/false) instead of is_greenhouse
+# - gebruikt_groeilicht (JA/NEE/ONBEKEND) instead of uses_growlight
+# - hoofdgewas instead of species_grown
+# - zekerheid instead of confidence
+
+
+def dutch_kas_metric(  # noqa: C901, PLR0912, PLR0915
+    example: dspy.Example,
+    prediction: Any,  # noqa: ANN401
+    trace: Any | None = None,  # noqa: ANN401
+) -> tuple[float, str]:
+    """
+    Evaluate Dutch PerplexityKasClassificatie predictions.
+
+    This metric handles Dutch field names and values:
+    - is_kas (true/false) instead of is_greenhouse
+    - gebruikt_groeilicht (JA/NEE/ONBEKEND) instead of uses_growlight
+    - hoofdgewas instead of species_grown
+
+    Scoring Components:
+    - 60%: Hierarchical classification accuracy (is_kas + gebruikt_groeilicht)
+    - 25%: Crop identification rate (hoofdgewas not empty)
+    - 15%: Confidence calibration
+
+    Args:
+        example: Ground truth example with Dutch field names
+        prediction: Model prediction with Dutch field names
+        trace: Optional execution trace (unused)
+
+    Returns:
+        Tuple of (score, feedback):
+        - score: Float between 0.0 and 1.0
+        - feedback: String with detailed explanation
+
+    """
+    del trace  # Unused parameter
+
+    feedback_parts = []
+
+    # ========================================
+    # Defensive checks for required fields
+    # ========================================
+
+    # Check for Dutch field names (Phase 4) or English fallback (Phase 3)
+    has_dutch_fields = hasattr(prediction, "is_kas") and hasattr(
+        prediction, "gebruikt_groeilicht"
+    )
+    has_english_fields = hasattr(prediction, "is_greenhouse") and hasattr(
+        prediction, "uses_growlight"
+    )
+
+    if not has_dutch_fields and not has_english_fields:
+        error_msg = (
+            "FATAL: Prediction missing required fields. "
+            f"Dutch: is_kas={hasattr(prediction, 'is_kas')}, "
+            f"gebruikt_groeilicht={hasattr(prediction, 'gebruikt_groeilicht')}. "
+            f"English: is_greenhouse={hasattr(prediction, 'is_greenhouse')}, "
+            f"uses_growlight={hasattr(prediction, 'uses_growlight')}"
+        )
+        logger.error(error_msg)
+        return 0.0, error_msg
+
+    # ========================================
+    # Extract predicted values (Dutch or English)
+    # ========================================
+
+    if has_dutch_fields:
+        pred_is_kas_raw = str(prediction.is_kas).strip().lower()
+        pred_growlight_raw = str(prediction.gebruikt_groeilicht).strip().upper()
+        pred_hoofdgewas = getattr(prediction, "hoofdgewas", "")
+        pred_zekerheid = getattr(prediction, "zekerheid", 0.5)
+    else:
+        # Fallback to English field names
+        pred_is_kas_raw = str(prediction.is_greenhouse).strip().lower()
+        pred_growlight_raw = str(prediction.uses_growlight).strip().upper()
+        pred_hoofdgewas = getattr(prediction, "species_grown", "")
+        pred_zekerheid = getattr(prediction, "confidence", 0.5)
+
+    # Normalize is_kas to boolean-like
+    pred_is_kas = pred_is_kas_raw in ("true", "ja", "yes", "1")
+
+    # Normalize gebruikt_groeilicht to JA/NEE/ONBEKEND
+    if pred_growlight_raw in ("JA", "YES", "TRUE"):
+        pred_growlight = "JA"
+    elif pred_growlight_raw in ("NEE", "NO", "FALSE"):
+        pred_growlight = "NEE"
+    else:
+        pred_growlight = "ONBEKEND"
+
+    # ========================================
+    # Extract ground truth (Dutch or English)
+    # ========================================
+
+    # Check if example uses Dutch or English field names
+    if hasattr(example, "is_kas"):
+        true_is_kas_raw = str(example.is_kas).strip().lower()
+        true_growlight_raw = (
+            str(getattr(example, "gebruikt_groeilicht", "ONBEKEND")).strip().upper()
+        )
+        true_hoofdgewas = getattr(example, "hoofdgewas", "")
+    else:
+        # Fallback to English
+        true_is_kas_raw = str(example.is_greenhouse).strip().lower()
+        true_growlight_raw = (
+            str(getattr(example, "uses_growlight", "UNKNOWN")).strip().upper()
+        )
+        true_hoofdgewas = getattr(example, "species_grown", "")
+
+    # Normalize ground truth
+    true_is_kas = true_is_kas_raw in ("true", "ja", "yes", "1")
+
+    if true_growlight_raw in ("JA", "YES", "TRUE"):
+        true_growlight = "JA"
+    elif true_growlight_raw in ("NEE", "NO", "FALSE"):
+        true_growlight = "NEE"
+    else:
+        true_growlight = "ONBEKEND"
+
+    # ========================================
+    # Component 1: Classification Accuracy (60%)
+    # ========================================
+
+    # is_kas classification
+    kas_correct = pred_is_kas == true_is_kas
+    kas_score = 1.0 if kas_correct else 0.0
+
+    if not kas_correct:
+        feedback_parts.append(
+            f"FOUT is_kas: voorspeld {'true' if pred_is_kas else 'false'}, "
+            f"verwacht {'true' if true_is_kas else 'false'}"
+        )
+
+    # gebruikt_groeilicht classification (only if kas=true in ground truth)
+    if true_is_kas:
+        growlight_correct = pred_growlight == true_growlight
+        growlight_score = 1.0 if growlight_correct else 0.0
+
+        if not growlight_correct:
+            feedback_parts.append(
+                f"FOUT gebruikt_groeilicht: voorspeld {pred_growlight}, "
+                f"verwacht {true_growlight}"
+            )
+
+            # Provide specific guidance
+            if true_growlight == "JA" and pred_growlight == "ONBEKEND":
+                feedback_parts.append(
+                    "TIP: Model zegt ONBEKEND maar verwacht JA - "
+                    "gebruik gewastype om belichting af te leiden"
+                )
+    else:
+        # If not a greenhouse, growlight should be ONBEKEND
+        growlight_score = 1.0 if pred_growlight == "ONBEKEND" else 0.0
+
+        if growlight_score == 0.0:
+            feedback_parts.append(
+                f"LOGICA FOUT: is_kas=false maar "
+                f"gebruikt_groeilicht={pred_growlight} (moet ONBEKEND zijn)"
+            )
+
+    classification_score = (kas_score + growlight_score) / 2.0
+
+    # ========================================
+    # Component 2: Crop Identification (25%)
+    # ========================================
+
+    # Check if hoofdgewas was identified
+    pred_crop = str(pred_hoofdgewas).strip() if pred_hoofdgewas else ""
+    true_crop = str(true_hoofdgewas).strip() if true_hoofdgewas else ""
+
+    # Score based on whether crop was identified
+    if true_is_kas:
+        if pred_crop:
+            crop_score = 1.0
+            feedback_parts.append(f"GOED: Gewas geïdentificeerd: '{pred_crop}'")
+        else:
+            crop_score = 0.0
+            feedback_parts.append(
+                "FOUT: Geen gewas geïdentificeerd - "
+                "gewasidentificatie is CRUCIAAL voor belichting-inferentie"
+            )
+    else:
+        # Non-greenhouse: crop identification not required
+        crop_score = 1.0
+
+    # ========================================
+    # Component 3: Confidence Calibration (15%)
+    # ========================================
+
+    # Confidence thresholds
+    conf_default = 0.5
+    conf_high = 0.7
+    conf_very_high = 0.8
+
+    try:
+        pred_conf = float(pred_zekerheid) if pred_zekerheid else conf_default
+    except (ValueError, TypeError):
+        pred_conf = conf_default
+
+    # Confidence should align with correctness
+    is_correct = kas_correct and (growlight_correct if true_is_kas else True)
+
+    if is_correct and pred_conf >= conf_high:
+        confidence_score = 1.0
+    elif not is_correct and pred_conf < conf_default:
+        # Low confidence on wrong answer is somewhat acceptable
+        confidence_score = 0.5
+    elif is_correct and pred_conf < conf_default:
+        # Correct but under-confident
+        confidence_score = 0.7
+        feedback_parts.append(
+            f"Correcte classificatie maar lage zekerheid ({pred_conf:.2f})"
+        )
+    else:
+        # Wrong with high confidence - bad
+        confidence_score = 0.0
+        if not is_correct and pred_conf >= conf_very_high:
+            feedback_parts.append(
+                f"WAARSCHUWING: Hoge zekerheid ({pred_conf:.2f}) "
+                "maar foute classificatie"
+            )
+
+    # ========================================
+    # Weighted Total Score
+    # ========================================
+
+    total_score = (
+        classification_score * 0.60 + crop_score * 0.25 + confidence_score * 0.15
+    )
+
+    # NaN Guard
+    if math.isnan(total_score):
+        bedrijfsnaam = getattr(
+            example, "bedrijfsnaam", getattr(example, "location_name", "unknown")
+        )
+        error_msg = f"NaN score voor '{bedrijfsnaam}' - waarschijnlijk parse fout"
+        logger.error(error_msg)
+        return 0.0, error_msg
+
+    # ========================================
+    # Final Feedback Assembly
+    # ========================================
+
+    if not feedback_parts:
+        feedback = (
+            f"✓ CORRECT | "
+            f"is_kas={'true' if pred_is_kas else 'false'} | "
+            f"gebruikt_groeilicht={pred_growlight} | "
+            f"hoofdgewas='{pred_crop}'"
+        )
+    else:
+        feedback = " | ".join(feedback_parts)
+
+    return total_score, feedback
+
+
+def dutch_kas_score_only(
+    example: dspy.Example,
+    prediction: Any,  # noqa: ANN401
+) -> float:
+    """
+    Return score without feedback for MIPROv2/BootstrapFewShot compatibility.
+
+    This is a backward-compatible wrapper around dutch_kas_metric
+    that returns only the score component.
+
+    Args:
+        example: Ground truth example
+        prediction: Model prediction
+
+    Returns:
+        Float score between 0.0 and 1.0
+
+    Example:
+        >>> from dspy.teleprompt import MIPROv2
+        >>> optimizer = MIPROv2(
+        ...     metric=dutch_kas_score_only,
+        ...     num_candidates=20
+        ... )
+
+    """
+    score, _ = dutch_kas_metric(example, prediction)
+    return score
+
+
+def dutch_kas_gepa_metric(
+    gold: dspy.Example,
+    pred: Any,  # noqa: ANN401
+    trace: Any | None = None,  # noqa: ANN401
+    pred_name: str | None = None,  # noqa: ARG001
+    pred_trace: Any | None = None,  # noqa: ANN401, ARG001
+) -> ScoreWithFeedback:
+    """
+    GEPA-compatible wrapper for dutch_kas_metric.
+
+    Args:
+        gold: Ground truth example
+        pred: Model prediction
+        trace: Optional execution trace (unused)
+        pred_name: Name of the predictor (unused)
+        pred_trace: Trace of predictor execution (unused)
+
+    Returns:
+        ScoreWithFeedback object for GEPA's reflection mechanism
+
+    """
+    score, feedback = dutch_kas_metric(gold, pred, trace)
     return ScoreWithFeedback(score=score, feedback=feedback)

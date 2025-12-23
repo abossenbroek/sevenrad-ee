@@ -13,14 +13,10 @@ import logging
 from enum import Enum
 from typing import TYPE_CHECKING, Literal
 
+from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
-class GrowlightUsage(str, Enum):
-    """Classification of growlight usage in greenhouses."""
-
-    YES = "YES"
-    NO = "NO"
-    UNKNOWN = "UNKNOWN"
-    NOT_APPLICABLE = "NOT_APPLICABLE"
+if TYPE_CHECKING:
+    from sevenrad_ee.ai.retrievers import Retriever
 
 try:
     import dspy
@@ -32,10 +28,43 @@ except ImportError as e:
     )
     raise ImportError(msg) from e
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
-if TYPE_CHECKING:
-    from sevenrad_ee.ai.retrievers import Retriever
+class GrowlightUsage(str, Enum):
+    """Classification of growlight usage in greenhouses."""
+
+    YES = "YES"
+    NO = "NO"
+    UNKNOWN = "UNKNOWN"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
+class GroeilichtGebruik(str, Enum):
+    """Dutch classification of growlight usage in greenhouses."""
+
+    JA = "JA"
+    NEE = "NEE"
+    ONBEKEND = "ONBEKEND"
+
+    def to_english(self) -> GrowlightUsage:
+        """Convert Dutch classification to English equivalent."""
+        mapping = {
+            GroeilichtGebruik.JA: GrowlightUsage.YES,
+            GroeilichtGebruik.NEE: GrowlightUsage.NO,
+            GroeilichtGebruik.ONBEKEND: GrowlightUsage.UNKNOWN,
+        }
+        return mapping[self]
+
+    @classmethod
+    def from_string(cls, value: str) -> "GroeilichtGebruik":
+        """Parse string to enum, case-insensitive."""
+        value_upper = value.strip().upper()
+        if value_upper in ("JA", "YES", "TRUE"):
+            return cls.JA
+        elif value_upper in ("NEE", "NO", "FALSE"):
+            return cls.NEE
+        else:
+            return cls.ONBEKEND
+
 
 logger = logging.getLogger(__name__)
 
@@ -654,12 +683,16 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
 
         logger.info("=" * 60)
         logger.info("GreenhouseDetector.forward() called")
-        logger.info(f"  Location: '{location_name}' in '{location_area}'")
+        logger.info("  Location: '%s' in '%s'", location_name, location_area)
         logger.debug(
-            f"  location_name type: {type(location_name)}, length: {len(location_name)}"
+            "  location_name type: %s, length: %d",
+            type(location_name),
+            len(location_name),
         )
         logger.debug(
-            f"  location_area type: {type(location_area)}, length: {len(location_area)}"
+            "  location_area type: %s, length: %d",
+            type(location_area),
+            len(location_area),
         )
 
         # ===== STAGE 1: RETRIEVE EVIDENCE =====
@@ -670,21 +703,21 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
                 location=location_area,
             )
             logger.info(
-                f"Evidence retrieval successful ({len(evidence_context)} chars)"
+                "Evidence retrieval successful (%d chars)", len(evidence_context)
             )
             logger.debug(
-                f"Evidence preview (first 300 chars): {evidence_context[:300]}"
+                "Evidence preview (first 300 chars): %s", evidence_context[:300]
             )
         except Exception as e:
             logger.error("STAGE 1 FAILED: Evidence retrieval failed")
-            logger.error(f"Error type: {type(e).__name__}")
+            logger.error("Error type: %s", type(e).__name__)
             logger.exception("Retrieval error details:")
             raise
 
         # ===== STAGE 2: CLASSIFY WITH EVIDENCE =====
         logger.info("STAGE 2: Classifying with retrieved evidence...")
         logger.debug(
-            f"Calling predictor with {len(evidence_context)} chars of evidence"
+            "Calling predictor with %d chars of evidence", len(evidence_context)
         )
 
         try:
@@ -695,25 +728,27 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
             )
             logger.info("Classification successful")
             logger.info(
-                f"  Result: is_greenhouse={prediction.is_greenhouse}, "
-                f"uses_growlight={prediction.uses_growlight}, "
-                f"confidence={prediction.confidence}"
+                "  Result: is_greenhouse=%s, uses_growlight=%s, confidence=%s",
+                prediction.is_greenhouse,
+                prediction.uses_growlight,
+                prediction.confidence,
             )
-            logger.debug(f"  Prediction type: {type(prediction)}")
-            logger.debug(f"  Prediction fields: {list(prediction.__dict__.keys())}")
+            logger.debug("  Prediction type: %s", type(prediction))
+            logger.debug("  Prediction fields: %s", list(prediction.__dict__.keys()))
 
             # Log reasoning preview
             if hasattr(prediction, "reasoning"):
+                max_preview_len = 200
                 reasoning_preview = (
-                    prediction.reasoning[:200]
-                    if len(prediction.reasoning) > 200
+                    prediction.reasoning[:max_preview_len]
+                    if len(prediction.reasoning) > max_preview_len
                     else prediction.reasoning
                 )
-                logger.debug(f"  Reasoning preview: {reasoning_preview}")
+                logger.debug("  Reasoning preview: %s", reasoning_preview)
 
         except Exception as e:
             logger.error("STAGE 2 FAILED: Classification failed")
-            logger.error(f"Error type: {type(e).__name__}")
+            logger.error("Error type: %s", type(e).__name__)
             logger.exception("Classification error details:")
             raise
 
@@ -749,6 +784,605 @@ class GreenhouseDetector(dspy.Module):  # type: ignore[misc]
         return SimplifiedGreenhouseAnalysis(
             is_greenhouse=bool(prediction.is_greenhouse),
             uses_growlight=uses_growlight_str,
+            confidence=float(prediction.confidence),
+            reasoning=prediction.reasoning,
+        )
+
+
+# Phase 3 GEPA Optimization Plan - Native Perplexity RAG
+# ======================================================
+#
+# The following classes implement the new architecture where Perplexity
+# performs search + reasoning + citation in a single call, rather than
+# using it as a dumb search API with a separate classifier.
+
+
+class ParseError(ValueError):
+    """Raised when prediction parsing fails with invalid values."""
+
+    pass
+
+
+class PerplexityGreenhouseClassifier(Signature):  # type: ignore[misc]
+    """
+    Classify Dutch greenhouse companies using Perplexity's native web search.
+
+    CRITICAL: Growers do NOT advertise lighting! Use CAUSAL REASONING:
+
+    STEP 1: Find what crops they grow (search in Dutch AND English)
+    - Search: "{company} kwekerij gewassen" / "{company} greenhouse crops"
+    - Look for: rozen, tomaten, orchideeën, gerbera, chrysanten, paprika, etc.
+
+    STEP 2: Infer lighting from crop type using this knowledge:
+
+    ALMOST ALWAYS USE LIGHTING (say YES if found):
+    - Roses (rozen): SON-T/Hybrid, 150-250 umol
+    - Tomatoes (tomaten, year-round): SON-T/Hybrid, 180-350 umol
+    - Gerbera: SON-T/Hybrid, 120-200 umol
+    - Alstroemeria: SON-T/Hybrid, 120-200 umol
+    - Freesia: SON-T, 100-180 umol
+    - Phalaenopsis orchids: LED, 40-120 umol
+
+    OFTEN USE LIGHTING (say YES if year-round production):
+    - Bell peppers (paprika): SON-T/Hybrid if winter production
+    - Cucumbers (komkommers): LED/Hybrid if winter production
+    - Eggplant (aubergine): SON-T if year-round
+    - Herbs (kruiden): LED if year-round supply
+
+    SOMETIMES/RARELY (say UNKNOWN unless clear evidence):
+    - Chrysanthemums: photoperiod control, not always assimilation
+    - Lilies: temperature-driven forcing
+    - Tulips: temperature-driven forcing
+    - Cymbidium orchids: typically NO lighting
+    - Anthurium: shade-loving, moderate light
+
+    STEP 3: Check for negative indicators
+    - "onbelichte teelt" = unlit cultivation -> NO
+    - "daglichtkas" = daylight-only -> NO
+    - Summer-only/seasonal production -> likely NO
+
+    HIERARCHICAL LOGIC:
+    - If is_greenhouse = 'false' -> uses_growlight MUST be 'UNKNOWN'
+    - If is_greenhouse = 'true' -> infer uses_growlight from crop type
+    - If crop type unknown -> uses_growlight = 'UNKNOWN'
+    """
+
+    # Input fields (minimal - let Perplexity search)
+    location_name: str = dspy.InputField(desc="Company name to research")
+    location_area: str = dspy.InputField(
+        desc="City or region in Netherlands (e.g., 'Waddinxveen')"
+    )
+
+    # Core classification outputs
+    is_greenhouse: str = dspy.OutputField(
+        desc=(
+            "Is this a greenhouse/kwekerij? 'true' or 'false'. "
+            "Search for company info, look for terms like 'kwekerij', 'glastuinbouw'. "
+            "'false' for auction houses, seed companies, transport, storage."
+        )
+    )
+
+    uses_growlight: str = dspy.OutputField(
+        desc=(
+            "Infer from crop type: 'YES', 'NO', or 'UNKNOWN'. "
+            "If roses/tomaten/gerbera/alstroemeria/freesia/Phalaenopsis -> YES. "
+            "If paprika/komkommers/aubergine with year-round production -> YES. "
+            "If chrysanten/lelies/tulpen/cymbidium/anthurium -> UNKNOWN. "
+            "If 'onbelichte teelt' or 'daglichtkas' found -> NO. "
+            "MUST be 'UNKNOWN' if is_greenhouse='false' or crop unknown."
+        )
+    )
+
+    # Crop detection - critical for causal inference
+    species_grown: str = dspy.OutputField(
+        desc=(
+            "Comma-separated crops found (Dutch or English): "
+            "rozen, tomaten, gerbera, orchideeën, chrysanten, paprika, etc. "
+            "This is CRITICAL for inferring lighting usage."
+        )
+    )
+
+    # Evidence capture - critical for scoring
+    dutch_terms_found: str = dspy.OutputField(
+        desc=(
+            "Comma-separated Dutch greenhouse/lighting terms found. "
+            "Examples: assimilatiebelichting, belichte teelt, glastuinbouw, "
+            "kunstlicht, kwekerij, SON-T, LED-belichting, groeilicht."
+        )
+    )
+
+    evidence_sources: str = dspy.OutputField(
+        desc=(
+            'JSON array of sources: [{"url": "...", "quote": "...", "tier": "..."}]. '
+            "Include the URLs from your search results with relevant quotes. "
+            "Tiers: 'company_website', 'supplier_case_study', 'job_posting' (tier 2); "
+            "'trade_media_nl' (tier 1); 'general_web' (tier 0.5)."
+        )
+    )
+
+    confidence: float = dspy.OutputField(
+        desc=(
+            "Classification confidence 0.0-1.0. "
+            "High (>0.8): Dutch sources + terminology + tier 2 evidence. "
+            "Medium (0.5-0.8): Some Dutch evidence or tier 1 sources. "
+            "Low (<0.5): General web sources or ambiguous evidence."
+        )
+    )
+
+    # Reflection - forces model to verify causal reasoning
+    verification_note: str = dspy.OutputField(
+        desc=(
+            "Verify your causal reasoning: "
+            "1. What crop(s) did you find? "
+            "2. According to the domain knowledge, does this crop use lighting? "
+            "3. Is your uses_growlight consistent with the crop type? "
+            "If crop is roses/tomaten/gerbera, uses_growlight should be YES."
+        )
+    )
+
+    reasoning: str = dspy.OutputField(
+        desc=(
+            "Step-by-step causal reasoning:\n"
+            "1. What crops does this company grow? (cite sources)\n"
+            "2. Based on domain knowledge, what lighting do these crops need?\n"
+            "3. Any negative indicators (onbelichte teelt, daglichtkas)?\n"
+            "4. Final inference: crop type -> lighting usage.\n"
+            "CITE ALL URLs from your search results."
+        )
+    )
+
+
+# Phase 4: Full Dutch Signature with Causal Reasoning
+# ====================================================
+#
+# Critical insight: Growers do NOT advertise lighting usage.
+# Searching for "assimilatiebelichting" or "SON-T" is useless.
+# Instead: Identify the CROP and infer lighting from domain knowledge.
+#
+# Full Dutch signature forces Perplexity to:
+# - Search Dutch sources naturally
+# - Perform chain-of-thought reasoning in Dutch
+# - Surface Dutch horticultural terminology
+
+
+class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
+    """
+    Classificeer of een locatie een commerciële kas is met belichting.
+
+    BELANGRIJK: Telers adverteren NIET met belichting! Gebruik causaal redeneren:
+
+    STAP 1: Zoek informatie over dit bedrijf - wat telen ze?
+    - Zoek naar: "{bedrijf} kwekerij" of "{bedrijf} glastuinbouw"
+    - Identificeer het hoofdgewas (rozen, tomaten, orchideeën, etc.)
+
+    STAP 2: Als het een kas is, bepaal het hoofdgewas en seizoen.
+
+    STAP 3: Leid af of belichting waarschijnlijk is op basis van het gewas:
+
+    GEWASSEN DIE BIJNA ALTIJD BELICHT WORDEN (zeg JA):
+    - Rozen: SON-T/Hybrid, 150-250 umol (jaarrond productie)
+    - Tomaten (jaarrond): SON-T/Hybrid, 180-350 umol
+    - Gerbera: SON-T/Hybrid, 120-200 umol
+    - Alstroemeria: SON-T/Hybrid, 120-200 umol
+    - Freesia: SON-T, 100-180 umol
+    - Phalaenopsis orchideeën: LED, 40-120 umol
+    - Lisianthus: SON-T/LED voor jaarrond
+    - Gypsophila (gipskruid): SON-T voor jaarrond
+    - Ardisia: LED voor winterverkoop
+    - Kalanchoe: LED/SON-T, fotoperiodesturing
+
+    GEWASSEN DIE VAAK BELICHT WORDEN (zeg JA bij jaarrond):
+    - Paprika (jaarrond productie): SON-T/Hybrid
+    - Komkommers (jaarrond): LED/Hybrid
+    - Aubergine (jaarrond): SON-T
+    - Kruiden (jaarrond levering): LED
+    - Aardbeien (winterteelt): LED
+    - Cyclamen (winterproductie): LED
+    - Begonia (winterproductie): LED/SON-T
+
+    GEWASSEN DIE SOMS BELICHT WORDEN (zeg ONBEKEND tenzij bewijs):
+    - Chrysanten: fotoperiodesturing, niet altijd assimilatie
+    - Lelies: temperatuurgestuurde forcering
+    - Tulpen: temperatuurgestuurde forcering
+    - Ranunculus, anemoon: soms belichting
+
+    GEWASSEN DIE ZELDEN BELICHT WORDEN (zeg NEE tenzij bewijs):
+    - Cymbidium orchideeën: meestal geen belichting
+    - Anthurium: schaduwminnend, matig licht
+    - Bromelia: tropisch, veel daglicht
+    - Perkplanten, tuinplanten: seizoensgebonden
+    - Vetplanten, cactussen: weinig licht nodig
+    - Zaadproductie, vermeerdering: meestal daglicht
+
+    STAP 4: Controleer op negatieve indicatoren:
+    - "onbelichte teelt" = geen kunstlicht -> NEE
+    - "daglichtkas" = alleen daglicht -> NEE
+    - Alleen zomerproductie/seizoensgebonden -> waarschijnlijk NEE
+
+    STAP 5: Als gewas niet in bovenstaande lijsten:
+    - Zoek aanvullende informatie over belichtingsgebruik bij dit gewas
+    - Bij twijfel: ONBEKEND
+
+    LET OP: Bedrijfstype ≠ faciliteitstype
+    - Zaadveredelingsbedrijf MET kassen → is_kas = True
+    - Onderzoekscentrum MET kassen → is_kas = True
+    - Beoordeel of er KAS-faciliteiten zijn, niet alleen de hoofdactiviteit
+
+    HIËRARCHISCHE LOGICA:
+    - Als is_kas = False → gebruikt_groeilicht MOET ONBEKEND zijn
+    - Als is_kas = True → leid gebruikt_groeilicht af van gewastype
+    - Als gewastype onbekend → gebruikt_groeilicht = ONBEKEND
+    """
+
+    # Invoervelden
+    bedrijfsnaam: str = dspy.InputField(
+        desc="Naam van het bedrijf of de kwekerij om te onderzoeken"
+    )
+    locatie: str = dspy.InputField(
+        desc="Plaats in Nederland (bijv. 'Waddinxveen', ''s-Gravenzande')"
+    )
+
+    # Kernclassificatie
+    is_kas: str = dspy.OutputField(
+        desc=(
+            "Is dit een kas/kwekerij/glastuinbouwbedrijf? 'true' of 'false'. "
+            "Zoek naar bedrijfsinformatie, let op 'kwekerij', 'glastuinbouw'. "
+            "'false' voor veilingen, zaadhandel, transport, opslag. "
+            "LET OP: Zaadveredelingsbedrijf MET kassen = 'true'."
+        )
+    )
+
+    # Gewasidentificatie - cruciaal voor causale inferentie
+    hoofdgewas: str = dspy.OutputField(
+        desc=(
+            "Wat teelt dit bedrijf? Belangrijkste gewas(sen). "
+            "Voorbeelden: rozen, tomaten, gerbera, orchideeën, paprika, komkommers. "
+            "Dit is CRUCIAAL voor het afleiden van belichtingsgebruik. "
+            "Leeg als niet gevonden of geen kas."
+        )
+    )
+
+    # Seizoensinformatie
+    seizoen: str = dspy.OutputField(
+        desc=(
+            "Productieseizoen: 'jaarrond', 'seizoensgebonden', of 'onbekend'. "
+            "Jaarrond productie = waarschijnlijk belichting. "
+            "Alleen zomer/seizoensgebonden = waarschijnlijk geen belichting."
+        )
+    )
+
+    # Kernclassificatie belichting
+    gebruikt_groeilicht: str = dspy.OutputField(
+        desc=(
+            "Gebruikt dit bedrijf assimilatiebelichting? 'JA', 'NEE', of 'ONBEKEND'. "
+            "Leid af van gewastype volgens de domeinkennis hierboven. "
+            "MOET 'ONBEKEND' zijn als is_kas='false' of gewas onbekend."
+        )
+    )
+
+    # Betrouwbaarheid
+    zekerheid: float = dspy.OutputField(
+        desc=(
+            "Betrouwbaarheid van de classificatie 0.0-1.0. "
+            "Hoog (>0.8): Gewas duidelijk geïdentificeerd + past in domeinkennis. "
+            "Gemiddeld (0.5-0.8): Gewas gevonden maar niet in standaardlijst. "
+            "Laag (<0.5): Gewas niet gevonden of onduidelijk."
+        )
+    )
+
+    # Gevonden bronnen
+    bronnen: str = dspy.OutputField(
+        desc=(
+            "Gevonden bronnen met URLs. Formaat: URL1 | URL2 | URL3. "
+            "Vermeld de belangrijkste bronnen die je hebt gevonden."
+        )
+    )
+
+    # Redenering
+    redenering: str = dspy.OutputField(
+        desc=(
+            "Stapsgewijze causale redenering:\n"
+            "1. Wat heb je gevonden over dit bedrijf?\n"
+            "2. Welk gewas teelt dit bedrijf?\n"
+            "3. Volgens de domeinkennis, gebruikt dit gewas belichting?\n"
+            "4. Zijn er negatieve indicatoren (onbelichte teelt, daglichtkas)?\n"
+            "5. Conclusie: gewastype → belichtingsgebruik.\n"
+            "VERMELD alle gevonden URLs."
+        )
+    )
+
+
+class PerplexityKasDetector(dspy.Module):  # type: ignore[misc]
+    """
+    Dutch single-stage detector using Perplexity's native RAG capabilities.
+
+    This detector uses Perplexity with a full Dutch signature to:
+    - Force Perplexity to search Dutch sources
+    - Perform chain-of-thought reasoning in Dutch
+    - Apply causal reasoning: crop type → lighting inference
+
+    Key insight: Growers don't advertise lighting. Instead of searching for
+    "assimilatiebelichting", we identify the CROP and infer lighting from
+    domain knowledge embedded in the signature.
+
+    Example:
+        >>> from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
+        >>> import dspy
+        >>>
+        >>> lm = PerplexityLM(model="sonar-pro", temperature=0)
+        >>> dspy.configure(lm=lm)
+        >>>
+        >>> detector = PerplexityKasDetector()
+        >>> result = detector(
+        ...     bedrijfsnaam="Porta Nova",
+        ...     locatie="Waddinxveen"
+        ... )
+        >>> print(result.gebruikt_groeilicht)  # JA, NEE, or ONBEKEND
+
+    """
+
+    def __init__(self) -> None:
+        """Initialize detector with ChainOfThought for Dutch reasoning."""
+        super().__init__()
+        self.classifier = dspy.ChainOfThought(PerplexityKasClassificatie)
+
+    def forward(
+        self,
+        bedrijfsnaam: str,
+        locatie: str,
+    ) -> dspy.Prediction:
+        """
+        Classificeer een locatie met Perplexity's native RAG in het Nederlands.
+
+        Args:
+            bedrijfsnaam: Naam van het bedrijf/kwekerij
+            locatie: Plaats in Nederland (bijv. 'Waddinxveen')
+
+        Returns:
+            dspy.Prediction met classificatieresultaten
+
+        """
+        logger.info("=" * 60)
+        logger.info("PerplexityKasDetector.forward() called")
+        logger.info("  Bedrijf: '%s' in '%s'", bedrijfsnaam, locatie)
+
+        try:
+            prediction = self.classifier(
+                bedrijfsnaam=bedrijfsnaam,
+                locatie=locatie,
+            )
+            logger.info("Classificatie succesvol")
+            logger.info(
+                "  Resultaat: is_kas=%s, gebruikt_groeilicht=%s, zekerheid=%s",
+                prediction.is_kas,
+                prediction.gebruikt_groeilicht,
+                prediction.zekerheid,
+            )
+            logger.info("  Hoofdgewas: %s", prediction.hoofdgewas)
+            logger.info("  Seizoen: %s", prediction.seizoen)
+            logger.debug("  Redenering: %s", prediction.redenering[:200])
+
+        except Exception as e:
+            logger.error("Classificatie MISLUKT")
+            logger.error("Fouttype: %s", type(e).__name__)
+            logger.exception("Classificatie foutdetails:")
+            raise
+
+        logger.info("PerplexityKasDetector.forward() voltooid")
+        logger.info("=" * 60)
+
+        return prediction
+
+    def to_english_prediction(self, prediction: dspy.Prediction) -> dspy.Prediction:
+        """
+        Convert Dutch prediction to English field names for compatibility.
+
+        Args:
+            prediction: Dutch prediction from forward()
+
+        Returns:
+            dspy.Prediction with English field names
+
+        """
+        # Parse is_kas to boolean
+        is_kas_str = str(prediction.is_kas).strip().lower()
+        is_greenhouse = is_kas_str in ("true", "ja", "yes", "1")
+
+        # Convert Dutch growlight to English
+        growlight_dutch = GroeilichtGebruik.from_string(prediction.gebruikt_groeilicht)
+        uses_growlight = growlight_dutch.to_english().value
+
+        return dspy.Prediction(
+            is_greenhouse=is_greenhouse,
+            uses_growlight=uses_growlight,
+            species_grown=prediction.hoofdgewas,
+            confidence=float(prediction.zekerheid),
+            reasoning=prediction.redenering,
+            # Preserve Dutch fields for debugging
+            _dutch_prediction=prediction,
+        )
+
+    def to_pydantic(self, prediction: dspy.Prediction) -> SimplifiedGreenhouseAnalysis:
+        """
+        Convert Dutch prediction to Pydantic model for validation.
+
+        Args:
+            prediction: Dutch prediction from forward()
+
+        Returns:
+            SimplifiedGreenhouseAnalysis validated Pydantic model
+
+        Raises:
+            ParseError: If prediction contains invalid values
+
+        """
+        # Parse is_kas
+        is_kas_str = str(prediction.is_kas).strip().lower()
+        if is_kas_str in ("true", "ja", "yes", "1"):
+            is_greenhouse = True
+        elif is_kas_str in ("false", "nee", "no", "0"):
+            is_greenhouse = False
+        else:
+            msg = f"Invalid is_kas value: '{prediction.is_kas}'"
+            logger.error("Parse failure: %s", msg)
+            raise ParseError(msg)
+
+        # Convert Dutch growlight to English
+        growlight_dutch = GroeilichtGebruik.from_string(prediction.gebruikt_groeilicht)
+        growlight_english = growlight_dutch.to_english()
+
+        return SimplifiedGreenhouseAnalysis(
+            is_greenhouse=is_greenhouse,
+            uses_growlight=growlight_english.value,
+            confidence=float(prediction.zekerheid),
+            reasoning=prediction.redenering,
+        )
+
+
+class PerplexityGreenhouseDetector(dspy.Module):  # type: ignore[misc]
+    """
+    Single-stage detector using Perplexity's native RAG capabilities.
+
+    This detector uses Perplexity to perform search + reasoning + citation
+    in a single API call, rather than using a separate retriever and classifier.
+
+    Key benefits:
+    - Perplexity searches the web FOR each classification (fresh, not cached)
+    - Perplexity's native citations become our evidence_sources
+    - Single LLM call instead of retriever + classifier + verifier
+    - MIPROv2 optimizes the one prompt that does everything
+
+    Example:
+        >>> from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
+        >>> import dspy
+        >>>
+        >>> # Configure PerplexityLM directly
+        >>> lm = PerplexityLM(model="sonar-pro", temperature=0)
+        >>> dspy.configure(lm=lm)
+        >>>
+        >>> # Create detector (no retriever needed!)
+        >>> detector = PerplexityGreenhouseDetector()
+        >>>
+        >>> # Classify - Perplexity searches and reasons in one call
+        >>> result = detector(
+        ...     location_name="Porta Nova",
+        ...     location_area="Waddinxveen"
+        ... )
+        >>> print(result.uses_growlight)
+
+    """
+
+    def __init__(self) -> None:
+        """Initialize detector with ChainOfThought for reasoning."""
+        super().__init__()
+        # Perplexity does search + reasoning in one call via ChainOfThought
+        self.classifier = dspy.ChainOfThought(PerplexityGreenhouseClassifier)
+
+    def forward(
+        self,
+        location_name: str,
+        location_area: str,
+    ) -> dspy.Prediction:
+        """
+        Classify a location using Perplexity's native RAG.
+
+        Perplexity performs web search, reasoning, and citation in a single call.
+        No separate retriever is needed.
+
+        Args:
+            location_name: Name of the company/facility
+            location_area: City or region (e.g., 'Waddinxveen, Netherlands')
+
+        Returns:
+            dspy.Prediction with classification results and evidence
+
+        """
+        request_id = request_id_var.get()
+
+        logger.info("=" * 60)
+        logger.info("PerplexityGreenhouseDetector.forward() called")
+        logger.info("  Location: '%s' in '%s'", location_name, location_area)
+        logger.debug(
+            "  location_name type: %s, length: %d",
+            type(location_name),
+            len(location_name),
+        )
+
+        # Single call - Perplexity searches, reasons, and cites
+        try:
+            prediction = self.classifier(
+                location_name=location_name,
+                location_area=location_area,
+            )
+            logger.info("Classification successful")
+            logger.info(
+                "  Result: is_greenhouse=%s, uses_growlight=%s, confidence=%s",
+                prediction.is_greenhouse,
+                prediction.uses_growlight,
+                prediction.confidence,
+            )
+            logger.info("  Species grown: %s", prediction.species_grown)
+            logger.debug("  Dutch terms found: %s", prediction.dutch_terms_found)
+            logger.debug("  Verification note: %s", prediction.verification_note)
+
+        except Exception as e:
+            logger.error("Classification FAILED")
+            logger.error("Error type: %s", type(e).__name__)
+            logger.exception("Classification error details:")
+            raise
+
+        logger.info("PerplexityGreenhouseDetector.forward() completed successfully")
+        logger.info("=" * 60)
+
+        return prediction
+
+    def to_pydantic(self, prediction: dspy.Prediction) -> SimplifiedGreenhouseAnalysis:
+        """
+        Convert DSPy Prediction to Pydantic model for validation.
+
+        Args:
+            prediction: DSPy Prediction from forward()
+
+        Returns:
+            SimplifiedGreenhouseAnalysis validated Pydantic model
+
+        Raises:
+            ParseError: If prediction contains invalid values (fail-fast)
+
+        """
+        # Parse is_greenhouse - handle various string formats
+        is_greenhouse_str = str(prediction.is_greenhouse).strip().lower()
+        if is_greenhouse_str in ("true", "yes", "1"):
+            is_greenhouse = True
+        elif is_greenhouse_str in ("false", "no", "0"):
+            is_greenhouse = False
+        else:
+            msg = f"Invalid is_greenhouse value: '{prediction.is_greenhouse}'"
+            logger.error("Parse failure: %s", msg)
+            raise ParseError(msg)
+
+        # Parse uses_growlight - fail-fast instead of silent UNKNOWN default
+        uses_growlight_str = str(prediction.uses_growlight).strip().upper()
+        valid_growlight_values: tuple[
+            Literal["YES", "NO", "UNKNOWN", "NOT_APPLICABLE"], ...
+        ] = ("YES", "NO", "UNKNOWN", "NOT_APPLICABLE")
+        if uses_growlight_str not in valid_growlight_values:
+            msg = (
+                f"Invalid uses_growlight value: '{prediction.uses_growlight}'. "
+                f"Must be one of: {valid_growlight_values}"
+            )
+            logger.error("Parse failure: %s", msg)
+            raise ParseError(msg)
+
+        # Cast to the Literal type after validation
+        uses_growlight: Literal["YES", "NO", "UNKNOWN", "NOT_APPLICABLE"] = (
+            uses_growlight_str  # type: ignore[assignment]
+        )
+
+        # Build simplified Pydantic model
+        return SimplifiedGreenhouseAnalysis(
+            is_greenhouse=is_greenhouse,
+            uses_growlight=uses_growlight,
             confidence=float(prediction.confidence),
             reasoning=prediction.reasoning,
         )

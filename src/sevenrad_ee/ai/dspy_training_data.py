@@ -18,9 +18,92 @@ except ImportError as e:
     msg = "dspy-ai package is required. Install with: uv pip install -e '.[dev]'"
     raise ImportError(msg) from e
 
-from sevenrad_ee.ai.dspy_greenhouse import GrowlightUsage
+from sevenrad_ee.ai.dspy_greenhouse import GroeilichtGebruik, GrowlightUsage
 
 logger = logging.getLogger(__name__)
+
+
+# Mapping from English species to Dutch
+SPECIES_EN_TO_NL: dict[str | None, str] = {
+    "roses": "rozen",
+    "tomatoes": "tomaten",
+    "peppers": "paprika",
+    "gerberas": "gerbera",
+    "lilies": "lelies",
+    "chrysanthemums": "chrysanten",
+    "vegetables": "groenten",
+    "flowers": "bloemen",
+    "berries": "bessen",
+    None: "",
+}
+
+# Mapping from English season to Dutch
+SEASON_MAPPING: dict[str, str] = {
+    "year-round": "jaarrond",
+    "seasonal": "seizoensgebonden",
+    "unknown": "onbekend",
+}
+
+
+def _convert_example_to_dutch(example: dspy.Example) -> dspy.Example:
+    """
+    Convert an English training example to Dutch format.
+
+    Args:
+        example: English dspy.Example with location_name, location_area, etc.
+
+    Returns:
+        Dutch dspy.Example with bedrijfsnaam, locatie, etc.
+
+    """
+    # Convert is_greenhouse to is_kas
+    is_kas = "true" if example.is_greenhouse else "false"
+
+    # Convert uses_growlight to gebruikt_groeilicht
+    if example.uses_growlight is None:
+        gebruikt_groeilicht = GroeilichtGebruik.ONBEKEND.value
+    elif example.uses_growlight == GrowlightUsage.YES.value:
+        gebruikt_groeilicht = GroeilichtGebruik.JA.value
+    elif example.uses_growlight == GrowlightUsage.NO.value:
+        gebruikt_groeilicht = GroeilichtGebruik.NEE.value
+    else:
+        gebruikt_groeilicht = GroeilichtGebruik.ONBEKEND.value
+
+    # Convert species to Dutch
+    species = getattr(example, "species_grown", None)
+    hoofdgewas = SPECIES_EN_TO_NL.get(species, species or "")
+
+    # Infer season from species (most training data is year-round production)
+    # Greenhouse flowers and vegetables are typically year-round in Netherlands
+    if example.is_greenhouse and species in [
+        "roses",
+        "tomatoes",
+        "peppers",
+        "gerberas",
+    ]:
+        seizoen = "jaarrond"
+    elif example.is_greenhouse:
+        seizoen = "jaarrond"  # Default assumption for commercial greenhouses
+    else:
+        seizoen = "onbekend"
+
+    # Convert reasoning to Dutch-style (keep English for now, just translate format)
+    redenering = getattr(example, "reasoning", "Geen redenering beschikbaar")
+
+    # Get sources as bronnen
+    bronnen = getattr(example, "sources", "") or ""
+
+    return dspy.Example(
+        bedrijfsnaam=example.location_name,
+        locatie=example.location_area.replace(", Netherlands", ""),
+        is_kas=is_kas,
+        hoofdgewas=hoofdgewas,
+        seizoen=seizoen,
+        gebruikt_groeilicht=gebruikt_groeilicht,
+        zekerheid=getattr(example, "confidence", 0.8),
+        bronnen=bronnen.replace("|||", " | "),
+        redenering=redenering,
+    ).with_inputs("bedrijfsnaam", "locatie")
 
 
 # Training Set: Hard YES (17 greenhouses with growlights)
@@ -530,3 +613,67 @@ def get_negative_examples() -> list[dspy.Example]:
 
     """
     return NEGATIVE_SET.copy()
+
+
+# ============================================================================
+# Dutch Training Data (Phase 4)
+# ============================================================================
+#
+# These functions provide Dutch-formatted training data for the
+# PerplexityKasClassificatie signature. The data is converted from the
+# English training set using _convert_example_to_dutch().
+
+
+def get_dutch_training_set() -> list[dspy.Example]:
+    """
+    Get the complete training set in Dutch format.
+
+    Converts English examples to Dutch field names and values:
+    - location_name → bedrijfsnaam
+    - location_area → locatie
+    - is_greenhouse → is_kas (true/false string)
+    - uses_growlight → gebruikt_groeilicht (JA/NEE/ONBEKEND)
+    - species_grown → hoofdgewas (Dutch names)
+    - confidence → zekerheid
+    - sources → bronnen
+
+    Returns:
+        List of 23 dspy.Example objects for training with Dutch fields
+
+    """
+    return [_convert_example_to_dutch(ex) for ex in TRAINING_SET]
+
+
+def get_dutch_validation_set() -> list[dspy.Example]:
+    """
+    Get the hold-out validation set in Dutch format.
+
+    This set should NEVER be used during training/optimization.
+
+    Returns:
+        List of 4 dspy.Example objects with Dutch fields
+
+    """
+    return [_convert_example_to_dutch(ex) for ex in VALIDATION_SET]
+
+
+def get_dutch_positive_examples() -> list[dspy.Example]:
+    """
+    Get only the hard YES examples in Dutch format.
+
+    Returns:
+        List of 17 greenhouse examples with Dutch fields
+
+    """
+    return [_convert_example_to_dutch(ex) for ex in TRAINING_SET_HARD_YES]
+
+
+def get_dutch_negative_examples() -> list[dspy.Example]:
+    """
+    Get only the hard NO examples in Dutch format.
+
+    Returns:
+        List of 6 non-greenhouse examples with Dutch fields
+
+    """
+    return [_convert_example_to_dutch(ex) for ex in NEGATIVE_SET]
