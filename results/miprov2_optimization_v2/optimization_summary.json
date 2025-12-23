@@ -1,0 +1,15 @@
+{
+  "optimization_complete": true,
+  "model_path": "results/miprov2_optimization_v2/optimized_detector.json",
+  "test_results_path": "results/miprov2_optimization_v2/test_results.json",
+  "avg_test_score": 0.8557692307692307,
+  "std_test_score": 0.19615384615384612,
+  "num_train": 41,
+  "num_val": 11,
+  "num_test": 13,
+  "optimizer": "MIPROv2",
+  "num_candidates": 20,
+  "init_temperature": 1.0,
+  "max_errors": 50,
+  "architecture": "PerplexityKasDetector (Dutch native RAG)"
+}

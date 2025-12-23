@@ -151,7 +151,7 @@ def load_greenhouse_data(cache_dir: Path) -> list[dspy.Example]:
             examples.append(example)
 
         except (json.JSONDecodeError, KeyError) as e:
-            logger.warning(f"Failed to load {json_file}: {e}")
+            logger.warning("Failed to load %s: %s", json_file, e)
             continue
 
     console.print(f"[green]✓[/green] Loaded {len(examples)} examples")
@@ -165,6 +165,7 @@ def run_optimization(
     val_size: float = 0.2,
     num_candidates: int = 20,
     init_temperature: float = 1.0,
+    max_errors: int = 50,
 ) -> dict[str, Any]:
     """
     Run full MIPROv2 optimization with PerplexityLM using native RAG.
@@ -181,6 +182,8 @@ def run_optimization(
         num_candidates: Number of prompt candidates to generate per iteration.
             Set to 20 (increased from 5) for structured extraction (per GEPA plan).
         init_temperature: Initial temperature for Bayesian optimization
+        max_errors: Maximum errors to tolerate during bootstrapping.
+            Higher values push MIPROv2 harder by allowing more API failures.
 
     Returns:
         Dictionary with optimization results and metrics
@@ -273,7 +276,9 @@ def run_optimization(
         auto=None,  # Disable auto to use custom num_candidates
         num_candidates=num_candidates,
         init_temperature=init_temperature,
+        max_errors=max_errors,
     )
+    console.print(f"[cyan]Max errors: {max_errors} (higher = push harder)[/cyan]")
 
     # Run optimization
     with Progress(
@@ -307,9 +312,8 @@ def run_optimization(
     metrics["optimization"]["total_duration_seconds"] = (
         metrics["optimization"]["end_time"] - metrics["optimization"]["start_time"]
     )
-    logger.info(
-        f"Optimization completed in {metrics['optimization']['total_duration_seconds']/60:.1f} minutes"
-    )
+    opt_mins = metrics["optimization"]["total_duration_seconds"] / 60
+    logger.info("Optimization completed in %.1f minutes", opt_mins)
 
     # Save optimized model
     model_file = output_dir / "optimized_detector.json"
@@ -319,7 +323,7 @@ def run_optimization(
     # ===== PHASE 2: EVALUATION =====
     logger.info("=" * 80)
     logger.info("STARTING PHASE 2: TEST SET EVALUATION")
-    logger.info(f"Evaluating {len(test_data)} test examples on optimized model")
+    logger.info("Evaluating %d test examples on optimized model", len(test_data))
     logger.info("=" * 80)
 
     phase_var.set("evaluation")
@@ -335,14 +339,16 @@ def run_optimization(
         request_id = str(uuid.uuid4())[:8]
         request_id_var.set(request_id)
 
-        logger.info(f"Processing test example {i+1}/{len(test_data)}")
+        logger.info("Processing test example %d/%d", i + 1, len(test_data))
         logger.debug(
-            f"Example input: bedrijfsnaam='{example.bedrijfsnaam}', "
-            f"locatie='{example.locatie}'"
+            "Example input: bedrijfsnaam='%s', locatie='%s'",
+            example.bedrijfsnaam,
+            example.locatie,
         )
         logger.debug(
-            f"Expected output: is_kas={example.is_kas}, "
-            f"gebruikt_groeilicht={example.gebruikt_groeilicht}"
+            "Expected output: is_kas=%s, gebruikt_groeilicht=%s",
+            example.is_kas,
+            example.gebruikt_groeilicht,
         )
 
         start_time = time.time()
@@ -356,11 +362,12 @@ def run_optimization(
 
             duration = time.time() - start_time
 
-            logger.info(f"Prediction successful in {duration:.2f}s")
+            logger.info("Prediction successful in %.2fs", duration)
             logger.debug(
-                f"Prediction output: is_kas={prediction.is_kas}, "
-                f"gebruikt_groeilicht={prediction.gebruikt_groeilicht}, "
-                f"zekerheid={prediction.zekerheid}"
+                "Prediction output: is_kas=%s, gebruikt_groeilicht=%s, zekerheid=%s",
+                prediction.is_kas,
+                prediction.gebruikt_groeilicht,
+                prediction.zekerheid,
             )
 
             score_result = dutch_kas_gepa_metric(example, prediction, None, None, None)
@@ -388,9 +395,9 @@ def run_optimization(
         except Exception as e:
             duration = time.time() - start_time
 
-            logger.error(f"TEST EXAMPLE {i+1} FAILED after {duration:.2f}s")
-            logger.error(f"Error type: {type(e).__name__}")
-            logger.error(f"Error message: {e!s}")
+            logger.error("TEST EXAMPLE %d FAILED after %.2fs", i + 1, duration)
+            logger.error("Error type: %s", type(e).__name__)
+            logger.error("Error message: %s", e)
             logger.exception("Full exception traceback:")
 
             # Create error dump for reproducibility
@@ -423,9 +430,10 @@ def run_optimization(
             with open(error_dump_file, "w") as f:
                 json.dump(error_dump, f, indent=2)
 
-            logger.error(f"Error dump saved: {error_dump_file}")
+            logger.error("Error dump saved: %s", error_dump_file)
             console.print(
-                f"[red]✗[/red] Test example {i+1} failed - see error_dump_{request_id}.json"
+                f"[red]✗[/red] Test example {i+1} failed - "
+                f"see error_dump_{request_id}.json"
             )
 
             metrics["evaluation"]["failed_predictions"] += 1
@@ -439,14 +447,20 @@ def run_optimization(
     logger.info("=" * 80)
     logger.info("EVALUATION COMPLETE")
     logger.info(
-        f"Successful: {metrics['evaluation']['successful_predictions']}/{len(test_data)}"
+        "Successful: %d/%d",
+        metrics["evaluation"]["successful_predictions"],
+        len(test_data),
     )
     logger.info(
-        f"Failed: {metrics['evaluation']['failed_predictions']}/{len(test_data)}"
+        "Failed: %d/%d",
+        metrics["evaluation"]["failed_predictions"],
+        len(test_data),
     )
     if len(test_scores) > 0:
         logger.info(
-            f"Average score: {np.mean(test_scores):.3f} ± {np.std(test_scores):.3f}"
+            "Average score: %.3f ± %.3f",
+            np.mean(test_scores),
+            np.std(test_scores),
         )
     logger.info("=" * 80)
 
@@ -486,6 +500,7 @@ def run_optimization(
         "optimizer": "MIPROv2",
         "num_candidates": num_candidates,
         "init_temperature": init_temperature,
+        "max_errors": max_errors,
         "architecture": "PerplexityKasDetector (Dutch native RAG)",
     }
 
@@ -516,6 +531,7 @@ def display_results(results: dict[str, Any]) -> None:
     table.add_row("Optimizer", results["optimizer"])
     table.add_row("Num Candidates", str(results["num_candidates"]))
     table.add_row("Init Temperature", str(results["init_temperature"]))
+    table.add_row("Max Errors", str(results.get("max_errors", "N/A")))
     table.add_row("", "")  # Separator
     table.add_row("Test Score (avg)", f"{results['avg_test_score']:.3f}")
     table.add_row("Test Score (std)", f"{results['std_test_score']:.3f}")
@@ -599,6 +615,14 @@ Examples:
         help="Initial temperature for Bayesian optimization (default: 1.0)",
     )
 
+    parser.add_argument(
+        "--max-errors",
+        type=int,
+        default=50,
+        help="Maximum errors to tolerate during bootstrapping (default: 50). "
+        "Higher values push MIPROv2 harder by allowing more API failures.",
+    )
+
     return parser.parse_args()
 
 
@@ -639,6 +663,7 @@ def main() -> int:
             val_size=args.val_size,
             num_candidates=args.num_candidates,
             init_temperature=args.init_temperature,
+            max_errors=args.max_errors,
         )
     except Exception as e:
         console.print(f"[red]✗[/red] Optimization failed: {e}", style="bold red")
@@ -654,7 +679,8 @@ def main() -> int:
     console.print(f"\n[green]✓[/green] Summary saved to {summary_file}")
 
     # Print metrics summary
-    logger.info("\n" + "=" * 80)
+    logger.info("")
+    logger.info("=" * 80)
     logger.info("METRICS SUMMARY")
     logger.info("=" * 80)
 
@@ -665,15 +691,18 @@ def main() -> int:
         "evaluation"
     ]["start_time"]
 
-    logger.info(f"\nOptimization Phase:")
-    logger.info(f"  Duration: {opt_duration/60:.1f} minutes")
+    logger.info("")
+    logger.info("Optimization Phase:")
+    logger.info("  Duration: %.1f minutes", opt_duration / 60)
 
-    logger.info(f"\nEvaluation Phase:")
-    logger.info(f"  Total Examples: {metrics['evaluation']['total_examples']}")
-    logger.info(f"  Successful: {metrics['evaluation']['successful_predictions']}")
-    logger.info(f"  Failed: {metrics['evaluation']['failed_predictions']}")
-    logger.info(f"  Duration: {eval_duration/60:.1f} minutes")
-    logger.info("=" * 80 + "\n")
+    logger.info("")
+    logger.info("Evaluation Phase:")
+    logger.info("  Total Examples: %d", metrics["evaluation"]["total_examples"])
+    logger.info("  Successful: %d", metrics["evaluation"]["successful_predictions"])
+    logger.info("  Failed: %d", metrics["evaluation"]["failed_predictions"])
+    logger.info("  Duration: %.1f minutes", eval_duration / 60)
+    logger.info("=" * 80)
+    logger.info("")
 
     return 0
 

@@ -947,35 +947,65 @@ class PerplexityGreenhouseClassifier(Signature):  # type: ignore[misc]
 
 class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
     """
-    Classificeer of een locatie een commerciële kas is met belichting.
+    Classificeer of een locatie een COMMERCIËLE kas is met belichting.
 
-    BELANGRIJK: Telers adverteren NIET met belichting! Gebruik causaal redeneren:
+    CONTEXT: Dit betreft COMMERCIËLE glastuinbouw, niet hobby of onderzoek.
 
-    STAP 1: Zoek informatie over dit bedrijf - wat telen ze?
-    - Zoek naar: "{bedrijf} kwekerij" of "{bedrijf} glastuinbouw"
-    - Identificeer het hoofdgewas (rozen, tomaten, orchideeën, etc.)
+    BELANGRIJK: Kaseigenaren adverteren NIET met belichting! Gebruik causaal redeneren.
 
-    STAP 2: Als het een kas is, bepaal het hoofdgewas en seizoen.
+    STAP 1: Identificeer de kaseigenaar
+    Zoek naar informatie over de KASEIGENAAR (niet alleen kweker!):
+    - Kweker (teler van gewassen)
+    - Veredelaar (zaadveredeling, kruising, selectie)
+    - Vermeerderaar (stekken, weefselkweek)
+    - Opkweekbedrijf (jonge planten voor andere telers)
+    - Ander glastuinbouwbedrijf
+    Zoek naar: "{bedrijf} glastuinbouw" of "{bedrijf} kwekerij" of "{bedrijf} veredeling"
 
-    STAP 3: Leid af of belichting waarschijnlijk is op basis van het gewas:
+    STAP 2: Bepaal het hoofdgewas en productiedoel
+    - Wat is het hoofdgewas? (rozen, tomaten, orchideeën, etc.)
+    - Wat is het productiedoel? (bloem, vrucht, stek, zaad, opkweek)
+    - Wat is het seizoen? (jaarrond, seizoensgebonden)
+
+    STAP 3: Lichtspectrum analyse - plausibiliteitsredenering
+    Welke kleuren in het lichtspectrum worden door vakliteratuur aanbevolen?
+
+    LICHTSPECTRUM SCENARIOS:
+    | Spectrum | Doel | Typisch gewas |
+    |----------|------|---------------|
+    | Meer rood, minder blauw, gecontroleerde far-red | Maximaliseren bloem/vrucht | Tomaat, paprika, rozen |
+    | Lagere R:FR-ratio | Bloemsteel, blad en productie in balans | Snijbloemen, potplanten |
+    | Meer blauw | Compactere groei, sterkere stengels | Perkplanten, opkweek |
+    | Far-red pulsen | Bloeisturing, vervroeging | Chrysant, kalanchoe |
+
+    Zoek naar informatie van fabrikanten:
+    - Signify (Philips Horticulture)
+    - Gavita
+    - Fluence
+    - Atophort (leverancier)
+    En vakliteratuur (Wageningen, TNO, proefstations)
+
+    STAP 4: Gewasspecifieke belichtingskennis
 
     GEWASSEN DIE BIJNA ALTIJD BELICHT WORDEN (zeg JA):
-    - Rozen: SON-T/Hybrid, 150-250 umol (jaarrond productie)
-    - Tomaten (jaarrond): SON-T/Hybrid, 180-350 umol
-    - Gerbera: SON-T/Hybrid, 120-200 umol
-    - Alstroemeria: SON-T/Hybrid, 120-200 umol
-    - Freesia: SON-T, 100-180 umol
-    - Phalaenopsis orchideeën: LED, 40-120 umol
+    - Rozen: SON-T/Hybrid, 150-250 µmol (jaarrond productie)
+    - Tomaten (jaarrond): SON-T/Hybrid/LED, 180-350 µmol
+    - Gerbera: SON-T/Hybrid, 120-200 µmol
+    - Alstroemeria: SON-T/Hybrid, 120-200 µmol
+    - Freesia: SON-T, 100-180 µmol
+    - Phalaenopsis orchideeën: LED, 40-120 µmol
     - Lisianthus: SON-T/LED voor jaarrond
     - Gypsophila (gipskruid): SON-T voor jaarrond
-    - Ardisia: LED voor winterverkoop
+    - Ardisia: LED voor winterverkoop (ZEER WAARSCHIJNLIJK belichting!)
     - Kalanchoe: LED/SON-T, fotoperiodesturing
+    - Amaryllis (Hippeastrum): SON-T/LED voor geforceerde bloei
+    - Zantedeschia (Calla): LED voor jaarrond productie
 
     GEWASSEN DIE VAAK BELICHT WORDEN (zeg JA bij jaarrond):
-    - Paprika (jaarrond productie): SON-T/Hybrid
+    - Paprika (jaarrond): SON-T/Hybrid/LED
     - Komkommers (jaarrond): LED/Hybrid
     - Aubergine (jaarrond): SON-T
-    - Kruiden (jaarrond levering): LED
+    - Kruiden (jaarrond): LED
     - Aardbeien (winterteelt): LED
     - Cyclamen (winterproductie): LED
     - Begonia (winterproductie): LED/SON-T
@@ -986,37 +1016,43 @@ class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
     - Tulpen: temperatuurgestuurde forcering
     - Ranunculus, anemoon: soms belichting
 
-    GEWASSEN DIE ZELDEN BELICHT WORDEN (zeg NEE tenzij bewijs):
+    GEWASSEN DIE ZELDEN BELICHT WORDEN (zeg NEE):
     - Cymbidium orchideeën: meestal geen belichting
-    - Anthurium: schaduwminnend, matig licht
+    - Anthurium: schaduwminnend
     - Bromelia: tropisch, veel daglicht
+    - Buxus: buitenteelt, geen kas
     - Perkplanten, tuinplanten: seizoensgebonden
     - Vetplanten, cactussen: weinig licht nodig
-    - Zaadproductie, vermeerdering: meestal daglicht
 
-    STAP 4: Controleer op negatieve indicatoren:
-    - "onbelichte teelt" = geen kunstlicht -> NEE
-    - "daglichtkas" = alleen daglicht -> NEE
-    - Alleen zomerproductie/seizoensgebonden -> waarschijnlijk NEE
+    STAP 5: Plausibiliteitsconclusie
+    - Welke fotosynthese heeft het meeste invloed op gewenste karakteristieken?
+      * Grotere bloem/vrucht
+      * Sterkere bloem/plant
+      * Betere houdbaarheid
+      * Intensere kleur
+    - Is het AANNEMELIJK dat de kaseigenaar LED en/of SON-T gebruikt?
+    - Weeg kosten/baten af voor dit specifieke gewas en bedrijfstype
 
-    STAP 5: Als gewas niet in bovenstaande lijsten:
-    - Zoek aanvullende informatie over belichtingsgebruik bij dit gewas
-    - Bij twijfel: ONBEKEND
+    STAP 6: Controleer op negatieve indicatoren:
+    - "onbelichte teelt" = geen kunstlicht → NEE
+    - "daglichtkas" = alleen daglicht → NEE
+    - Alleen zomerproductie/seizoensgebonden → waarschijnlijk NEE
+    - Buitenteelt (vollegrond) → NEE
 
-    LET OP: Bedrijfstype ≠ faciliteitstype
-    - Zaadveredelingsbedrijf MET kassen → is_kas = True
+    BEDRIJFSTYPE ≠ FACILITEITSTYPE:
+    - Veredelingsbedrijf MET kassen → is_kas = True, beoordeel belichting apart
     - Onderzoekscentrum MET kassen → is_kas = True
     - Beoordeel of er KAS-faciliteiten zijn, niet alleen de hoofdactiviteit
 
     HIËRARCHISCHE LOGICA:
     - Als is_kas = False → gebruikt_groeilicht MOET ONBEKEND zijn
-    - Als is_kas = True → leid gebruikt_groeilicht af van gewastype
-    - Als gewastype onbekend → gebruikt_groeilicht = ONBEKEND
+    - Als is_kas = True → leid gebruikt_groeilicht af van gewastype + plausibiliteit
+    - Als gewastype onbekend → zoek verder of zeg ONBEKEND
     """
 
     # Invoervelden
     bedrijfsnaam: str = dspy.InputField(
-        desc="Naam van het bedrijf of de kwekerij om te onderzoeken"
+        desc="Naam van het bedrijf of de kaseigenaar om te onderzoeken"
     )
     locatie: str = dspy.InputField(
         desc="Plaats in Nederland (bijv. 'Waddinxveen', ''s-Gravenzande')"
@@ -1025,10 +1061,11 @@ class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
     # Kernclassificatie
     is_kas: str = dspy.OutputField(
         desc=(
-            "Is dit een kas/kwekerij/glastuinbouwbedrijf? 'true' of 'false'. "
-            "Zoek naar bedrijfsinformatie, let op 'kwekerij', 'glastuinbouw'. "
-            "'false' voor veilingen, zaadhandel, transport, opslag. "
-            "LET OP: Zaadveredelingsbedrijf MET kassen = 'true'."
+            "Heeft deze kaseigenaar een kas/glastuinbouwbedrijf? 'true' of 'false'. "
+            "Zoek naar bedrijfsinformatie over de KASEIGENAAR: kweker, veredelaar, "
+            "vermeerderaar, opkweekbedrijf. Let op 'glastuinbouw', 'kas', 'kwekerij'. "
+            "'false' alleen voor veilingen, pure zaadhandel (zonder kassen), transport, opslag. "
+            "LET OP: Veredelingsbedrijf of onderzoekscentrum MET kassen = 'true'."
         )
     )
 
@@ -1078,16 +1115,56 @@ class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
         )
     )
 
+    # Vakliteratuur over licht en groei
+    literatuur: str = dspy.OutputField(
+        desc=(
+            "Vakliteratuur van universiteiten (Wageningen, TNO) of lichtfabrikanten "
+            "(Signify, Philips, Gavita, Fluence) die uitlegt hoe fotonen de groei "
+            "en/of bloemvorming beïnvloeden voor dit gewas. "
+            "Formaat: 'Bron: bevinding | Bron: bevinding'. "
+            "Bijv: 'WUR: rozen reageren op 150-250 µmol met 15% meerproductie | "
+            "Signify: far-red verhoogt bloemstrekking bij rozen'."
+        )
+    )
+
+    # Lichtspectrum analyse
+    spectrum: str = dspy.OutputField(
+        desc=(
+            "Welke lichtspectra zijn bekend bepaalde aspecten van dit gewas te beïnvloeden? "
+            "Formaat JSON-achtig: "
+            "{'meer rood, minder blauw': 'effect op bloem/vrucht', "
+            "'lagere R:FR-ratio': 'effect op strekking', "
+            "'far-red pulsen': 'effect op bloei'}. "
+            "Wees specifiek voor het geïdentificeerde gewas."
+        )
+    )
+
+    # Lichtsterkte aanbeveling
+    lichtsterkte: str = dspy.OutputField(
+        desc=(
+            "Welke lichtsterkte (µmol/m²/s of PPFD) wordt typisch aanbevolen "
+            "voor dit gewas volgens vakliteratuur of fabrikanten? "
+            "Bijv: '180-250 µmol voor tomaat jaarrond', '40-80 µmol voor Phalaenopsis', "
+            "'150-200 µmol voor rozen bloem-optimalisatie'. "
+            "Vermeld bron indien bekend."
+        )
+    )
+
     # Redenering
     redenering: str = dspy.OutputField(
         desc=(
-            "Stapsgewijze causale redenering:\n"
-            "1. Wat heb je gevonden over dit bedrijf?\n"
-            "2. Welk gewas teelt dit bedrijf?\n"
-            "3. Volgens de domeinkennis, gebruikt dit gewas belichting?\n"
-            "4. Zijn er negatieve indicatoren (onbelichte teelt, daglichtkas)?\n"
-            "5. Conclusie: gewastype → belichtingsgebruik.\n"
-            "VERMELD alle gevonden URLs."
+            "Stapsgewijze causale redenering met wetenschappelijke onderbouwing:\n"
+            "1. KASEIGENAAR: Wat voor type is dit? (kweker, veredelaar, vermeerderaar, opkweek)\n"
+            "2. GEWAS: Welk gewas teelt/veredelt dit bedrijf? Wat is het productiedoel?\n"
+            "3. LITERATUUR: Wat zegt vakliteratuur (WUR, Signify, etc.) over lichtbehoefte?\n"
+            "4. SPECTRUM: Welk lichtspectrum is optimaal? (R:FR ratio, far-red, blauw/rood)\n"
+            "5. LICHTSTERKTE: Hoeveel µmol wordt aanbevolen voor dit gewas?\n"
+            "6. PLAUSIBILITEIT: Is het AANNEMELIJK dat deze kaseigenaar investeert in LED/SON-T?\n"
+            "   - Kosten/baten voor dit bedrijfstype\n"
+            "   - Gewenste kwaliteitskenmerken (grotere bloem, betere houdbaarheid)\n"
+            "7. NEGATIEF: Zijn er contra-indicatoren? (onbelichte teelt, daglichtkas, buitenteelt)\n"
+            "8. CONCLUSIE: gewastype + literatuur + spectrum + plausibiliteit → belichtingsgebruik.\n"
+            "VERMELD alle bronnen: URLs, WUR rapporten, Signify case studies, etc."
         )
     )
 

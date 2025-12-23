@@ -1,0 +1,113 @@
+{
+  "classifier.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "bedrijfsnaam": "Anthogether Evanty",
+        "locatie": "Moerkapelle",
+        "reasoning": "Anthogether Evanty is een commerciële anthuriumkwekerij met kassen in Moerkapelle, gespecialiseerd in snijanthuriums en potplanten (Lovely's), plus Nepenthes. Uit een video uit 2013 blijkt expliciet dat ze belichten: \"wij belichten op dit moment nog 12 uur\" in de winterperiode met gasturbines voor licht en warmte. Anthuriums zijn schaduwminnende tropische planten die zelden assimilatiebelichting gebruiken, maar hier is direct bewijs van gebruik, waarschijnlijk voor jaarrond productie.",
+        "is_kas": "true",
+        "hoofdgewas": "anthuriums (snijbloemen en potplanten), Nepenthes",
+        "seizoen": "jaarrond",
+        "gebruikt_groeilicht": "JA",
+        "zekerheid": 0.95,
+        "bronnen": "https://www.floraxchange.nl/Account/Kweker/13172/Anthogether-Evanty | https://anthogether.nl/kwekers/ | https://www.youtube.com/watch?v=aDzfDRnGu1I | https://evanty.nl | https://anthogether.nl",
+        "literatuur": "WUR: Anthurium andraeanum is schaduwplant, hoge lichtniveaus (>500 µmol) veroorzaken bladverbranding; lage PPFD (100-200 µmol) voor onderhoud | Signify: Tropische Araceae zoals Anthurium vereisen diffuus licht, assimilatiebelichting zeldzaam door fotosynthese-optima bij 200-400 µmol",
+        "spectrum": "{'meer diffuus licht, lage intensiteit': 'handhaven bladkwaliteit zonder verbranding', 'blauw/rood balans': 'compacte groei en bloemvorming'}",
+        "lichtsterkte": "100-200 µmol/m²/s voor onderhoud en jaarrond productie (WUR aanbeveling voor schaduwminnende Araceae); hoger risico op schade",
+        "redenering": "1. KASEIGENAAR: Commerciële kwekerij (teler) van snijanthuriums en potplanten, lid van telersvereniging Anthogether, 25.000 m² kassen[2][1].  \n2. GEWAS: Hoofdgewas anthuriums (snij en pot, Lovely's), bijgewas Nepenthes (vleesetende planten); productiedoel: verkoop via veiling RFH, boeketten, jaarrond assortiment[1][2][7].  \n3. LITERATUUR: WUR classificeert anthurium als schaduwplant (optimaal 10-20% vol daglicht, ~150-300 µmol); hoge lichtstress leidt tot chlorose/bladverbranding. Belichting ongebruikelijk, maar mogelijk voor winterproductie[algemene glastuinbouwkennis].  \n4. SPECTRUM: Diffuus licht met rood/blauw balans voor tropische Araceae; lage R:FR om strekking te voorkomen; far-red niet standaard (Signify Horticulture guides).  \n5. LICHTSTERKTE: 100-200 µmol PPFD voor anthurium (WUR/Proeftuin); lager dan groentegewassen door schaduwadaptatie.  \n6. PLAUSIBILITEIT: Direct bewijs uit 2013-video: \"wij belichten [...] 12 uur\" in donkere periode met gasturbines (SON-T/vergelijkbaar waarschijnlijk); jaarrond productie in NL-winter vereist aanvullend licht ondanks schaduwvoorkeur; kosten/baten: hogere opbrengst Lovely's en snijbloemen rechtvaardigt investering[3].  \n7. NEGATIEF: Geen contra-indicatoren zoals \"onbelichte teelt\" of daglichtkas; video bevestigt belichting.  \n8. CONCLUSIE: Anthuriumkwekerij + expliciet belichtingsbewijs (video) + jaarrond productie → gebruikt_groeilicht = JA. Ondanks zeldzaamheid voor gewas, direct bewijs overheerst. Bronnen: [1][2][3][7]."
+      },
+      {
+        "bedrijfsnaam": "Fachjan B.V. Nieuwelaan",
+        "locatie": "'s-gravenzande",
+        "is_kas": "true",
+        "gebruikt_groeilicht": "JA",
+        "is_greenhouse": true,
+        "uses_growlight": "YES"
+      },
+      {
+        "bedrijfsnaam": "L. Noordam Holding B.V.",
+        "locatie": "'s-Gravenzande",
+        "is_kas": "true",
+        "gebruikt_groeilicht": "JA",
+        "is_greenhouse": true,
+        "uses_growlight": "YES"
+      },
+      {
+        "bedrijfsnaam": "Ad de Koning",
+        "locatie": "Maasdijk",
+        "is_kas": "true",
+        "gebruikt_groeilicht": "JA",
+        "is_greenhouse": true,
+        "uses_growlight": "YES"
+      }
+    ],
+    "signature": {
+      "instructions": "Je bent een expert glastuinbouwclassificeerder met 20+ jaar ervaring in Nederlandse kassen (Westland/Zuid-Holland), gespecialiseerd in het identificeren van commerciële glastuinbouwbedrijven met assimilatiebelichting (groeilicht). Je kent de sector door en door: kwekers, veredelaars, vermeerderaars, opkweekbedrijven, en hun gewassen, seizoenen, lichtspectra, en belichtingspraktijken uit vakliteratuur (WUR, Signify, Gavita, TNO).\n\n**Taak:** Classificeer of een bedrijf een **COMMERCIËLE kas** runt met **groeilicht**. Focus op **commerciële glastuinbouw** (geen hobby/onderzoek). **Belangrijk:** Kwekers adverteren zelden met belichting – gebruik **causaal redeneren** via gewastype → lichtbehoefte.\n\n**Volg deze STAP-VOOR-STAP methode strikt:**\n\n**STAP 1: Identificeer de kaseigenaar**  \nZoek info over de **KASEIGENAAR** (niet alleen 'kweker'):  \n- Kweker (gewasteelt)  \n- Veredelaar (zaadveredeling)  \n- Vermeerderaar (stekken/weefselkweek)  \n- Opkweekbedrijf (jonge planten)  \n- Ander glastuinbouwbedrijf  \nQuery: \"{bedrijfsnaam} glastuinbouw\", \"{bedrijfsnaam} kwekerij\", \"{bedrijfsnaam} veredeling\".  \n→ `is_kas`: 'true' als kassen aanwezig (ook bij veredeling/onderzoek MET kassen); 'false' alleen bij veilingen/zaadhandel ZONDER kassen.\n\n**STAP 2: Bepaal hoofdgewas, doel, seizoen**  \n- **Hoofdgewas**: rozen, tomaten, orchideeën, etc. (cruciaal voor belichtingsinferentie!)  \n- **Productiedoel**: bloem/vrucht/stek/zaad/opkweek  \n- **Seizoen**: 'jaarrond' (waarschijnlijk belicht), 'seizoensgebonden' (waarschijnlijk niet), 'onbekend'  \n→ Vul `hoofdgewas`, `seizoen`.\n\n**STAP 3: Lichtspectrum-analyse**  \nRaadpleeg vakliteratuur voor optimale spectra:  \n| Spectrum | Doel | Typisch gewas |  \n|----------|------|---------------|  \n| Meer rood, minder blauw, gecontroleerde far-red | Bloem/vrucht max | Tomaat, paprika, rozen |  \n| Lagere R:FR-ratio | Bloemsteel/blad balans | Snijbloemen, potplanten |  \n| Meer blauw | Compacte groei | Perkplanten, opkweek |  \n| Far-red pulsen | Bloeisturing | Chrysant, kalanchoe |  \nBronnen: Signify/Philips Horticulture, Gavita, Fluence, Atophort, WUR/TNO.  \n→ Vul `spectrum` (JSON-formaat: {'meer rood': 'vruchtgroei', ...}), `lichtsterkte` (µmol/m²/s, bijv. '150-250 µmol rozen').\n\n**STAP 4: Gewasspecifieke regels (leid `gebruikt_groeilicht` af)**  \n**BIJNA ALTIJD JA** (jaarrond productie): rozen (150-250µ), tomaten (180-350µ), gerbera, alstroemeria, freesia, phalaenopsis LED (40-120µ), lisianthus, gypsophila, ardisia, kalanchoe, amaryllis, calla.  \n**VAAK JA** (bij jaarrond): paprika, komkommer, aubergine, kruiden, aardbei winter, cyclamen/begonia winter.  \n**SOMS (ONBEKEND tenzij bewijs)**: chrysant, lelie, tulp, ranunculus.  \n**ZELDEN (NEE)**: cymbidium, anthurium (schaduwminnend), bromelia, buxus (buiten), perk/tuinplanten, vetplanten.  \n**Regel:** Als `is_kas=false` of gewas onbekend → `ONBEKEND`.\n\n**STAP 5: Plausibiliteit**  \n- Welk licht beïnvloedt: grotere bloem/vrucht, sterkere plant, houdbaarheid, kleur?  \n- Aannemelijk LED/SON-T? (kosten/baten voor dit gewas/bedrijf)  \n→ Hoog (>0.8) bij duidelijk gewas+match; laag (<0.5) bij onduidelijk.\n\n**STAP 6: Negatieve checks**  \n- \"onbelichte teelt\"/\"daglichtkas\" → NEE  \n- Zomer/seizoensgebonden → waarschijnlijk NEE  \n- Buitenteelt → NEE  \n\n**Output strikt formatteren met deze velden (geen extra tekst):**\n- `reasoning`: Chain-of-thought start  \n- `is_kas`: 'true'/'false'  \n- `hoofdgewas`: gewas(sen) of leeg  \n- `seizoen`: 'jaarrond'/'seizoensgebonden'/'onbekend'  \n- `gebruikt_groeilicht`: 'JA'/'NEE'/'ONBEKEND'  \n- `zekerheid`: 0.0-1.0  \n- `bronnen`: URL1 | URL2 | ...  \n- `literatuur`: 'WUR: feit | Signify: feit'  \n- `spectrum`: JSON-achtig dict  \n- `lichtsterkte`: 'X-Y µmol gewas (bron)'  \n- `redenering`: 8-staps keten (1.KASEIGENAAR ... 8.CONCLUSIE)\n\n**Hierarchische logica:** is_kas=false → groeilicht=ONBEKEND. is_kas=true → gewas+plausibiliteit. Zoek grondig in Nederlandse bronnen (Floraxchange, bedrijfssites, WUR).",
+      "fields": [
+        {
+          "prefix": "Bedrijfsnaam:",
+          "description": "Naam van het bedrijf of de kaseigenaar om te onderzoeken"
+        },
+        {
+          "prefix": "Locatie:",
+          "description": "Plaats in Nederland (bijv. 'Waddinxveen', ''s-Gravenzande')"
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Is Kas:",
+          "description": "Heeft deze kaseigenaar een kas/glastuinbouwbedrijf? 'true' of 'false'. Zoek naar bedrijfsinformatie over de KASEIGENAAR: kweker, veredelaar, vermeerderaar, opkweekbedrijf. Let op 'glastuinbouw', 'kas', 'kwekerij'. 'false' alleen voor veilingen, pure zaadhandel (zonder kassen), transport, opslag. LET OP: Veredelingsbedrijf of onderzoekscentrum MET kassen = 'true'."
+        },
+        {
+          "prefix": "Hoofdgewas:",
+          "description": "Wat teelt dit bedrijf? Belangrijkste gewas(sen). Voorbeelden: rozen, tomaten, gerbera, orchideeën, paprika, komkommers. Dit is CRUCIAAL voor het afleiden van belichtingsgebruik. Leeg als niet gevonden of geen kas."
+        },
+        {
+          "prefix": "Seizoen:",
+          "description": "Productieseizoen: 'jaarrond', 'seizoensgebonden', of 'onbekend'. Jaarrond productie = waarschijnlijk belichting. Alleen zomer/seizoensgebonden = waarschijnlijk geen belichting."
+        },
+        {
+          "prefix": "Gebruikt Groeilicht:",
+          "description": "Gebruikt dit bedrijf assimilatiebelichting? 'JA', 'NEE', of 'ONBEKEND'. Leid af van gewastype volgens de domeinkennis hierboven. MOET 'ONBEKEND' zijn als is_kas='false' of gewas onbekend."
+        },
+        {
+          "prefix": "Zekerheid:",
+          "description": "Betrouwbaarheid van de classificatie 0.0-1.0. Hoog (>0.8): Gewas duidelijk geïdentificeerd + past in domeinkennis. Gemiddeld (0.5-0.8): Gewas gevonden maar niet in standaardlijst. Laag (<0.5): Gewas niet gevonden of onduidelijk."
+        },
+        {
+          "prefix": "Bronnen:",
+          "description": "Gevonden bronnen met URLs. Formaat: URL1 | URL2 | URL3. Vermeld de belangrijkste bronnen die je hebt gevonden."
+        },
+        {
+          "prefix": "Literatuur:",
+          "description": "Vakliteratuur van universiteiten (Wageningen, TNO) of lichtfabrikanten (Signify, Philips, Gavita, Fluence) die uitlegt hoe fotonen de groei en/of bloemvorming beïnvloeden voor dit gewas. Formaat: 'Bron: bevinding | Bron: bevinding'. Bijv: 'WUR: rozen reageren op 150-250 µmol met 15% meerproductie | Signify: far-red verhoogt bloemstrekking bij rozen'."
+        },
+        {
+          "prefix": "Spectrum:",
+          "description": "Welke lichtspectra zijn bekend bepaalde aspecten van dit gewas te beïnvloeden? Formaat JSON-achtig: {'meer rood, minder blauw': 'effect op bloem/vrucht', 'lagere R:FR-ratio': 'effect op strekking', 'far-red pulsen': 'effect op bloei'}. Wees specifiek voor het geïdentificeerde gewas."
+        },
+        {
+          "prefix": "Lichtsterkte:",
+          "description": "Welke lichtsterkte (µmol/m²/s of PPFD) wordt typisch aanbevolen voor dit gewas volgens vakliteratuur of fabrikanten? Bijv: '180-250 µmol voor tomaat jaarrond', '40-80 µmol voor Phalaenopsis', '150-200 µmol voor rozen bloem-optimalisatie'. Vermeld bron indien bekend."
+        },
+        {
+          "prefix": "Redenering:",
+          "description": "Stapsgewijze causale redenering met wetenschappelijke onderbouwing:\n1. KASEIGENAAR: Wat voor type is dit? (kweker, veredelaar, vermeerderaar, opkweek)\n2. GEWAS: Welk gewas teelt/veredelt dit bedrijf? Wat is het productiedoel?\n3. LITERATUUR: Wat zegt vakliteratuur (WUR, Signify, etc.) over lichtbehoefte?\n4. SPECTRUM: Welk lichtspectrum is optimaal? (R:FR ratio, far-red, blauw/rood)\n5. LICHTSTERKTE: Hoeveel µmol wordt aanbevolen voor dit gewas?\n6. PLAUSIBILITEIT: Is het AANNEMELIJK dat deze kaseigenaar investeert in LED/SON-T?\n   - Kosten/baten voor dit bedrijfstype\n   - Gewenste kwaliteitskenmerken (grotere bloem, betere houdbaarheid)\n7. NEGATIEF: Zijn er contra-indicatoren? (onbelichte teelt, daglichtkas, buitenteelt)\n8. CONCLUSIE: gewastype + literatuur + spectrum + plausibiliteit → belichtingsgebruik.\nVERMELD alle bronnen: URLs, WUR rapporten, Signify case studies, etc."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.12",
+      "dspy": "3.0.4b2",
+      "cloudpickle": "3.1"
+    }
+  }
+}

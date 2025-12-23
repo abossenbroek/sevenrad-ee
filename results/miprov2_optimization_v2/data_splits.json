@@ -1,0 +1,9 @@
+{
+  "total": 65,
+  "train": 41,
+  "val": 11,
+  "test": 13,
+  "test_size": 0.2,
+  "val_size": 0.2,
+  "seed": 42
+}
