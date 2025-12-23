@@ -1,15 +1,20 @@
 """
-Run full MIPROv2 optimization with PerplexityLM.
+Run full MIPROv2 optimization with PerplexityLM using native RAG.
 
 This script runs the complete MIPROv2 optimization using:
-- Student Model: PerplexityLM (sonar-pro) with native structured outputs
+- Student Model: PerplexityLM (sonar-pro) with native web search
+- Architecture: Single-stage Perplexity RAG (search + reason + cite in one call)
 - Optimization: MIPROv2 with Bayesian optimization (no teacher model needed)
 
+Key improvement from previous approach:
+- BEFORE: Perplexity Search → Cache → Text → DSPy Predictor → Parse (3+ LLM calls)
+- AFTER:  Perplexity RAG (search + reason + cite in ONE call) (1 LLM call)
+
 Expected runtime: 1-3 hours depending on dataset size
-Expected cost: Lower than GEPA as no teacher model is required
+Expected cost: ~1000+ API calls per optimization run (41 train x 20 candidates)
 
 Documentation Type: Script (Code to Run)
-Part of: Phase 3 - MIPROv2 Optimization Strategy
+Part of: Phase 3 GEPA Optimization Plan - Native Perplexity RAG
 """
 
 import argparse
@@ -30,10 +35,9 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
-from sevenrad_ee.ai.dspy_evaluation import gepa_compatible_metric
-from sevenrad_ee.ai.dspy_greenhouse import GreenhouseDetector
+from sevenrad_ee.ai.dspy_evaluation import dutch_kas_gepa_metric
+from sevenrad_ee.ai.dspy_greenhouse import PerplexityKasDetector
 from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
-from sevenrad_ee.ai.retrievers import CachedRetriever
 from sevenrad_ee.ai.utils.logging_setup import (
     get_logger,
     phase_var,
@@ -120,13 +124,29 @@ def load_greenhouse_data(cache_dir: Path) -> list[dspy.Example]:
             is_greenhouse = data["is_greenhouse"]
             uses_growlight = data["uses_growlight"]
 
-            # Create dspy.Example (using parameter names that match GreenhouseDetector.forward())
+            # Convert English values to Dutch for PerplexityKasClassificatie
+            # is_kas: true/false (same as English)
+            is_kas = "true" if is_greenhouse else "false"
+
+            # gebruikt_groeilicht: JA/NEE/ONBEKEND
+            growlight_map = {
+                "YES": "JA",
+                "NO": "NEE",
+                "UNKNOWN": "ONBEKEND",
+                "NOT_APPLICABLE": "NEE",  # For non-greenhouses
+            }
+            gebruikt_groeilicht = growlight_map.get(uses_growlight, "ONBEKEND")
+
+            # Create dspy.Example with Dutch field names for PerplexityKasDetector
             example = dspy.Example(
-                location_name=company_name,
-                location_area=location,
+                bedrijfsnaam=company_name,
+                locatie=location,
+                is_kas=is_kas,
+                gebruikt_groeilicht=gebruikt_groeilicht,
+                # Keep English fields for stratification
                 is_greenhouse=is_greenhouse,
                 uses_growlight=uses_growlight,
-            ).with_inputs("location_name", "location_area")
+            ).with_inputs("bedrijfsnaam", "locatie")
 
             examples.append(example)
 
@@ -143,18 +163,23 @@ def run_optimization(
     output_dir: Path,
     test_size: float = 0.2,
     val_size: float = 0.2,
-    num_candidates: int = 10,
+    num_candidates: int = 20,
     init_temperature: float = 1.0,
 ) -> dict[str, Any]:
     """
-    Run full MIPROv2 optimization with PerplexityLM.
+    Run full MIPROv2 optimization with PerplexityLM using native RAG.
+
+    Uses PerplexityKasDetector which performs search + reason + cite in Dutch
+    in a single Perplexity API call. MIPROv2 optimizes the prompt that controls
+    both search behavior and classification reasoning.
 
     Args:
-        cache_dir: Directory with cached research data
+        cache_dir: Directory with labeled training data (JSON files with ground truth)
         output_dir: Directory to save optimization results
         test_size: Proportion of data to use for final testing
         val_size: Proportion of training data to use for validation
-        num_candidates: Number of prompt candidates to generate per iteration
+        num_candidates: Number of prompt candidates to generate per iteration.
+            Set to 20 (increased from 5) for structured extraction (per GEPA plan).
         init_temperature: Initial temperature for Bayesian optimization
 
     Returns:
@@ -215,10 +240,6 @@ def run_optimization(
         )
     )
 
-    # Create retriever and detector
-    cached_retriever = CachedRetriever(cache_dir=cache_dir)
-    detector = GreenhouseDetector(retriever=cached_retriever)
-
     # Configure student model (PerplexityLM) for predictions
     console.print("\n[yellow]Configuring model...[/yellow]")
     student_lm = PerplexityLM(
@@ -227,6 +248,13 @@ def run_optimization(
     )
     dspy.configure(lm=student_lm)
     console.print("[green]✓[/green] Student model: PerplexityLM (sonar-pro)")
+
+    # Create detector - uses native Perplexity RAG with Dutch signature
+    console.print(
+        "[cyan]Architecture: PerplexityKasDetector "
+        "(Dutch native RAG - search + reason + cite in one call)[/cyan]"
+    )
+    detector = PerplexityKasDetector()
 
     # ===== PHASE 1: OPTIMIZATION =====
     logger.info("=" * 80)
@@ -241,7 +269,7 @@ def run_optimization(
     )
 
     optimizer = MIPROv2(
-        metric=gepa_compatible_metric,
+        metric=dutch_kas_gepa_metric,
         auto=None,  # Disable auto to use custom num_candidates
         num_candidates=num_candidates,
         init_temperature=init_temperature,
@@ -309,42 +337,44 @@ def run_optimization(
 
         logger.info(f"Processing test example {i+1}/{len(test_data)}")
         logger.debug(
-            f"Example input: location_name='{example.location_name}', "
-            f"location_area='{example.location_area}'"
+            f"Example input: bedrijfsnaam='{example.bedrijfsnaam}', "
+            f"locatie='{example.locatie}'"
         )
         logger.debug(
-            f"Expected output: is_greenhouse={example.is_greenhouse}, "
-            f"uses_growlight={example.uses_growlight}"
+            f"Expected output: is_kas={example.is_kas}, "
+            f"gebruikt_groeilicht={example.gebruikt_groeilicht}"
         )
 
         start_time = time.time()
 
         try:
+            # Call with Dutch field names
             prediction = optimized_detector(
-                location_name=example.location_name,
-                location_area=example.location_area,
+                bedrijfsnaam=example.bedrijfsnaam,
+                locatie=example.locatie,
             )
 
             duration = time.time() - start_time
 
             logger.info(f"Prediction successful in {duration:.2f}s")
             logger.debug(
-                f"Prediction output: is_greenhouse={prediction.is_greenhouse}, "
-                f"uses_growlight={prediction.uses_growlight}, "
-                f"confidence={prediction.confidence}"
+                f"Prediction output: is_kas={prediction.is_kas}, "
+                f"gebruikt_groeilicht={prediction.gebruikt_groeilicht}, "
+                f"zekerheid={prediction.zekerheid}"
             )
 
-            score, feedback = gepa_compatible_metric(
-                example, prediction, None, None, None
-            )
+            score_result = dutch_kas_gepa_metric(example, prediction, None, None, None)
+            # ScoreWithFeedback has .score and .feedback attributes
+            score = score_result.score
+            feedback = score_result.feedback
             test_scores.append(score)
             test_predictions.append(
                 {
-                    "location_name": example.location_name,
-                    "true_is_greenhouse": example.is_greenhouse,
-                    "pred_is_greenhouse": prediction.is_greenhouse,
-                    "true_uses_growlight": example.uses_growlight,
-                    "pred_uses_growlight": prediction.uses_growlight,
+                    "bedrijfsnaam": example.bedrijfsnaam,
+                    "true_is_kas": example.is_kas,
+                    "pred_is_kas": prediction.is_kas,
+                    "true_gebruikt_groeilicht": example.gebruikt_groeilicht,
+                    "pred_gebruikt_groeilicht": prediction.gebruikt_groeilicht,
                     "score": score,
                     "feedback": feedback,
                     "request_id": request_id,
@@ -456,6 +486,7 @@ def run_optimization(
         "optimizer": "MIPROv2",
         "num_candidates": num_candidates,
         "init_temperature": init_temperature,
+        "architecture": "PerplexityKasDetector (Dutch native RAG)",
     }
 
     return results
@@ -481,6 +512,7 @@ def display_results(results: dict[str, Any]) -> None:
     table.add_row("Validation Examples", f"{results['num_val']:,}")
     table.add_row("Test Examples", f"{results['num_test']:,}")
     table.add_row("", "")  # Separator
+    table.add_row("Architecture", results.get("architecture", "N/A"))
     table.add_row("Optimizer", results["optimizer"])
     table.add_row("Num Candidates", str(results["num_candidates"]))
     table.add_row("Init Temperature", str(results["init_temperature"]))
@@ -556,8 +588,8 @@ Examples:
     parser.add_argument(
         "--num-candidates",
         type=int,
-        default=10,
-        help="Number of prompt candidates per iteration (default: 10)",
+        default=20,
+        help="Number of prompt candidates per iteration (default: 20)",
     )
 
     parser.add_argument(
@@ -582,7 +614,7 @@ def main() -> int:
     console.print(
         Panel.fit(
             "[bold cyan]MIPROv2 Optimization with PerplexityLM[/bold cyan]\n"
-            "Bayesian optimization using MIPROv2\n"
+            "Native RAG: Perplexity search + reason + cite in one call\n"
             "[dim]Student: PerplexityLM (no teacher model required)[/dim]",
             border_style="cyan",
         )
