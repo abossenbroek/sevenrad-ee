@@ -401,10 +401,10 @@ def run_optimization(
                 "example_index": i + 1,
                 "total_examples": len(test_data),
                 "example_data": {
-                    "location_name": example.location_name,
-                    "location_area": example.location_area,
-                    "expected_is_greenhouse": example.is_greenhouse,
-                    "expected_uses_growlight": example.uses_growlight,
+                    "bedrijfsnaam": example.bedrijfsnaam,
+                    "locatie": example.locatie,
+                    "expected_is_kas": example.is_kas,
+                    "expected_gebruikt_groeilicht": example.gebruikt_groeilicht,
                 },
                 "error": {
                     "type": type(e).__name__,
