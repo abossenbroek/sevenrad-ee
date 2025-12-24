@@ -26,6 +26,50 @@ This retrospective applies critical scrutiny to the MIPROv2 optimization results
 
 **Data split:** 65 total examples = 41 train + 11 validation + 13 test (held-out)
 
+**Important:** V2 and V3 were **independent optimization runs**, not re-analyses of the same model.
+
+---
+
+## Independent Runs and Label Evolution
+
+V2 (Dec 22) and V3 (Dec 23) were separate MIPROv2 optimization runs with different results:
+
+### Error Comparison Between Runs
+
+| Company | V2 Pred | V2 True | V3 Pred | V3 True | Change |
+|---------|---------|---------|---------|---------|--------|
+| Van den Bos Ardisia | ONBEKEND | JA | **JA** | JA | Model improved |
+| de Bruijn | ONBEKEND | **JA** | JA | **NEE** | Label changed |
+| Vreugdenhil | ONBEKEND | JA | JA | JA | Model improved |
+| Stolk | ONBEKEND | **ONBEKEND** | JA | **NEE** | Label changed |
+| Jongland | ONBEKEND | JA | ONBEKEND | JA | Same error |
+| Nunhems | (perfect) | - | ONBEKEND | JA | New error |
+
+### Label Changes Between Runs
+
+| Company | V2 Label | V3 Label | Rationale |
+|---------|----------|----------|-----------|
+| **de Bruijn** | JA | **NEE** | Changed to "seasonal tomatoes" |
+| **Stolk** | ONBEKEND | **NEE** | Changed to "Yucca = no lights" |
+
+### Final Ground Truth (Current State)
+
+| Company | is_greenhouse | uses_growlight | Crop |
+|---------|---------------|----------------|------|
+| Van den Bos Ardisia | true | **YES** | Ardisia crenata |
+| de Bruijn | true | **NO** | Tomaten (seasonal) |
+| Kwekerij De Opstal | true | YES | Trosrozen |
+| Vereijken 's-Gravenzande | true | YES | Trostomaten |
+| Nunhems Netherlands | true | YES | Groentezaden |
+| Vreugdenhil Bulbs | true | YES | Amaryllis, Calla |
+| N.L. van Geest | true | YES | Amaryllis |
+| Bernhard Optimum | true | YES | Phalaenopsis |
+| WPK Westlandse | true | YES | Opkweek groenten |
+| Vereijken Kwekerijen | true | YES | Trostomaten |
+| Stolk Kwekerij | true | **NO** | Yucca, Fatsia |
+| Batist Westmade | true | YES | Gerbera |
+| Kwekerij Jongland | true | YES | Groenten |
+
 ---
 
 ## Changes from Previous Retrospectives
