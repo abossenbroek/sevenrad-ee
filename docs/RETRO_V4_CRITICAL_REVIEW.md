@@ -11,18 +11,20 @@
 
 This retrospective applies critical scrutiny to the MIPROv2 optimization results. Rather than accepting the 85.6% accuracy as "good," we challenge the underlying assumptions, statistical validity, and ground truth labels.
 
-**Key finding:** The claimed 85.6% accuracy is statistically meaningless with n=13, and at least one ground truth label (de Bruijn tomatoes) appears suspicious.
+**Key finding:** The 85.6% out-of-sample accuracy on n=13 held-out test examples is sufficient for current development purposes, though not for production claims. At least one ground truth label (de Bruijn tomatoes) appears suspicious.
 
 ---
 
 ## Retrospective Progression
 
-| Version | Date | Score | Key Focus |
-|---------|------|-------|-----------|
-| v1 | 2025-12-22 | 67.9% | Architecture fixes, Dutch signature |
-| v2 | 2025-12-22 | 85.6% | Kaseigenaar search, gewas-specifieke regels |
-| v3 | 2025-12-23 | 85.6% | RAG activation, plausible reasoning, economic reality |
-| **v4** | **2025-12-24** | 85.6% | **Critical review, statistical validity, label verification** |
+| Version | Date | In-Sample (n=41) | Out-of-Sample (n=13) | Key Focus |
+|---------|------|------------------|----------------------|-----------|
+| v1 | 2025-12-22 | ~75% | 67.9% | Architecture fixes, Dutch signature |
+| v2 | 2025-12-22 | 93.2% | 85.6% | Kaseigenaar search, gewas-specifieke regels |
+| v3 | 2025-12-23 | 93.2% | 85.6% | RAG activation, plausible reasoning, economic reality |
+| **v4** | **2025-12-24** | **93.2%** | **85.6%** | **Critical review, label verification** |
+
+**Data split:** 65 total examples = 41 train + 11 validation + 13 test (held-out)
 
 ---
 
@@ -58,20 +60,22 @@ This retrospective applies critical scrutiny to the MIPROv2 optimization results
 
 ## Critical Findings
 
-### 1. Statistical Validity Concerns
+### 1. Statistical Context
 
-The test set of n=13 is insufficient for meaningful conclusions.
+The dataset is intentionally limited to avoid exposing all available data. For current development purposes, the 65-example dataset with 13 held-out test examples is sufficient.
 
-| Metric | Value | Problem |
-|--------|-------|---------|
-| Sample size | 13 | Far below minimum for reliable metrics |
-| 95% Confidence Interval | 57% - 98% | Range so wide it's nearly meaningless |
-| Standard deviation | 19.6% | High variance indicates unreliable signal |
-| Training vs Test gap | 93.18% vs 85.6% | Suggests overfitting |
+| Metric | Value | Interpretation |
+|--------|-------|----------------|
+| Training set | 41 examples | Reasonable for prompt optimization |
+| Validation set | 11 examples | Used during MIPROv2 optimization |
+| Test set (held-out) | 13 examples | Out-of-sample evaluation |
+| In-sample accuracy | 93.2% | Model fits training data well |
+| Out-of-sample accuracy | 85.6% | Generalization gap of ~7.6% |
+| Standard deviation | 19.6% | Some variance across examples |
 
-**Minimum sample size:** For reliable classification metrics, need 100-200 samples per class.
+**Note on confidence intervals:** With n=13, the 95% CI for 85.6% is approximately 57%-98%. This is acceptable for development iteration but would require more data for production claims.
 
-**Baseline missing:** What is random chance for 3-class (JA/NEE/ONBEKEND)? Approximately 33%. The improvement over baseline should be the metric, not absolute accuracy.
+**Baseline:** Random chance for 3-class (JA/NEE/ONBEKEND) is ~33%. The model significantly outperforms baseline.
 
 ### 2. Ground Truth Label Questions
 
@@ -140,7 +144,7 @@ The PAL challenge framework was applied to scrutinize the optimization results:
    - **Answer:** At least one (de Bruijn) appears to be a labeling error, not a model error.
 
 3. **Is the sample size statistically meaningful?**
-   - **Answer:** No. Need 100+ samples for reliable conclusions.
+   - **Answer:** Sufficient for development iteration. Would need more for production claims.
 
 4. **Is "seasonal tomatoes" logic sound?**
    - **Answer:** Questionable. Dutch commercial tomatoes are typically lit year-round.
@@ -223,8 +227,11 @@ The following challenge was posed to scrutinize the findings:
 
 ## Conclusion
 
-The 85.6% accuracy claimed in Retro 2 and maintained through Retro 3 is not a reliable metric. The sample size is too small, at least one ground truth label is suspicious, and the error cost framework is missing.
+The 85.6% out-of-sample accuracy (vs 93.2% in-sample) represents solid progress for development purposes. The ~7.6% generalization gap is acceptable, and the model significantly outperforms the ~33% random baseline.
 
-This does not mean the optimization work was wasted - the architecture improvements and domain knowledge additions are valuable. However, **production deployment decisions should not be based on n=13 test results**.
+**Key caveats identified in this review:**
+1. At least one ground truth label (de Bruijn tomatoes) is suspicious and should be verified
+2. The limited test set (n=13) is sufficient for iteration but not for production claims
+3. Error cost analysis is missing - the impact of different error types depends on use case
 
-**Bottom line:** We have a potentially good model, but we lack the statistical evidence to prove it.
+**Bottom line:** The model shows good development progress. Before production use, verify suspicious labels and consider expanding the test set.
