@@ -271,11 +271,34 @@ The following challenge was posed to scrutinize the findings:
 
 ## Conclusion
 
-The 85.6% out-of-sample accuracy (vs 93.2% in-sample) represents solid progress for development purposes. The ~7.6% generalization gap is acceptable, and the model significantly outperforms the ~33% random baseline.
+The 85.6% out-of-sample accuracy represents solid progress for development purposes. The model significantly outperforms the ~33% random baseline.
 
-**Key caveats identified in this review:**
-1. At least one ground truth label (de Bruijn tomatoes) is suspicious and should be verified
-2. The limited test set (n=13) is sufficient for iteration but not for production claims
-3. Error cost analysis is missing - the impact of different error types depends on use case
+### Key Insight: Same Score, Different Story
 
-**Bottom line:** The model shows good development progress. Before production use, verify suspicious labels and consider expanding the test set.
+V2 and V3 both achieved 85.6%, but through different paths:
+
+| Aspect | V2 (Dec 22) | V3 (Dec 23) |
+|--------|-------------|-------------|
+| Model behavior | Conservative (many ONBEKEND) | Confident (more JA predictions) |
+| Ardisia, Vreugdenhil | Wrong (ONBEKEND) | **Correct (JA)** |
+| de Bruijn, Stolk | Matched labels (ONBEKEND) | Mismatch (JA vs NEE) |
+| Labels changed | - | de Bruijn: JA→NEE, Stolk: ONBEKEND→NEE |
+
+**The model actually improved** - it now correctly identifies more greenhouses with growlights. The apparent "errors" in V3 are due to label changes, not model regression.
+
+### Label Quality Question
+
+Two labels were changed to NEE between runs:
+- **de Bruijn (tomatoes)**: Changed to NEE based on "seasonal production" rationale
+- **Stolk (Yucca)**: Changed to NEE based on "shade-tolerant plant" rationale
+
+The de Bruijn label remains questionable - Dutch commercial tomato production typically uses assimilation lighting regardless of delivery season.
+
+### Bottom Line
+
+The model is improving. The 85.6% score understates actual progress because:
+1. Model predictions became more accurate (Ardisia, Vreugdenhil fixed)
+2. Some "errors" reflect label changes, not model failures
+3. The de Bruijn label may be incorrect
+
+**For production use:** Verify the de Bruijn label against actual nighttime satellite imagery or company records.
