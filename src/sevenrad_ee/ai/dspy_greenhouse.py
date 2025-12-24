@@ -953,6 +953,23 @@ class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
 
     BELANGRIJK: Kaseigenaren adverteren NIET met belichting! Gebruik causaal redeneren.
 
+    ECONOMISCHE REALITEIT:
+    Professionele glastuinbouw bedrijven opereren MEESTAL jaarrond vanwege:
+    - Hoge vaste kosten kas/infrastructuur (hypotheek, arbeid, energie)
+    - Klanten (veilingen, retail) verwachten continue levering
+    - "Seizoensgebonden" in marketing ≠ seizoensgebonden operatie
+
+    UITZONDERINGEN op jaarrond operatie:
+    - Bollenteelt (tulpen, hyacinten) → echt seizoensgebonden vanwege rustperiode
+    - Vermeerderaars vs afkwekers → verschillende economie en lichtbehoeften
+
+    GEMENGDE GEWASSEN - BEDRIJFSNIVEAU CLASSIFICATIE:
+    De vraag is: "Gebruikt dit BEDRIJF commerciële groeilampen?" - niet per gewas.
+    Als EEN gewas in de operatie profiteert van LED/SON-T belichting:
+    - Het bedrijf heeft geïnvesteerd in belichtingsinfrastructuur
+    - Het bedrijf moet geclassificeerd worden als JA (gebruikt groeilampen)
+    Voorbeeld: Kweker met amaryllis + tulpen → amaryllis profiteert → bedrijf = JA
+
     STAP 1: Identificeer de kaseigenaar
     Zoek naar informatie over de KASEIGENAAR (niet alleen kweker!):
     - Kweker (teler van gewassen)
