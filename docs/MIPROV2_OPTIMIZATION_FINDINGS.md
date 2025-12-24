@@ -387,6 +387,10 @@ Two labels warrant verification:
 - Controlled ablation studies (single-variable changes)
 - Error cost analysis by use case
 
+### Infrastructure Improvements
+
+- **Save training predictions during optimization**: Modify `scripts/run_miprov2_optimization.py` to persist predictions on training set. Currently `optimized_detector.json` saves `traces: []` and `train: []` empty. Saving training predictions would enable in-sample accuracy verification and overfitting analysis.
+
 ### Priority 3 (Publication Ready)
 
 - Literature review (DSPy, MIPROv2, agricultural AI)
