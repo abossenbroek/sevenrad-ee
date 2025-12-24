@@ -1,0 +1,295 @@
+{
+  "company": "Van Onselen Aubergines B.V.",
+  "location": "'s Gravenzande",
+  "timestamp": "2025-10-25T18:06:56.321136",
+  "queries": [
+    {
+      "query": "\"Van Onselen Aubergines B.V.\" 's Gravenzande AND (assimilatiebelichting OR groeilicht OR \"belichte teelt\")",
+      "response_id": "c1a88256-50f8-4aba-962e-ee996df6075f",
+      "model": "sonar-pro",
+      "content": "Van Onselen Aubergines B.V. is een glastuinbouwbedrijf in 's-Gravenzande dat aubergines teelt in moderne kassen, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf gebruikmaakt van assimilatiebelichting, groeilicht of belichte teelt.\n\nEssenti\u00eble context en details:\n- Het bedrijf is gevestigd aan de Naaldwijkseweg 360, 2691 PZ, 's-Gravenzande en is actief in de glastuinbouwsector, waar het aubergines teelt en verpakt[1][3][4][5][6][7].\n- De offici\u00eble bedrijfswebsite benadrukt duurzame en voedselveilige teelt in moderne kassen, maar noemt geen specifieke toepassing van assimilatiebelichting of groeilicht[6].\n- In de Jaarrapportage 2023 van de gemeente Westland wordt Van Onselen Aubergines B.V. genoemd in de context van toezicht op assimilatiebelichting (kunstlicht voor plantengroei) in de regio[2]. Er wordt echter niet expliciet vermeld dat dit bedrijf assimilatiebelichting toepast; het wordt genoemd als een van de bedrijven waar controles plaatsvinden op naleving van regels rond assimilatiebelichting[2].\n- Assimilatiebelichting is een gangbare techniek in de glastuinbouw in Westland, en er worden periodiek nachtelijke controles uitgevoerd op het gebruik en de afscherming van groeilicht bij glastuinbouwbedrijven in de regio, waaronder Van Onselen Aubergines B.V.[2].\n\nSamengevat: Van Onselen Aubergines B.V. is actief in de glastuinbouw in een regio waar assimilatiebelichting veel voorkomt en wordt gecontroleerd, maar er is geen expliciet bewijs in de gevonden bronnen dat het bedrijf deze techniek daadwerkelijk toepast. De bedrijfswebsite en openbare bedrijfsprofielen maken hier geen melding van, en de gemeentelijke rapportage noemt het bedrijf alleen in de context van algemene controles op assimilatiebelichting in de sector[2][6].",
+      "citations": [
+        "https://companyinfo.nl/organisatieprofiel/teelt-van-groenten-onder-glas/van-onselen-aubergines-b-v-s-gravenzande-71266054-000010393757",
+        "https://westland.bestuurlijkeinformatie.nl/Document/View/f46ac7e6-c00a-4348-a163-a4bc1f662d46",
+        "https://nl.kompass.com/c/van-onselen-aubergines-b-v/nln3600359/",
+        "https://www.creditsafe.com/business-index/en-gb/company/van-onselen-aubergines-bv-nl04772032",
+        "https://www.compadex.com/nl/businesses/nl/van-onselen-aubergines-b-v-71266054-10393757",
+        "https://www.vanonselenaubergines.nl",
+        "https://www.telefoonboek.nl/bedrijven/t4951849/s-gravenzande/van-onselen-aubergines-b.v./"
+      ]
+    },
+    {
+      "query": "\"Van Onselen Aubergines B.V.\" AND (Signify OR Hortilux OR \"Philips LED\" OR Gavita)",
+      "response_id": "b8b40a6a-ed1f-4fd3-931c-5b8b043172f3",
+      "model": "sonar-pro",
+      "content": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.V. is a greenhouse horticulture company specializing in aubergine (eggplant) cultivation in 's-Gravenzande, Netherlands[1][4]. The company has been operating for over 35 years and grows aubergines in modern, state-of-the-art greenhouses that create ideal climate conditions[1][3]. The business is now being run by the third generation of the Van Onselen family[1].\n\nWhile one of the search results discusses North American growers visiting Dutch greenhouse operations to learn about Philips LED technology[2], Van Onselen Aubergines is not mentioned among the facilities visited during that tour. The tour included other Dutch operations such as Jami VOF (tomatoes), Gerja B.V. (cucumbers), Siberia B.V. (lettuce and leafy vegetables), and Wim Peters Kwekerijen (tomatoes)[2], but there is no indication that Van Onselen participated in this or uses these specific lighting technologies.\n\nThe search results do not contain information about what horticultural lighting systems Van Onselen Aubergines currently uses in their greenhouse operations.",
+      "citations": [
+        "https://purplepride.nl/en/growers-2/",
+        "https://www.signify.com/en-us/blog/archive/innovation/north-america-growers-visit-dutch-greenhouse-operations-to-learn-more-about-philips-brand-horticulture-lighting",
+        "https://www.vanonselenaubergines.nl",
+        "https://transfirm.nl/nl/organisatie/71266054-van-onselen-aubergines-b.v.?lang=en",
+        "https://www.creditsafe.com/business-index/en-gb/company/van-onselen-aubergines-bv-nl04772032",
+        "https://vb-greenhouses.com/meet-vb",
+        "https://www.greefa.com/projects/",
+        "https://www.creditsafe.com/business-index/nl-nl/company/van-onselen-aubergines-bv-nl04772032",
+        "https://www.hortidaily.com/article/9581167/from-eggplants-to-bullseyes-dirk-is-the-aubergenius/",
+        "https://www.vanonselenaubergines.nl/contact/"
+      ]
+    },
+    {
+      "query": "\"Van Onselen Aubergines B.V.\" AND (\"onbelichte teelt\" OR \"daglichtkas\" OR \"zonder kunstlicht\")",
+      "response_id": "c8bcba42-8fcb-4a92-98a2-a89e677fe613",
+      "model": "sonar-pro",
+      "content": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimilatiebelichting[1][3]. Dit betekent dat zij uitsluitend gebruikmaken van natuurlijk daglicht en niet investeren in jaarrondteelt met kunstlicht, vanwege de hoge energiekosten en de concurrentiepositie ten opzichte van Zuid-Europese producenten[1][3].\n\nEssenti\u00eble context:\n- **Teeltcyclus:** De oogst loopt tot eind oktober, waarna de kas wordt leeggemaakt en gereinigd. Pas in januari worden nieuwe planten gezet, omdat aubergines moeilijk te telen zijn bij een lage lichtsom en eerder planten met kunstlicht te veel energie zou kosten[1].\n- **Motivatie:** Van Onselen Aubergines overweegt wel jaarrondteelt met belichting, maar ziet dit als economisch niet haalbaar door concurrentie uit Spanje en de hoge energiekosten in Nederland[3].\n- **Specialisatie:** Het bedrijf teelt reguliere paarse aubergines en heeft \u00e9\u00e9n locatie voor specialties, maar ook deze worden zonder kunstlicht geteeld[1].\n\nAanvullende relevante informatie:\n- Van Onselen Aubergines B.V. behoort met circa 17 hectare tot de grootste auberginetelers in Nederland, verdeeld over vier locaties in \u2019s-Gravenzande en De Lier[1][11].\n- Het bedrijf is lid van Co\u00f6peratie Growers United, die de verkoop en marketing verzorgt[1].\n- De teeltstrategie is gericht op energiezuinigheid en het vermijden van de risico\u2019s en kosten die gepaard gaan met kunstmatige belichting[1][3].\n\nSamengevat: Van Onselen Aubergines B.V. kiest bewust voor een teelt zonder kunstlicht (\"onbelichte teelt\") en gebruikt geen daglichtkas met assimilatiebelichting, vanwege teelttechnische en economische overwegingen[1][3].",
+      "citations": [
+        "https://www.onderglas.nl/wij-hoeven-minder-op-het-scherpst-van-de-snede-te-wisselen/",
+        "https://www.glastuinbouwnederland.nl/nieuws/aubergine-in-balans-met-led-belichting-is-zeer-interessante-proef/pagina/17/?contactPerson=29&cHash=d0edf0f8d19d59743bb8fcf6e6d2c3e5",
+        "https://www.nieuweoogst.nl/nieuws/2019/07/08/van-onselen-aubergines-overweegt-jaarrondteelt",
+        "https://www.kasalsenergiebron.nl/nieuws/onderzoek-naar-succesvol-en-energiezuinig-aubergine-belichten/",
+        "https://www.vanonselenaubergines.nl",
+        "https://www.alfa.nl/naaldwijk/actueel/ondernemer-in-beeld-van-onselen-aubergines",
+        "https://www.groentennieuws.nl/article/9704159/van-onselen-aubergines-geeft-cyprioten-kijkje-in-de-kas/",
+        "https://www.onderglas.nl/betere-plantbalans-en-klimaat-brengt-belichte-teelt-dichterbij/",
+        "https://www.vanonselenaubergines.nl/historie/",
+        "https://www.kennisinjekas.nl/tuinbouwnl/Onderzoeken/14790_Telers_aan_zet__Aubergine_0.pdf",
+        "https://www.goedemorgengroente.nl/nieuws/ondernemen/ondernemer-in-beeld-van-onselen-aubergines",
+        "https://companyinfo.nl/organisatieprofiel/teelt-van-groenten-onder-glas/van-onselen-aubergines-b-v-s-gravenzande-71266054-000010393757",
+        "https://www.youtube.com/watch?v=TKIrU1I1je0",
+        "https://www.glastuinbouwnederland.nl/nieuws/onderzoek-naar-succesvol-en-energiezuinig-aubergine-belichten/pagina/19/?contactPerson=43&cHash=aa325f90010f0b52b191a4f96d3999e9",
+        "https://nl.kompass.com/c/van-onselen-aubergines-b-v/nln3600359/",
+        "https://www.kasalsenergiebron.nl/content/research/00020443.pdf",
+        "https://aardbeienvanhaalen.nl",
+        "https://www.compadex.com/nl/businesses/nl/m-h-j-m-hommel-holding-b-v-88658465-54506468"
+      ]
+    }
+  ],
+  "evidence": {
+    "positive": [],
+    "negative": [
+      {
+        "url": "https://www.onderglas.nl/wij-hoeven-minder-op-het-scherpst-van-de-snede-te-wisselen/",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.glastuinbouwnederland.nl/nieuws/aubergine-in-balans-met-led-belichting-is-zeer-interessante-proef/pagina/17/?contactPerson=29&cHash=d0edf0f8d19d59743bb8fcf6e6d2c3e5",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.nieuweoogst.nl/nieuws/2019/07/08/van-onselen-aubergines-overweegt-jaarrondteelt",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.kasalsenergiebron.nl/nieuws/onderzoek-naar-succesvol-en-energiezuinig-aubergine-belichten/",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.vanonselenaubergines.nl",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.alfa.nl/naaldwijk/actueel/ondernemer-in-beeld-van-onselen-aubergines",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.groentennieuws.nl/article/9704159/van-onselen-aubergines-geeft-cyprioten-kijkje-in-de-kas/",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.onderglas.nl/betere-plantbalans-en-klimaat-brengt-belichte-teelt-dichterbij/",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.vanonselenaubergines.nl/historie/",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.kennisinjekas.nl/tuinbouwnl/Onderzoeken/14790_Telers_aan_zet__Aubergine_0.pdf",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgengroente.nl/nieuws/ondernemen/ondernemer-in-beeld-van-onselen-aubergines",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://companyinfo.nl/organisatieprofiel/teelt-van-groenten-onder-glas/van-onselen-aubergines-b-v-s-gravenzande-71266054-000010393757",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.youtube.com/watch?v=TKIrU1I1je0",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.glastuinbouwnederland.nl/nieuws/onderzoek-naar-succesvol-en-energiezuinig-aubergine-belichten/pagina/19/?contactPerson=43&cHash=aa325f90010f0b52b191a4f96d3999e9",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://nl.kompass.com/c/van-onselen-aubergines-b-v/nln3600359/",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.kasalsenergiebron.nl/content/research/00020443.pdf",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://aardbeienvanhaalen.nl",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.compadex.com/nl/businesses/nl/m-h-j-m-hommel-holding-b-v-88658465-54506468",
+        "snippet": "Van Onselen Aubergines B.V. teelt aubergines in kassen in het Westland, maar kiest bewust voor een teeltstrategie zonder kunstmatige belichting (\"onbelichte teelt\") en dus geen daglichtkas met assimil",
+        "source": "reclassification",
+        "tier": "company_website"
+      }
+    ],
+    "ambiguous": [
+      {
+        "url": "https://companyinfo.nl/organisatieprofiel/teelt-van-groenten-onder-glas/van-onselen-aubergines-b-v-s-gravenzande-71266054-000010393757",
+        "snippet": "Van Onselen Aubergines B.V. is een glastuinbouwbedrijf in 's-Gravenzande dat aubergines teelt in moderne kassen, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf gebruikmaakt va",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://westland.bestuurlijkeinformatie.nl/Document/View/f46ac7e6-c00a-4348-a163-a4bc1f662d46",
+        "snippet": "Van Onselen Aubergines B.V. is een glastuinbouwbedrijf in 's-Gravenzande dat aubergines teelt in moderne kassen, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf gebruikmaakt va",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://nl.kompass.com/c/van-onselen-aubergines-b-v/nln3600359/",
+        "snippet": "Van Onselen Aubergines B.V. is een glastuinbouwbedrijf in 's-Gravenzande dat aubergines teelt in moderne kassen, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf gebruikmaakt va",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.creditsafe.com/business-index/en-gb/company/van-onselen-aubergines-bv-nl04772032",
+        "snippet": "Van Onselen Aubergines B.V. is een glastuinbouwbedrijf in 's-Gravenzande dat aubergines teelt in moderne kassen, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf gebruikmaakt va",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.compadex.com/nl/businesses/nl/van-onselen-aubergines-b-v-71266054-10393757",
+        "snippet": "Van Onselen Aubergines B.V. is een glastuinbouwbedrijf in 's-Gravenzande dat aubergines teelt in moderne kassen, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf gebruikmaakt va",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.vanonselenaubergines.nl",
+        "snippet": "Van Onselen Aubergines B.V. is een glastuinbouwbedrijf in 's-Gravenzande dat aubergines teelt in moderne kassen, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf gebruikmaakt va",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.telefoonboek.nl/bedrijven/t4951849/s-gravenzande/van-onselen-aubergines-b.v./",
+        "snippet": "Van Onselen Aubergines B.V. is een glastuinbouwbedrijf in 's-Gravenzande dat aubergines teelt in moderne kassen, maar er is geen direct bewijs in de beschikbare bronnen dat het bedrijf gebruikmaakt va",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://purplepride.nl/en/growers-2/",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.signify.com/en-us/blog/archive/innovation/north-america-growers-visit-dutch-greenhouse-operations-to-learn-more-about-philips-brand-horticulture-lighting",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "supplier_case_study"
+      },
+      {
+        "url": "https://www.vanonselenaubergines.nl",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://transfirm.nl/nl/organisatie/71266054-van-onselen-aubergines-b.v.?lang=en",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.creditsafe.com/business-index/en-gb/company/van-onselen-aubergines-bv-nl04772032",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://vb-greenhouses.com/meet-vb",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.greefa.com/projects/",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.creditsafe.com/business-index/nl-nl/company/van-onselen-aubergines-bv-nl04772032",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.hortidaily.com/article/9581167/from-eggplants-to-bullseyes-dirk-is-the-aubergenius/",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.vanonselenaubergines.nl/contact/",
+        "snippet": "Based on the available search results, there is no direct information connecting Van Onselen Aubergines B.V. with Signify, Hortilux, Philips LED, or Gavita lighting systems.\n\nVan Onselen Aubergines B.",
+        "source": "reclassification",
+        "tier": "company_website"
+      }
+    ]
+  },
+  "classification_suggestion": "NEGATIVE (no growlights)",
+  "dutch_terms_found": [
+    "belichte teelt",
+    "daglichtkas",
+    "zonder kunstlicht",
+    "kunstlicht",
+    "assimilatiebelichting",
+    "groeilicht",
+    "onbelichte teelt"
+  ],
+  "confidence_score": 1.0,
+  "notes": ""
+}

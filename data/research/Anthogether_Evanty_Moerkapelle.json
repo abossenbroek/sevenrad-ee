@@ -1,0 +1,351 @@
+{
+  "company": "Anthogether Evanty",
+  "location": "Moerkapelle",
+  "timestamp": "2025-11-11T12:18:37.459158",
+  "queries": [
+    {
+      "query": "\"Anthogether Evanty\" Moerkapelle AND (assimilatiebelichting OR groeilicht OR \"belichte teelt\")",
+      "response_id": "459f5202-1e8a-4756-8822-7858ca4ce522",
+      "model": "sonar-pro",
+      "content": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**\n- Evanty is een kwekerij in Moerkapelle die al meer dan 50 jaar anthuriums teelt, zowel als snijbloem als potplant. Het bedrijf staat bekend om zijn unieke kleinbloemige Anthuriums, verkocht onder de naam \"Lovely's\". (Bron: Anthogether.nl, Floraxchange.nl, Evanty.nl)\n- Evanty is een van de zes bedrijven die aangesloten zijn bij de telersvereniging Anthogether. (Bron: Anthogether.nl, Anthogether.nl/kwekers)\n\n**Assimilatiebelichting (groeilicht):**\n- In de beschikbare bronnen wordt **niet expliciet vermeld** dat Evanty of Anthogether in Moerkapelle gebruik maakt van assimilatiebelichting (groeilicht) of belichte teelt bij de teelt van anthuriums.\n- Er zijn wel algemene rapporten beschikbaar over de toepassing van assimilatiebelichting in de glastuinbouw, inclusief bij andere bloemsoorten zoals Alstroemeria en Aster. Deze rapporten geven aan dat assimilatiebelichting de productie in de winter kan verhogen en de uitgroei van bloemen kan versnellen, maar er zijn ook risico's zoals knopval bij te lang belichten. (Bron: edepot.wur.nl/391976, edepot.wur.nl/391523, edepot.wur.nl/392150)\n- Voor anthuriums wordt in de openbare bronnen niet specifiek aangegeven of en hoe assimilatiebelichting wordt toegepast.\n\n**Conclusie:**\n- Evanty in Moerkapelle is een gerenommeerde anthuriumkweker en lid van Anthogether.\n- Er is **geen directe informatie** gevonden in de openbare bronnen dat Evanty of Anthogether in Moerkapelle gebruik maakt van assimilatiebelichting of belichte teelt bij anthuriums. Voor specifieke informatie over hun teeltmethoden zou direct contact met het bedrijf of een persoonlijke bron nodig zijn.",
+      "citations": [
+        "https://anthogether.nl/kwekers/",
+        "https://edepot.wur.nl/391976",
+        "https://www.floraxchange.nl/Account/Kweker/13172/Anthogether-Evanty",
+        "https://edepot.wur.nl/274228",
+        "https://anthogether.nl",
+        "https://royalbrinkman.nl/elektrotechniek/verlichting/assimilatie-verlichting/",
+        "https://www.greenflor.nl/de-de/c/blumen",
+        "https://edepot.wur.nl/391989",
+        "https://evanty.nl",
+        "https://edepot.wur.nl/391523",
+        "https://www.onderglas.nl/gaat-om-balans-meerproductie-en-vruchtgewicht/",
+        "https://edepot.wur.nl/392150",
+        "https://w-ww.floraxchange.nl/Connectie/Kwekers?page=4",
+        "https://vannova.floraxchange.nl/Connectie/kwekers?page=4",
+        "https://nl.wikipedia.org/wiki/Assimilatieverlichting"
+      ]
+    },
+    {
+      "query": "\"Anthogether Evanty\" AND (Signify OR Hortilux OR \"Philips LED\" OR Gavita)",
+      "response_id": "cbf7ee70-f19b-42c7-ab54-2038498fa156",
+      "model": "sonar-pro",
+      "content": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or related business activities. The search results focus on major horticultural lighting companies and products, but do not mention Anthogether Evanty in any capacity[1][2][3][8][9].\n\n**Key companies in horticultural lighting** include:\n- **Signify (Philips Lighting)**\n- **Gavita Holland B.V.**\n- **Hortilux Schreder B.V.**\n- **Eye Hortilux**\n- **Philips LED (Signify)**\n- **Gavita**[1][2][3][8][9]\n\nThese companies are recognized for their innovation and market leadership in horticultural lighting, offering products such as LED grow lights, high-pressure sodium lamps, and advanced plasma fixtures[1][2][5][6][7][9]. Comparative reviews and catalogs highlight their product performance and technological advancements, but do not reference Anthogether Evanty[2][3].\n\nIf you are seeking information about a partnership, product, or technology involving Anthogether Evanty and any of these companies, there is no documentation or mention in the available sources. If Anthogether Evanty is a new or niche entity, it may not be covered in mainstream industry reports or product catalogs as of the latest available data.",
+      "citations": [
+        "https://www.globalbankingandfinance.com/horticulture-lighting-market-size-growth-and-key-companies-signify-philips-lighting-gavita-holland-b-v-ge-lighting-ge-lighting-current-osram-opto-semiconductors-agrolux-helios",
+        "http://strabo.bg/img/010316020629GAV13-1003CatalogusNederlandv3_WEB.pdf",
+        "https://www.youtube.com/watch?v=cTdN6EM7s4c",
+        "https://www.philips-hue.com/b-dam/b2b-li/en_AA/products/Horticulture/Horticulture-products/general-booklet-philips-horticulture-2015.pdf",
+        "https://www.lighting.philips.com/application-areas/specialist-applications/horticulture",
+        "https://www.assets.signify.com/is/content/Signify/Assets/signify/global/20230202-global-trade-catalog-december-2022.pdf",
+        "https://www.signify.com/global/our-company/news/press-release-archive/2017/20170614-philips-lighting-begins-largest-led-horticultural-lighting-project-in-the-world",
+        "https://www.openpr.com/news/3781181/grow-lights-market-expected-to-reach-rapid-growth-by-2031",
+        "https://gavita.com"
+      ]
+    },
+    {
+      "query": "\"Anthogether Evanty\" AND (\"onbelichte teelt\" OR \"daglichtkas\" OR \"zonder kunstlicht\")",
+      "response_id": "e85ab70b-d792-47f9-a10d-c5001278057d",
+      "model": "sonar-pro",
+      "content": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de beschikbare bronnen. Evanty is een van de zes kwekerijen binnen de telersvereniging Anthogether en teelt al meer dan 50 jaar anthuriums, zowel als snijbloem en als potplant[3][5]. De nadruk ligt op kwaliteit, service en een breed assortiment, maar er wordt niet expliciet melding gemaakt van teeltmethoden zonder kunstlicht of in daglichtkassen.\n\n**Essenti\u00eble context:**\n- Evanty heeft een productieoppervlakte van circa 25.000 m\u00b2 en is onderdeel van Anthogether, een vereniging die dagelijks via Royal Flora Holland handelt en een breed assortiment snijanthuriums aanbiedt[5].\n- In de beschikbare bedrijfsinformatie en promotieteksten wordt niet gesproken over *onbelichte teelt*, *daglichtkassen* of het expliciet vermijden van kunstlicht in de productie[1][3][5].\n- Er zijn in de sierteeltsector wel experimenten en ontwikkelingen rondom daglichtloze teelt en meerlagenteelt met uitsluitend kunstlicht, maar deze worden niet in verband gebracht met Anthogether Evanty of hun anthuriumteelt[2].\n\n**Aanvullende relevante informatie:**\n- De sector experimenteert met verschillende belichtingsstrategie\u00ebn, waaronder daglichtloze systemen en energiezuinige belichting, maar deze zijn vooral gericht op andere gewassen of op onderzoekssituaties[2][4].\n- Anthogether profileert zich vooral op assortiment, kwaliteit en snelle levering, niet op specifieke duurzame teeltmethoden zoals onbelichte teelt of daglichtkassen[5][7].\n\n**Conclusie op basis van beschikbare bronnen:**\nEr is geen bewijs dat Anthogether Evanty anthuriums teelt zonder kunstlicht of in daglichtkassen. De teeltwijze wordt niet nader gespecificeerd in de openbare bedrijfsinformatie, en er zijn geen expliciete claims over het vermijden van kunstlicht of het gebruik van uitsluitend daglicht in hun kassen.",
+      "citations": [
+        "https://bloomer.nl/inspiratie/op-bezoek-bij-de-kweker-anthogether-anthurium/",
+        "https://edepot.wur.nl/542953",
+        "https://www.floraxchange.nl/Account/Kweker/13172/Anthogether-Evanty",
+        "https://www.onderglas.nl/betere-plantbalans-en-klimaat-brengt-belichte-teelt-dichterbij/",
+        "https://anthogether.nl/kwekers/",
+        "https://libstore.ugent.be/fulltxt/RUG01/003/200/606/RUG01-003200606_2024_0001_AC.pdf",
+        "https://anthogether.nl/duurzaamheid/",
+        "https://www.plantlighting.nl/publicaties/",
+        "https://anthogether.nl",
+        "https://glitch-innovatie.eu/resources/uploads/2021/05/Rapportage-GLITCH-sla-2020-2021.pdf",
+        "https://ppflowers.freshportal.nl/pl/product/index/index/page/8/",
+        "https://libstore.ugent.be/fulltxt/RUG01/003/118/754/RUG01-003118754_2023_0001_AC.pdf",
+        "https://vannova.floraxchange.nl/Connectie/kwekers?page=4",
+        "https://www.glastuinbouwnederland.nl/content/user_upload/2022_Energiezuinige_belichting_bloeiende_potplanten_zonder_remmiddelen_Plant_Lighting.pdf",
+        "https://www.floraxchange.nl/Connectie/Kwekers?key=al&page=4",
+        "https://www.kasalsenergiebron.nl/content/research/Eindrapport_11292.pdf",
+        "https://anthogether.nl/verpakkingen/",
+        "https://edepot.wur.nl/205150",
+        "https://edepot.wur.nl/274081"
+      ]
+    }
+  ],
+  "evidence": {
+    "positive": [],
+    "negative": [],
+    "ambiguous": [
+      {
+        "url": "https://anthogether.nl/kwekers/",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/391976",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/13172/Anthogether-Evanty",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/274228",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://anthogether.nl",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://royalbrinkman.nl/elektrotechniek/verlichting/assimilatie-verlichting/",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.greenflor.nl/de-de/c/blumen",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/391989",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://evanty.nl",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://edepot.wur.nl/391523",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.onderglas.nl/gaat-om-balans-meerproductie-en-vruchtgewicht/",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/392150",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://w-ww.floraxchange.nl/Connectie/Kwekers?page=4",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://vannova.floraxchange.nl/Connectie/kwekers?page=4",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://nl.wikipedia.org/wiki/Assimilatieverlichting",
+        "snippet": "Op basis van de beschikbare zoekresultaten kan ik het volgende melden over Anthogether Evanty in Moerkapelle en hun gebruik van assimilatiebelichting (groeilicht):\n\n**Anthogether Evanty Moerkapelle:**",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.globalbankingandfinance.com/horticulture-lighting-market-size-growth-and-key-companies-signify-philips-lighting-gavita-holland-b-v-ge-lighting-ge-lighting-current-osram-opto-semiconductors-agrolux-helios",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "http://strabo.bg/img/010316020629GAV13-1003CatalogusNederlandv3_WEB.pdf",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.youtube.com/watch?v=cTdN6EM7s4c",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.philips-hue.com/b-dam/b2b-li/en_AA/products/Horticulture/Horticulture-products/general-booklet-philips-horticulture-2015.pdf",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.lighting.philips.com/application-areas/specialist-applications/horticulture",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.assets.signify.com/is/content/Signify/Assets/signify/global/20230202-global-trade-catalog-december-2022.pdf",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.signify.com/global/our-company/news/press-release-archive/2017/20170614-philips-lighting-begins-largest-led-horticultural-lighting-project-in-the-world",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "supplier_case_study"
+      },
+      {
+        "url": "https://www.openpr.com/news/3781181/grow-lights-market-expected-to-reach-rapid-growth-by-2031",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://gavita.com",
+        "snippet": "There is no evidence in the search results that **Anthogether Evanty** is directly associated with **Signify**, **Hortilux**, **Philips LED**, or **Gavita** in the context of horticultural lighting or",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://bloomer.nl/inspiratie/op-bezoek-bij-de-kweker-anthogether-anthurium/",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/542953",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Account/Kweker/13172/Anthogether-Evanty",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.onderglas.nl/betere-plantbalans-en-klimaat-brengt-belichte-teelt-dichterbij/",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://anthogether.nl/kwekers/",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://libstore.ugent.be/fulltxt/RUG01/003/200/606/RUG01-003200606_2024_0001_AC.pdf",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://anthogether.nl/duurzaamheid/",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.plantlighting.nl/publicaties/",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://anthogether.nl",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://glitch-innovatie.eu/resources/uploads/2021/05/Rapportage-GLITCH-sla-2020-2021.pdf",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://ppflowers.freshportal.nl/pl/product/index/index/page/8/",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://libstore.ugent.be/fulltxt/RUG01/003/118/754/RUG01-003118754_2023_0001_AC.pdf",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://vannova.floraxchange.nl/Connectie/kwekers?page=4",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.glastuinbouwnederland.nl/content/user_upload/2022_Energiezuinige_belichting_bloeiende_potplanten_zonder_remmiddelen_Plant_Lighting.pdf",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.floraxchange.nl/Connectie/Kwekers?key=al&page=4",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.kasalsenergiebron.nl/content/research/Eindrapport_11292.pdf",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://anthogether.nl/verpakkingen/",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/205150",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/274081",
+        "snippet": "Er zijn geen directe aanwijzingen dat **Anthogether Evanty** anthuriums teelt in een *onbelichte teelt* (zonder kunstlicht) of in een *daglichtkas* (kas die uitsluitend daglicht gebruikt) volgens de b",
+        "source": "query_3",
+        "tier": "company_website"
+      }
+    ]
+  },
+  "classification_suggestion": "NEGATIVE (no growlights)",
+  "dutch_terms_found": [
+    "assimilatiebelichting",
+    "zonder kunstlicht",
+    "belichte teelt",
+    "kunstlicht",
+    "daglichtkas",
+    "groeilicht",
+    "onbelichte teelt"
+  ],
+  "confidence_score": 0.75,
+  "notes": "Expected classification from VIIRS data analysis: NEGATIVE",
+  "manual_classification_date": "2025-11-11T12:43:34.824295"
+}

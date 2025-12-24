@@ -1,0 +1,712 @@
+"""
+Run full MIPROv2 optimization with PerplexityLM using native RAG.
+
+This script runs the complete MIPROv2 optimization using:
+- Student Model: PerplexityLM (sonar-pro) with native web search
+- Architecture: Single-stage Perplexity RAG (search + reason + cite in one call)
+- Optimization: MIPROv2 with Bayesian optimization (no teacher model needed)
+
+Key improvement from previous approach:
+- BEFORE: Perplexity Search → Cache → Text → DSPy Predictor → Parse (3+ LLM calls)
+- AFTER:  Perplexity RAG (search + reason + cite in ONE call) (1 LLM call)
+
+Expected runtime: 1-3 hours depending on dataset size
+Expected cost: ~1000+ API calls per optimization run (41 train x 20 candidates)
+
+Documentation Type: Script (Code to Run)
+Part of: Phase 3 GEPA Optimization Plan - Native Perplexity RAG
+"""
+
+import argparse
+import contextvars
+import json
+import logging
+import os
+import random
+import time
+import uuid
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+from dotenv import load_dotenv
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
+from sevenrad_ee.ai.dspy_evaluation import dutch_kas_gepa_metric
+from sevenrad_ee.ai.dspy_greenhouse import PerplexityKasDetector
+from sevenrad_ee.ai.dspy_perplexity import PerplexityLM
+from sevenrad_ee.ai.utils.logging_setup import (
+    get_logger,
+    phase_var,
+    request_id_var,
+    setup_logging,
+)
+from sklearn.model_selection import train_test_split
+
+try:
+    import dspy
+    from dspy.teleprompt import MIPROv2
+except ImportError as e:
+    msg = "dspy-ai package is required. Install with: uv pip install -e '.[dev]'"
+    raise ImportError(msg) from e
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Initialize logging FIRST (before creating any loggers)
+setup_logging(log_file="miprov2_optimization_debug.log")
+
+console = Console()
+logger = get_logger(__name__)
+
+# Random seed for reproducibility
+SEED = 42
+
+# Metrics tracking
+metrics = {
+    "optimization": {
+        "start_time": None,
+        "end_time": None,
+        "total_duration_seconds": 0.0,
+    },
+    "evaluation": {
+        "start_time": None,
+        "end_time": None,
+        "total_examples": 0,
+        "successful_predictions": 0,
+        "failed_predictions": 0,
+        "total_duration_seconds": 0.0,
+    },
+}
+
+
+def load_greenhouse_data(cache_dir: Path) -> list[dspy.Example]:
+    """
+    Load cached greenhouse data from JSON files.
+
+    Args:
+        cache_dir: Directory containing research JSON files
+
+    Returns:
+        List of dspy.Example objects with company data
+
+    """
+    examples = []
+    json_files = list(cache_dir.glob("*.json"))
+
+    console.print(f"[cyan]Loading data from {len(json_files)} JSON files...[/cyan]")
+
+    for json_file in json_files:
+        try:
+            data = json.loads(json_file.read_text())
+
+            # Extract fields from JSON
+            company_name = data.get("company", "")
+            location = data.get("location", "")
+
+            # Require ground truth labels (fail fast if missing)
+            if "is_greenhouse" not in data:
+                msg = (
+                    f"Missing 'is_greenhouse' label in {json_file.name}. "
+                    "Run scripts/label_training_data.py to add labels."
+                )
+                raise ValueError(msg)
+            if "uses_growlight" not in data:
+                msg = (
+                    f"Missing 'uses_growlight' label in {json_file.name}. "
+                    "Run scripts/label_training_data.py to add labels."
+                )
+                raise ValueError(msg)
+
+            is_greenhouse = data["is_greenhouse"]
+            uses_growlight = data["uses_growlight"]
+
+            # Convert English values to Dutch for PerplexityKasClassificatie
+            # is_kas: true/false (same as English)
+            is_kas = "true" if is_greenhouse else "false"
+
+            # gebruikt_groeilicht: JA/NEE/ONBEKEND
+            growlight_map = {
+                "YES": "JA",
+                "NO": "NEE",
+                "UNKNOWN": "ONBEKEND",
+                "NOT_APPLICABLE": "NEE",  # For non-greenhouses
+            }
+            gebruikt_groeilicht = growlight_map.get(uses_growlight, "ONBEKEND")
+
+            # Create dspy.Example with Dutch field names for PerplexityKasDetector
+            example = dspy.Example(
+                bedrijfsnaam=company_name,
+                locatie=location,
+                is_kas=is_kas,
+                gebruikt_groeilicht=gebruikt_groeilicht,
+                # Keep English fields for stratification
+                is_greenhouse=is_greenhouse,
+                uses_growlight=uses_growlight,
+            ).with_inputs("bedrijfsnaam", "locatie")
+
+            examples.append(example)
+
+        except (json.JSONDecodeError, KeyError) as e:
+            logger.warning("Failed to load %s: %s", json_file, e)
+            continue
+
+    console.print(f"[green]✓[/green] Loaded {len(examples)} examples")
+    return examples
+
+
+def run_optimization(
+    cache_dir: Path,
+    output_dir: Path,
+    test_size: float = 0.2,
+    val_size: float = 0.2,
+    num_candidates: int = 20,
+    init_temperature: float = 1.0,
+    max_errors: int = 50,
+) -> dict[str, Any]:
+    """
+    Run full MIPROv2 optimization with PerplexityLM using native RAG.
+
+    Uses PerplexityKasDetector which performs search + reason + cite in Dutch
+    in a single Perplexity API call. MIPROv2 optimizes the prompt that controls
+    both search behavior and classification reasoning.
+
+    Args:
+        cache_dir: Directory with labeled training data (JSON files with ground truth)
+        output_dir: Directory to save optimization results
+        test_size: Proportion of data to use for final testing
+        val_size: Proportion of training data to use for validation
+        num_candidates: Number of prompt candidates to generate per iteration.
+            Set to 20 (increased from 5) for structured extraction (per GEPA plan).
+        init_temperature: Initial temperature for Bayesian optimization
+        max_errors: Maximum errors to tolerate during bootstrapping.
+            Higher values push MIPROv2 harder by allowing more API failures.
+
+    Returns:
+        Dictionary with optimization results and metrics
+
+    """
+    # Set random seeds for reproducibility
+    random.seed(SEED)
+    np.random.seed(SEED)
+
+    # Create output directory
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Load data
+    all_data = load_greenhouse_data(cache_dir)
+
+    if len(all_data) == 0:
+        msg = f"No data found in {cache_dir}"
+        raise ValueError(msg)
+
+    console.print(f"[cyan]Total examples: {len(all_data)}[/cyan]")
+
+    # Split data: train+val / test
+    train_val_data, test_data = train_test_split(
+        all_data,
+        test_size=test_size,
+        random_state=SEED,
+        stratify=[ex.is_greenhouse for ex in all_data],
+    )
+
+    # Split train_val into train / val
+    train_data, val_data = train_test_split(
+        train_val_data,
+        test_size=val_size,
+        random_state=SEED,
+        stratify=[ex.is_greenhouse for ex in train_val_data],
+    )
+
+    console.print(
+        f"[cyan]Split: {len(train_data)} train, "
+        f"{len(val_data)} val, {len(test_data)} test[/cyan]"
+    )
+
+    # Save data splits
+    splits_file = output_dir / "data_splits.json"
+    splits_file.write_text(
+        json.dumps(
+            {
+                "total": len(all_data),
+                "train": len(train_data),
+                "val": len(val_data),
+                "test": len(test_data),
+                "test_size": test_size,
+                "val_size": val_size,
+                "seed": SEED,
+            },
+            indent=2,
+        )
+    )
+
+    # Configure student model (PerplexityLM) for predictions
+    console.print("\n[yellow]Configuring model...[/yellow]")
+    student_lm = PerplexityLM(
+        model="sonar-pro",
+        temperature=0,
+    )
+    dspy.configure(lm=student_lm)
+    console.print("[green]✓[/green] Student model: PerplexityLM (sonar-pro)")
+
+    # Create detector - uses native Perplexity RAG with Dutch signature
+    console.print(
+        "[cyan]Architecture: PerplexityKasDetector "
+        "(Dutch native RAG - search + reason + cite in one call)[/cyan]"
+    )
+    detector = PerplexityKasDetector()
+
+    # ===== PHASE 1: OPTIMIZATION =====
+    logger.info("=" * 80)
+    logger.info("STARTING PHASE 1: MIPROv2 OPTIMIZATION")
+    logger.info("=" * 80)
+    phase_var.set("optimization")
+    metrics["optimization"]["start_time"] = time.time()
+
+    # Configure MIPROv2
+    console.print(
+        "\n[yellow]Starting MIPROv2 optimization (this may take 1-3 hours)...[/yellow]"
+    )
+
+    optimizer = MIPROv2(
+        metric=dutch_kas_gepa_metric,
+        auto=None,  # Disable auto to use custom num_candidates
+        num_candidates=num_candidates,
+        init_temperature=init_temperature,
+        max_errors=max_errors,
+    )
+    console.print(f"[cyan]Max errors: {max_errors} (higher = push harder)[/cyan]")
+
+    # Run optimization
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Optimizing with MIPROv2...", total=None)
+
+        try:
+            # num_trials ~ 2x num_candidates recommended by MIPROv2
+            num_trials = num_candidates * 2
+            # minibatch_size must be <= valset size
+            minibatch_size = min(10, len(val_data))
+            optimized_detector = optimizer.compile(
+                detector,
+                trainset=train_data,
+                valset=val_data,
+                num_trials=num_trials,
+                minibatch_size=minibatch_size,
+            )
+            progress.update(task, completed=True)
+            console.print("[green]✓[/green] Optimization completed successfully")
+
+        except Exception as e:
+            logger.exception("Optimization failed")
+            console.print(f"[red]✗[/red] Optimization failed: {e}", style="bold red")
+            raise
+
+    metrics["optimization"]["end_time"] = time.time()
+    metrics["optimization"]["total_duration_seconds"] = (
+        metrics["optimization"]["end_time"] - metrics["optimization"]["start_time"]
+    )
+    opt_mins = metrics["optimization"]["total_duration_seconds"] / 60
+    logger.info("Optimization completed in %.1f minutes", opt_mins)
+
+    # Save optimized model
+    model_file = output_dir / "optimized_detector.json"
+    optimized_detector.save(str(model_file))
+    console.print(f"[green]✓[/green] Saved optimized model to {model_file}")
+
+    # ===== PHASE 2: EVALUATION =====
+    logger.info("=" * 80)
+    logger.info("STARTING PHASE 2: TEST SET EVALUATION")
+    logger.info("Evaluating %d test examples on optimized model", len(test_data))
+    logger.info("=" * 80)
+
+    phase_var.set("evaluation")
+    metrics["evaluation"]["start_time"] = time.time()
+    metrics["evaluation"]["total_examples"] = len(test_data)
+
+    console.print("\n[yellow]Evaluating on test set...[/yellow]")
+    test_scores = []
+    test_predictions = []
+
+    for i, example in enumerate(test_data):
+        # Generate unique ID for this evaluation
+        request_id = str(uuid.uuid4())[:8]
+        request_id_var.set(request_id)
+
+        logger.info("Processing test example %d/%d", i + 1, len(test_data))
+        logger.debug(
+            "Example input: bedrijfsnaam='%s', locatie='%s'",
+            example.bedrijfsnaam,
+            example.locatie,
+        )
+        logger.debug(
+            "Expected output: is_kas=%s, gebruikt_groeilicht=%s",
+            example.is_kas,
+            example.gebruikt_groeilicht,
+        )
+
+        start_time = time.time()
+
+        try:
+            # Call with Dutch field names
+            prediction = optimized_detector(
+                bedrijfsnaam=example.bedrijfsnaam,
+                locatie=example.locatie,
+            )
+
+            duration = time.time() - start_time
+
+            logger.info("Prediction successful in %.2fs", duration)
+            logger.debug(
+                "Prediction output: is_kas=%s, gebruikt_groeilicht=%s, zekerheid=%s",
+                prediction.is_kas,
+                prediction.gebruikt_groeilicht,
+                prediction.zekerheid,
+            )
+
+            score_result = dutch_kas_gepa_metric(example, prediction, None, None, None)
+            # ScoreWithFeedback has .score and .feedback attributes
+            score = score_result.score
+            feedback = score_result.feedback
+            test_scores.append(score)
+            test_predictions.append(
+                {
+                    "bedrijfsnaam": example.bedrijfsnaam,
+                    "true_is_kas": example.is_kas,
+                    "pred_is_kas": prediction.is_kas,
+                    "true_gebruikt_groeilicht": example.gebruikt_groeilicht,
+                    "pred_gebruikt_groeilicht": prediction.gebruikt_groeilicht,
+                    "score": score,
+                    "feedback": feedback,
+                    "request_id": request_id,
+                    "duration_seconds": duration,
+                }
+            )
+
+            metrics["evaluation"]["successful_predictions"] += 1
+            metrics["evaluation"]["total_duration_seconds"] += duration
+
+        except Exception as e:
+            duration = time.time() - start_time
+
+            logger.error("TEST EXAMPLE %d FAILED after %.2fs", i + 1, duration)
+            logger.error("Error type: %s", type(e).__name__)
+            logger.error("Error message: %s", e)
+            logger.exception("Full exception traceback:")
+
+            # Create error dump for reproducibility
+            error_dump = {
+                "timestamp": datetime.now().isoformat(),
+                "request_id": request_id,
+                "phase": "evaluation",
+                "example_index": i + 1,
+                "total_examples": len(test_data),
+                "example_data": {
+                    "bedrijfsnaam": example.bedrijfsnaam,
+                    "locatie": example.locatie,
+                    "expected_is_kas": example.is_kas,
+                    "expected_gebruikt_groeilicht": example.gebruikt_groeilicht,
+                },
+                "error": {
+                    "type": type(e).__name__,
+                    "message": str(e),
+                },
+            }
+
+            # Add API error details if available
+            if hasattr(e, "__cause__") and hasattr(e.__cause__, "response"):
+                error_dump["api_response"] = {
+                    "status_code": e.__cause__.response.status_code,
+                    "body": e.__cause__.response.text,
+                }
+
+            error_dump_file = output_dir / f"error_dump_{request_id}.json"
+            with open(error_dump_file, "w") as f:
+                json.dump(error_dump, f, indent=2)
+
+            logger.error("Error dump saved: %s", error_dump_file)
+            console.print(
+                f"[red]✗[/red] Test example {i+1} failed - "
+                f"see error_dump_{request_id}.json"
+            )
+
+            metrics["evaluation"]["failed_predictions"] += 1
+
+            # Continue to next example to see all failures
+            continue
+
+    # End of evaluation
+    metrics["evaluation"]["end_time"] = time.time()
+
+    logger.info("=" * 80)
+    logger.info("EVALUATION COMPLETE")
+    logger.info(
+        "Successful: %d/%d",
+        metrics["evaluation"]["successful_predictions"],
+        len(test_data),
+    )
+    logger.info(
+        "Failed: %d/%d",
+        metrics["evaluation"]["failed_predictions"],
+        len(test_data),
+    )
+    if len(test_scores) > 0:
+        logger.info(
+            "Average score: %.3f ± %.3f",
+            np.mean(test_scores),
+            np.std(test_scores),
+        )
+    logger.info("=" * 80)
+
+    # Calculate test metrics
+    avg_test_score = np.mean(test_scores)
+    std_test_score = np.std(test_scores)
+
+    console.print(f"[green]✓[/green] Test set evaluation completed")
+    console.print(
+        f"[cyan]Average test score: {avg_test_score:.3f} ± {std_test_score:.3f}[/cyan]"
+    )
+
+    # Save test results
+    test_results_file = output_dir / "test_results.json"
+    test_results_file.write_text(
+        json.dumps(
+            {
+                "test_scores": test_scores,
+                "avg_score": float(avg_test_score),
+                "std_score": float(std_test_score),
+                "predictions": test_predictions,
+            },
+            indent=2,
+        )
+    )
+
+    # Create results summary
+    results = {
+        "optimization_complete": True,
+        "model_path": str(model_file),
+        "test_results_path": str(test_results_file),
+        "avg_test_score": float(avg_test_score),
+        "std_test_score": float(std_test_score),
+        "num_train": len(train_data),
+        "num_val": len(val_data),
+        "num_test": len(test_data),
+        "optimizer": "MIPROv2",
+        "num_candidates": num_candidates,
+        "init_temperature": init_temperature,
+        "max_errors": max_errors,
+        "architecture": "PerplexityKasDetector (Dutch native RAG)",
+    }
+
+    return results
+
+
+def display_results(results: dict[str, Any]) -> None:
+    """
+    Display optimization results in formatted table.
+
+    Args:
+        results: Dictionary with optimization results
+
+    """
+    table = Table(
+        title="MIPROv2 Optimization Results",
+        show_header=True,
+        header_style="bold cyan",
+    )
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", justify="right")
+
+    table.add_row("Training Examples", f"{results['num_train']:,}")
+    table.add_row("Validation Examples", f"{results['num_val']:,}")
+    table.add_row("Test Examples", f"{results['num_test']:,}")
+    table.add_row("", "")  # Separator
+    table.add_row("Architecture", results.get("architecture", "N/A"))
+    table.add_row("Optimizer", results["optimizer"])
+    table.add_row("Num Candidates", str(results["num_candidates"]))
+    table.add_row("Init Temperature", str(results["init_temperature"]))
+    table.add_row("Max Errors", str(results.get("max_errors", "N/A")))
+    table.add_row("", "")  # Separator
+    table.add_row("Test Score (avg)", f"{results['avg_test_score']:.3f}")
+    table.add_row("Test Score (std)", f"{results['std_test_score']:.3f}")
+    table.add_row("", "")  # Separator
+    table.add_row("Optimized Model", str(Path(results["model_path"]).name))
+    table.add_row("Test Results", str(Path(results["test_results_path"]).name))
+
+    console.print("\n")
+    console.print(table)
+    console.print("\n[green]✓ MIPROv2 optimization completed successfully![/green]")
+
+
+def parse_arguments() -> argparse.Namespace:
+    """
+    Parse command-line arguments.
+
+    Returns:
+        Parsed arguments
+
+    """
+    parser = argparse.ArgumentParser(
+        description="Run full MIPROv2 optimization with PerplexityLM",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Run with default settings
+  uv run python scripts/run_miprov2_optimization.py \\
+    --cache-dir data/research \\
+    --output-dir results/miprov2_optimization
+
+  # Custom train/test split and MIPROv2 parameters
+  uv run python scripts/run_miprov2_optimization.py \\
+    --cache-dir data/research \\
+    --output-dir results/miprov2_optimization \\
+    --test-size 0.3 \\
+    --val-size 0.25 \\
+    --num-candidates 15 \\
+    --init-temperature 1.5
+        """,
+    )
+
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        required=True,
+        help="Directory containing cached research JSON files",
+    )
+
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        required=True,
+        help="Directory to save optimization results",
+    )
+
+    parser.add_argument(
+        "--test-size",
+        type=float,
+        default=0.2,
+        help="Proportion of data for test set (default: 0.2)",
+    )
+
+    parser.add_argument(
+        "--val-size",
+        type=float,
+        default=0.2,
+        help="Proportion of training data for validation (default: 0.2)",
+    )
+
+    parser.add_argument(
+        "--num-candidates",
+        type=int,
+        default=20,
+        help="Number of prompt candidates per iteration (default: 20)",
+    )
+
+    parser.add_argument(
+        "--init-temperature",
+        type=float,
+        default=1.0,
+        help="Initial temperature for Bayesian optimization (default: 1.0)",
+    )
+
+    parser.add_argument(
+        "--max-errors",
+        type=int,
+        default=50,
+        help="Maximum errors to tolerate during bootstrapping (default: 50). "
+        "Higher values push MIPROv2 harder by allowing more API failures.",
+    )
+
+    return parser.parse_args()
+
+
+def main() -> int:
+    """
+    Run MIPROv2 optimization.
+
+    Returns:
+        Exit code (0 for success, 1 for failure)
+
+    """
+    # Display header
+    console.print(
+        Panel.fit(
+            "[bold cyan]MIPROv2 Optimization with PerplexityLM[/bold cyan]\n"
+            "Native RAG: Perplexity search + reason + cite in one call\n"
+            "[dim]Student: PerplexityLM (no teacher model required)[/dim]",
+            border_style="cyan",
+        )
+    )
+
+    args = parse_arguments()
+
+    # Verify cache directory exists
+    if not args.cache_dir.exists():
+        console.print(
+            f"[red]✗[/red] Cache directory not found: {args.cache_dir}",
+            style="bold red",
+        )
+        return 1
+
+    # Run optimization
+    try:
+        results = run_optimization(
+            cache_dir=args.cache_dir,
+            output_dir=args.output_dir,
+            test_size=args.test_size,
+            val_size=args.val_size,
+            num_candidates=args.num_candidates,
+            init_temperature=args.init_temperature,
+            max_errors=args.max_errors,
+        )
+    except Exception as e:
+        console.print(f"[red]✗[/red] Optimization failed: {e}", style="bold red")
+        logger.exception("Optimization failed")
+        return 1
+
+    # Display results
+    display_results(results)
+
+    # Save summary
+    summary_file = args.output_dir / "optimization_summary.json"
+    summary_file.write_text(json.dumps(results, indent=2))
+    console.print(f"\n[green]✓[/green] Summary saved to {summary_file}")
+
+    # Print metrics summary
+    logger.info("")
+    logger.info("=" * 80)
+    logger.info("METRICS SUMMARY")
+    logger.info("=" * 80)
+
+    opt_duration = (metrics["optimization"]["end_time"] or time.time()) - metrics[
+        "optimization"
+    ]["start_time"]
+    eval_duration = (metrics["evaluation"]["end_time"] or time.time()) - metrics[
+        "evaluation"
+    ]["start_time"]
+
+    logger.info("")
+    logger.info("Optimization Phase:")
+    logger.info("  Duration: %.1f minutes", opt_duration / 60)
+
+    logger.info("")
+    logger.info("Evaluation Phase:")
+    logger.info("  Total Examples: %d", metrics["evaluation"]["total_examples"])
+    logger.info("  Successful: %d", metrics["evaluation"]["successful_predictions"])
+    logger.info("  Failed: %d", metrics["evaluation"]["failed_predictions"])
+    logger.info("  Duration: %.1f minutes", eval_duration / 60)
+    logger.info("=" * 80)
+    logger.info("")
+
+    return 0
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    raise SystemExit(main())

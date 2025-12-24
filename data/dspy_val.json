@@ -1,0 +1,26 @@
+[
+  {
+    "location_name": "Fachjan Project Plants",
+    "location_area": "Honselersdijk",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  },
+  {
+    "location_name": "Kwekerij Vicini Herenwerf",
+    "location_area": "Maasland",
+    "is_greenhouse": "YES",
+    "uses_growlight": "NEEDS_MANUAL_REVIEW"
+  },
+  {
+    "location_name": "Diamond Flowers",
+    "location_area": "Zuilichem",
+    "is_greenhouse": "YES",
+    "uses_growlight": "POSITIVE (uses growlights)"
+  },
+  {
+    "location_name": "Porta Nova",
+    "location_area": "Waddinxveen",
+    "is_greenhouse": "YES",
+    "uses_growlight": "POSITIVE (uses growlights)"
+  }
+]

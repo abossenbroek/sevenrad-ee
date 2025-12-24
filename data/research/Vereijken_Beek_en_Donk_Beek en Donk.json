@@ -1,0 +1,261 @@
+{
+  "company": "Vereijken Beek en Donk",
+  "location": "Beek en Donk",
+  "timestamp": "2025-11-11T12:20:46.585300",
+  "queries": [
+    {
+      "query": "\"Vereijken Beek en Donk\" Beek en Donk AND (assimilatiebelichting OR groeilicht OR \"belichte teelt\")",
+      "response_id": "54034ad9-a665-4c0d-ad7b-3f6dc713827a",
+      "model": "sonar-pro",
+      "content": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\nThe Beek en Donk location serves as one of Vereijken's primary production centers. The company currently cultivates tomatoes across more than 60 hectares distributed over 7 growing facilities in North Brabant, Limburg, and the Westland region, with 40 hectares dedicated to illuminated cultivation.[5] The Beek en Donk facility itself features modern infrastructure, including a 6,000 square meter packaging hall that was constructed as part of the company's expansion efforts.[1]\n\n## Illuminated Cultivation Systems\n\nVereijken has implemented advanced climate control and lighting systems at the Beek en Donk location. The facility operates using principles aligned with modern cultivation techniques, including the application of assimilation lighting (groeilicht) for enhanced crop production.[2][3] Since 2010, Vereijken has gained substantial experience with the Covent-G Climate Optimizer system at this location, which manages greenhouse air conditioning and humidity control through controlled dehumidification using outside air.[4] This system works in combination with energy screens to achieve significant energy cost savings while maintaining optimal growing conditions for the tomatoes.[4]\n\n## Contact Information\n\nThe Beek en Donk facility is located at Peeldijk 6a, 5741 PC Beek en Donk, and can be reached at +31(0)492-461345.[7]",
+      "citations": [
+        "https://vereijkenkwekerijen.nl/over-ons/",
+        "https://www.wur.nl/upload_mm/d/3/5/8b5f5909-8769-44c2-93cf-8e74399db4b5_EINDRAPPORT%20INES-GELDERLAND%20GTB-1233-juli2013.pdf",
+        "https://core.ac.uk/download/pdf/29218386.pdf",
+        "https://www.rvo.nl/sites/default/files/2018/07/Samenvatting-projecten-subsidie-Marktintroductie-energie-innovatie-tweede-openstelling-2012.pdf",
+        "https://vereijkenkwekerijen.nl",
+        "https://www.glastuinbouwnederland.nl/nieuws/assimilatiebelichting-afschermen-vanaf-1-september-2023/",
+        "https://vereijkenkwekerijen.nl/contact/",
+        "https://edepot.wur.nl/274228",
+        "https://www.helmond.nl/internet/PlanMER-Groene-Peelvallei.pdf"
+      ]
+    },
+    {
+      "query": "\"Vereijken Beek en Donk\" AND (Signify OR Hortilux OR \"Philips LED\" OR Gavita)",
+      "response_id": "bccd9756-066a-437c-ad24-97e95ee3aaa3",
+      "model": "sonar-pro",
+      "content": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlichtingssystemen.\n\n- Vereijken heeft expliciet gekozen voor **LED\u2019s van Hortilux** voor een deel van hun teelt. Een belangrijk verschil met de lampen van Signify is de manier waarop het licht wordt verspreid: Hortilux-LED\u2019s richten een meer geconcentreerde bundel schuin naar beneden, terwijl Signify-modules het licht horizontaal verspreiden. Dit verschil in lichtverdeling is relevant voor de positionering van de lampen ten opzichte van het gewas[7].\n- Er is ook sprake van eerdere of parallelle inzet van **Signify/Philips LED**-systemen bij Vereijken, waarmee al veel onderzoek is gedaan. De vergelijking tussen Hortilux en Signify wordt expliciet gemaakt in de context van proeven met verschillende lichtspectra en -intensiteiten[7].\n- Dronebeelden van de nieuwe huisvesting in Beek en Donk zijn gedeeld op social media, waarbij Signify wordt genoemd in de context van gesprekken over verlichting, wat wijst op een relatie of samenwerking[5].\n- Vereijken Beek en Donk wordt in internationale projectoverzichten genoemd als locatie waar **LED-groeilampen** voor tomaten worden toegepast, maar zonder merkvermelding[2].\n\nEr zijn geen aanwijzingen in de zoekresultaten dat **Gavita** betrokken is bij de verlichtingsinstallaties van Vereijken Beek en Donk.\n\nSamengevat: **Vereijken Kwekerijen in Beek en Donk werkt met LED-groeilampen van zowel Hortilux als Signify (Philips LED)**, met duidelijke technische en operationele vergelijkingen tussen deze systemen. Gavita wordt niet genoemd in relatie tot deze locatie[5][7].",
+      "citations": [
+        "https://vereijkenkwekerijen.nl/over-ons/",
+        "https://www.horti-growlight.com/en-gb/projects/vereijken-beek-en-donk",
+        "https://www.groentennieuws.nl/article/9642920/vereijken-kwekerijen-koopt-grond-voor-groei/",
+        "https://www.lighting.philips.nl/toepassingsgebieden/specialist-applications/led-groeilampen/partners",
+        "https://www.goedemorgentuinbouw.nl/nieuws/op-social-media/dronebeelden-vereijken",
+        "https://www.signify.com/nl-nl/partner-program",
+        "https://www.onderglas.nl/lang-niet-alles-bekend-over-toevoegen-verrood-licht-aan-spectrum/",
+        "https://vereijkenkwekerijen.nl",
+        "https://bizzy.org/nl/nl/17187155/vereijken-vastgoed-beek-en-donk-bv",
+        "https://www.goedemorgenaardbei.nl/nieuws/hygine/ook-isf-higher-level-voor-vereijken-in-s-gravenzande",
+        "https://vereijkeninterieurbouw.nl/over-ons/",
+        "https://vereijkenkwekerijen.nl/vestigingen/"
+      ]
+    },
+    {
+      "query": "\"Vereijken Beek en Donk\" AND (\"onbelichte teelt\" OR \"daglichtkas\" OR \"zonder kunstlicht\")",
+      "response_id": "ae15fcad-31c4-4083-bcbb-316c0886e2bf",
+      "model": "sonar-pro",
+      "content": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus als **onbelichte teelt**[1][2][4]. Er is geen directe aanwijzing dat Vereijken een \"daglichtkas\" (een kas met speciale daglichttechnologie) exploiteert, maar er zijn wel connecties met innovatie in energiezuinige teelt en deelname aan bijeenkomsten over daglichtkassen.\n\nEssenti\u00eble context en details:\n- Vereijken Kwekerijen heeft in Beek en Donk een kas waar **onbelichte cocktailtomaten** worden geteeld, dus zonder gebruik van assimilatiebelichting (kunstlicht)[4]. Dit wordt bevestigd in een rapport over \"Het Nieuwe Telen\", waarin de energiebesparing van deze onbelichte teelt wordt besproken.\n- In een verslag van een netwerkbijeenkomst in 2012 wordt gemeld dat bij Vereijken Kwekerijen in Beek en Donk een rondleiding werd gegeven, waarbij de **onbelichte kas met twee energieschermen** werd getoond als voorbeeld van toekomstgerichte teeltsystemen zonder kunstlicht[2].\n- Vereijken Kwekerijen heeft een sterke focus op innovatie en energiezuinige teelt, onder andere door toepassing van \"Het Nieuwe Telen\", wat inhoudt dat klimaat en energiegebruik in de kas geoptimaliseerd worden, onder meer door het gebruik van energieschermen en luchtbehandelingssystemen[4].\n- Er is geen expliciet bewijs dat Vereijken in Beek en Donk een \"daglichtkas\" in de strikte zin (zoals ontwikkeld door WUR, met lenzen en zonnecollectoren in het kasdek) exploiteert, maar het bedrijf is wel betrokken bij discussies en bijeenkomsten over dit soort innovaties[2].\n\nSamengevat:\n- **Vereijken Beek en Donk teelt tomaten in onbelichte kassen, dus zonder kunstlicht**.\n- Er is geen direct bewijs voor een daglichtkas, maar wel voor energiezuinige, innovatieve teeltmethoden zonder assimilatiebelichting[2][4].",
+      "citations": [
+        "https://vereijkenkwekerijen.nl",
+        "https://www.wur.nl/upload_mm/d/3/5/8b5f5909-8769-44c2-93cf-8e74399db4b5_EINDRAPPORT%20INES-GELDERLAND%20GTB-1233-juli2013.pdf",
+        "https://www.groentennieuws.nl/article/9642920/vereijken-kwekerijen-koopt-grond-voor-groei/",
+        "https://edepot.wur.nl/175668",
+        "https://kassenbouw.com/project/vereijken-kwekerijen/",
+        "https://vereijkenkwekerijen.nl/werken-bij/",
+        "https://www.onderglas.nl/bij-aanpak-galmijt-is-het-van-groot-belang-dat-je-er-vroeg-bij-bent/",
+        "https://www.laarbeekseboeren.nl/vereijken-kwekerijen/",
+        "https://nl.kompass.com/c/vereijken-kwekerijen-b-v/nl490968/"
+      ]
+    }
+  ],
+  "evidence": {
+    "positive": [
+      {
+        "url": "https://vereijkenkwekerijen.nl/over-ons/",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.wur.nl/upload_mm/d/3/5/8b5f5909-8769-44c2-93cf-8e74399db4b5_EINDRAPPORT%20INES-GELDERLAND%20GTB-1233-juli2013.pdf",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://core.ac.uk/download/pdf/29218386.pdf",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.rvo.nl/sites/default/files/2018/07/Samenvatting-projecten-subsidie-Marktintroductie-energie-innovatie-tweede-openstelling-2012.pdf",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://vereijkenkwekerijen.nl",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.glastuinbouwnederland.nl/nieuws/assimilatiebelichting-afschermen-vanaf-1-september-2023/",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://vereijkenkwekerijen.nl/contact/",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://edepot.wur.nl/274228",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.helmond.nl/internet/PlanMER-Groene-Peelvallei.pdf",
+        "snippet": "Vereijken Kwekerijen operates a significant facility in Beek en Donk that specializes in the cultivation of Tasty Tom cluster tomatoes using advanced lighting technology.[1][5]\n\n## Facility Overview\n\n",
+        "source": "query_1",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://vereijkenkwekerijen.nl/over-ons/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.horti-growlight.com/en-gb/projects/vereijken-beek-en-donk",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.groentennieuws.nl/article/9642920/vereijken-kwekerijen-koopt-grond-voor-groei/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.lighting.philips.nl/toepassingsgebieden/specialist-applications/led-groeilampen/partners",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.goedemorgentuinbouw.nl/nieuws/op-social-media/dronebeelden-vereijken",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://www.signify.com/nl-nl/partner-program",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.onderglas.nl/lang-niet-alles-bekend-over-toevoegen-verrood-licht-aan-spectrum/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://vereijkenkwekerijen.nl",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://bizzy.org/nl/nl/17187155/vereijken-vastgoed-beek-en-donk-bv",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.goedemorgenaardbei.nl/nieuws/hygine/ook-isf-higher-level-voor-vereijken-in-s-gravenzande",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://vereijkeninterieurbouw.nl/over-ons/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://vereijkenkwekerijen.nl/vestigingen/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk gebruikt **LED-groeilampen** voor de tomatenteelt, en er is directe betrokkenheid met zowel **Hortilux** als **Signify (voorheen Philips Lighting)** bij hun verlic",
+        "source": "query_2",
+        "tier": "company_website"
+      }
+    ],
+    "negative": [
+      {
+        "url": "https://vereijkenkwekerijen.nl",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "general_web"
+      },
+      {
+        "url": "https://www.wur.nl/upload_mm/d/3/5/8b5f5909-8769-44c2-93cf-8e74399db4b5_EINDRAPPORT%20INES-GELDERLAND%20GTB-1233-juli2013.pdf",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.groentennieuws.nl/article/9642920/vereijken-kwekerijen-koopt-grond-voor-groei/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "trade_media_nl"
+      },
+      {
+        "url": "https://edepot.wur.nl/175668",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://kassenbouw.com/project/vereijken-kwekerijen/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://vereijkenkwekerijen.nl/werken-bij/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.onderglas.nl/bij-aanpak-galmijt-is-het-van-groot-belang-dat-je-er-vroeg-bij-bent/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://www.laarbeekseboeren.nl/vereijken-kwekerijen/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "company_website"
+      },
+      {
+        "url": "https://nl.kompass.com/c/vereijken-kwekerijen-b-v/nl490968/",
+        "snippet": "Vereijken Kwekerijen in Beek en Donk teelt tomaten zowel in belichte als in **onbelichte kassen**; specifiek wordt op de locatie Beek en Donk een deel van de teelt uitgevoerd zonder kunstlicht, dus al",
+        "source": "query_3",
+        "tier": "company_website"
+      }
+    ],
+    "ambiguous": []
+  },
+  "classification_suggestion": "POSITIVE (uses growlights)",
+  "dutch_terms_found": [
+    "assimilatiebelichting",
+    "zonder kunstlicht",
+    "belichte teelt",
+    "kunstlicht",
+    "daglichtkas",
+    "groeilicht",
+    "onbelichte teelt"
+  ],
+  "confidence_score": 0.85,
+  "notes": "Expected classification from VIIRS data analysis: POSITIVE",
+  "manual_classification_date": "2025-11-11T12:43:34.820814"
+}

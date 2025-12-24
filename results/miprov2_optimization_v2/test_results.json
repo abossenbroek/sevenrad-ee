@@ -1,0 +1,164 @@
+{
+  "test_scores": [
+    0.55,
+    0.55,
+    1.0,
+    1.0,
+    1.0,
+    0.55,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.85,
+    1.0,
+    0.625
+  ],
+  "avg_score": 0.8557692307692307,
+  "std_score": 0.19615384615384612,
+  "predictions": [
+    {
+      "bedrijfsnaam": "Van den Bos Premium Ardisia's",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "ONBEKEND",
+      "score": 0.55,
+      "feedback": "FOUT gebruikt_groeilicht: voorspeld ONBEKEND, verwacht JA | TIP: Model zegt ONBEKEND maar verwacht JA - gebruik gewastype om belichting af te leiden | GOED: Gewas ge\u00efdentificeerd: 'Ardisia crenata (rode, witte, zalm, roze varianten)'",
+      "request_id": "e7869d33",
+      "duration_seconds": 7.590186834335327
+    },
+    {
+      "bedrijfsnaam": "Tomatenkwekerij A. de Bruijn en Zn.",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "ONBEKEND",
+      "score": 0.55,
+      "feedback": "FOUT gebruikt_groeilicht: voorspeld ONBEKEND, verwacht JA | TIP: Model zegt ONBEKEND maar verwacht JA - gebruik gewastype om belichting af te leiden | GOED: Gewas ge\u00efdentificeerd: 'tomaten (losse ronde tomaten, ras Axxy)'",
+      "request_id": "55b35340",
+      "duration_seconds": 20.175834894180298
+    },
+    {
+      "bedrijfsnaam": "Kwekerij De Opstal V.O.F.",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "JA",
+      "score": 1.0,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'trosrozen (snijrozen)'",
+      "request_id": "9fc64441",
+      "duration_seconds": 9.143260955810547
+    },
+    {
+      "bedrijfsnaam": "Vereijken 's-Gravenzande B.V.",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "JA",
+      "score": 1.0,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'trostomaten'",
+      "request_id": "028ddeff",
+      "duration_seconds": 8.13437795639038
+    },
+    {
+      "bedrijfsnaam": "Nunhems Netherlands BV",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "JA",
+      "score": 1.0,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'hydroponische sla (lettuce), high-wire komkommers'",
+      "request_id": "5358d16e",
+      "duration_seconds": 9.385284900665283
+    },
+    {
+      "bedrijfsnaam": "Vreugdenhil Bulbs & Plants",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "ONBEKEND",
+      "score": 0.55,
+      "feedback": "FOUT gebruikt_groeilicht: voorspeld ONBEKEND, verwacht JA | TIP: Model zegt ONBEKEND maar verwacht JA - gebruik gewastype om belichting af te leiden | GOED: Gewas ge\u00efdentificeerd: 'amaryllis, Zantedeschia (calla), tulpen, bol- en knolgewassen'",
+      "request_id": "7d80318e",
+      "duration_seconds": 8.836123704910278
+    },
+    {
+      "bedrijfsnaam": "N.L. van Geest bv",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "JA",
+      "score": 1.0,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'Amaryllis (Hippeastrum) bollen en bloemen'",
+      "request_id": "8e3ff548",
+      "duration_seconds": 8.912246227264404
+    },
+    {
+      "bedrijfsnaam": "Bernhard Optimum",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "JA",
+      "score": 1.0,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'snijrozen (Avalanche), Phalaenopsis, tuinplanten'",
+      "request_id": "c772c31b",
+      "duration_seconds": 8.623239278793335
+    },
+    {
+      "bedrijfsnaam": "WPK - Westlandse Plantenkwekerij",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "JA",
+      "score": 1.0,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'tomatenplanten, paprikaplanten, komkommerplanten (opkweek)'",
+      "request_id": "c75ffee0",
+      "duration_seconds": 6.878491163253784
+    },
+    {
+      "bedrijfsnaam": "Vereijken Kwekerijen",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "JA",
+      "score": 1.0,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'trostomaten (Tasty Tom)'",
+      "request_id": "d455f531",
+      "duration_seconds": 17.191832065582275
+    },
+    {
+      "bedrijfsnaam": "J.H.A. Stolk Kwekerij",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "ONBEKEND",
+      "pred_gebruikt_groeilicht": "ONBEKEND",
+      "score": 0.85,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'Yucca's, Areca (goudpalm), Spathiphyllum, Fatsia japonica, Monstera deliciosa, groeneplanten mix'",
+      "request_id": "4384dedb",
+      "duration_seconds": 17.551077127456665
+    },
+    {
+      "bedrijfsnaam": "Batist Westmade",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "JA",
+      "score": 1.0,
+      "feedback": "GOED: Gewas ge\u00efdentificeerd: 'gerbera'",
+      "request_id": "6317fcf1",
+      "duration_seconds": 6.813647747039795
+    },
+    {
+      "bedrijfsnaam": "Kwekerij Jongland B.V.",
+      "true_is_kas": "true",
+      "pred_is_kas": "true",
+      "true_gebruikt_groeilicht": "JA",
+      "pred_gebruikt_groeilicht": "ONBEKEND",
+      "score": 0.625,
+      "feedback": "FOUT gebruikt_groeilicht: voorspeld ONBEKEND, verwacht JA | TIP: Model zegt ONBEKEND maar verwacht JA - gebruik gewastype om belichting af te leiden | GOED: Gewas ge\u00efdentificeerd: 'groenten (ongespecificeerd)'",
+      "request_id": "9f4885b6",
+      "duration_seconds": 14.222655057907104
+    }
+  ]
+}
