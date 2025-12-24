@@ -1033,11 +1033,16 @@ class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
     - Is het AANNEMELIJK dat de kaseigenaar LED en/of SON-T gebruikt?
     - Weeg kosten/baten af voor dit specifieke gewas en bedrijfstype
 
-    STAP 6: Controleer op negatieve indicatoren:
+    STAP 6: Controleer op negatieve indicatoren (alleen EXPLICIETE vermeldingen!):
     - "onbelichte teelt" = geen kunstlicht → NEE
     - "daglichtkas" = alleen daglicht → NEE
-    - Alleen zomerproductie/seizoensgebonden → waarschijnlijk NEE
+    - "wij telen zonder kunstlicht" → expliciet NEE
     - Buitenteelt (vollegrond) → NEE
+
+    GEEN contra-indicatoren (leiden NIET tot NEE):
+    - "seizoensgebonden" / "maart-oktober" → vaak LEVERINGS-periode, niet operatieperiode
+    - "biologisch" → veel bio-telers belichten wél
+    - Geen vermelding van belichting → normaal, telers adverteren niet met belichting
 
     BEDRIJFSTYPE ≠ FACILITEITSTYPE:
     - Veredelingsbedrijf MET kassen → is_kas = True, beoordeel belichting apart
