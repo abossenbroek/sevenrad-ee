@@ -1191,7 +1191,8 @@ class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
             "6. PLAUSIBILITEIT: Is het AANNEMELIJK dat deze kaseigenaar investeert in LED/SON-T?\n"
             "   - Kosten/baten voor dit bedrijfstype\n"
             "   - Gewenste kwaliteitskenmerken (grotere bloem, betere houdbaarheid)\n"
-            "7. NEGATIEF: Zijn er contra-indicatoren? (onbelichte teelt, daglichtkas, buitenteelt)\n"
+            "7. NEGATIEF: Zijn er EXPLICIETE contra-indicatoren? (onbelichte teelt, daglichtkas)\n"
+            "   LET OP: 'seizoensgebonden' of 'maart-oktober' is GEEN contra-indicator!\n"
             "8. CONCLUSIE: gewastype + literatuur + spectrum + plausibiliteit → belichtingsgebruik.\n"
             "VERMELD alle bronnen: URLs, WUR rapporten, Signify case studies, etc."
         )
