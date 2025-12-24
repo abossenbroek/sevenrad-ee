@@ -949,6 +949,13 @@ class PerplexityKasClassificatie(Signature):  # type: ignore[misc]
     """
     Classificeer of een locatie een COMMERCIËLE kas is met belichting.
 
+    JE BENT EEN RAG MODEL - ZOEK ACTIEF:
+    Je hebt toegang tot webzoeken. GEBRUIK deze actief bij elke classificatie!
+    - Zoek: "{bedrijfsnaam} glastuinbouw kwekerij"
+    - Zoek: "{gewas} assimilatiebelichting Nederland"
+    - Zoek: "WUR {gewas}" of "Signify {gewas} case study"
+    Zoek op SOORT niveau (tomaat, roos), NIET cultivar niveau (Axxy, Red Naomi).
+
     CONTEXT: Dit betreft COMMERCIËLE glastuinbouw, niet hobby of onderzoek.
 
     BELANGRIJK: Kaseigenaren adverteren NIET met belichting! Gebruik causaal redeneren.
